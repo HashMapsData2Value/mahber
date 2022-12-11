@@ -27,7 +27,7 @@ Let n=π, *k_π* and K_π represent the prover.
 
 1. Generate key image *K^~* = *k_π* \* *Hp(K_π)*
 2. Generate random integers *a* and *r_i* for i member of *1*, *2*, ..., *n* EXCEPT for *r_π*.
-3. Compute *c_{π+1}* = *Hn(m || a\*G || aHp(K_π))*
+3. Compute *c_{π+1}* = *Hn(m || a\*G || a\*Hp(K_π))*
 4. For *i* = *π+1*, *π+2*, ..., *n*, *1*, *2*, ..., *π-1* (looping around after *n* to *1*) compute
     *c_{i+1}* = *Hn(m || r_i \* G + c_i \* K_i || r_i \* Hp(K_i) + c_i \* K^~)*
 5. Define *r_π* = *a* - *c_π* \* *k_π*
