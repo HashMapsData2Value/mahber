@@ -21,11 +21,11 @@ We can use this property of ring signatures to prove to the SC that account B re
 
 # Math
 
-Let R = {K_1, K_2, ..., K_n} be a collection of *n* public keys, also known as a ring *R*. Each corresponds to a private key *k_n*. *Hp* is a hash-function that links a point to another point on the curve. *Hn* is a normal scalar to scalar hash-function, e.g. Keccak. *G* is the generator such that *K_n* = *k_n* \* G (mod *l*). The *+* and \* operators are either scalar or curve point operators depending on the case. *m* is the message that is being signed. In general things are happening (mod *l*).
+Let *R* = {*K_1, K_2, ..., K_n*} be a collection of *n* public keys, also known as a ring *R*. Each corresponds to a private key *k_n*. *Hp* is a hash-function that links a point to another point on the curve. *Hn* is a normal scalar to scalar hash-function, e.g. Keccak. *G* is the generator such that *K_n* = *k_n* \* G (mod *l*). The *+* and \* operators are either scalar or curve point operators depending on the case. *m* is the message that is being signed. In general things are happening (mod *l*).
 
 Let n=π, *k_π* and K_π represent the prover.
 
-1. Generate key image *K^~* = *k_π* x *Hp(K_π)*
+1. Generate key image *K^~* = *k_π* \* *Hp(K_π)*
 2. Generate random integers *a* and *r_i* for i member of *1*, *2*, ..., *n* EXCEPT for *r_π*.
 3. Compute *c_{π+1}* = *Hn(m || a\*G || aHp(K_π))*
 4. For *i* = *π+1*, *π+2*, ..., *n*, *1*, *2*, ..., *π-1* (looping around after *n* to *1*) compute
@@ -44,6 +44,6 @@ What about verification? The SC has to verify that things are correct. It does s
 Refer to Zero to Monero 2.0 pages 30-31 for more in-depth and rigurous explanations.
 
 # Issues 
-- For the smart contract to be able to verify it needs the introduction of some Ed25519 opcodes, like scalar multiplicaton. *K^~* is itself not created from *G* but rather follows.
+- For the smart contract to be able to verify it needs the introduction of some Ed25519 opcodes, like scalar multiplicaton. *K^~* is itself not created from *G*.
 - Unclear at this stage how this could scale to many keys. Should the SC max out at 10? Or could it grow to arbitrary sizes, with the caveat being that the extractor has to pay extra for a larger ring size with many more public keys? Perhaps the user could be forced to pass on the indices of the public keys they want
 - Could this be expanded to do "private DAOs"? I.e., an SC that basically contains the treasuries of several DAOs?
