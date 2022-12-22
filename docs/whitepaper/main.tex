@@ -129,7 +129,6 @@ The LibSodium fork has a function called \href{https://github.com/algorand/go-al
 
 The LibSodium fork has two scalarmult functions. One is between a scalar and any point, called \href{https://github.com/algorand/go-algorand/blob/master/crypto/libsodium-fork/src/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c#L31}{\_crypto\_scalarmult\_ed25519}. The second assumes the point is the base point \href{https://github.com/algorand/go-algorand/blob/f06c4816d0e7c5ec1a67744373268719d012e628/crypto/libsodium-fork/src/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c#L74}{\_crypto\_scalarmult\_ed25519\_base}.
 
-
 \subsection{$H_s$}
 
 The AVM already offers several hash functions: Keccak256, SHA256 and SHA512\_256. Monero uses Keccak256 in their ring signatures.
@@ -138,16 +137,15 @@ The AVM already offers several hash functions: Keccak256, SHA256 and SHA512\_256
 
 $H_p$ is a special hash function that directly outputs a curve point. If it was possible to discover a scalar $n$ such that $n G = Hp(x)$, the entire ring signature would be broken.
 
-Monero, specifically Shen Noether, has implemented the code for this hash function in (C/C++) \href{https://github.com/monero-project/monero/blob/master/src/ringct/rctOps.cpp#L654}{hash\_to\_p3} and \href{https://github.com/monero-project/monero/blob/master/src/crypto/crypto.cpp#L611}{hash\_to\_ec}. A Python implementation, purely for educational and research purposes, can be \href{https://github.com/monero-project/mininero/blob/master/mininero.py#L238}{found here}.
+Monero has implemented the code for this hash function in (C/C++) \href{https://github.com/monero-project/monero/blob/master/src/ringct/rctOps.cpp#L654}{hash\_to\_p3} and \href{https://github.com/monero-project/monero/blob/master/src/crypto/crypto.cpp#L611}{hash\_to\_ec}. Original CryptoNote implementation \href{https://github.com/cryptonotefoundation/cryptonote/blob/8edd998304431c219b432194b7a3847b44b576c3/src/crypto/crypto.cpp#L329-L389}{here}. A Python implementation, purely for educational and research purposes, can be \href{https://github.com/monero-project/mininero/blob/master/mininero.py#L238}{found here}.
 
 For more information on how Monero has implemented $H_p$:
 \begin{enumerate}
     \item \href{https://web.getmonero.org/zh-tw/resources/research-lab/pubs/ge_fromfe.pdf}{GetMonero PDF: Understanding ge\_fromfe\_frombytes vartime}
     \item \href{https://web.getmonero.org/resources/research-lab/pubs/MRL-0003.pdf}{GetMonero PDF: Monero is Not That Mysterious}
-    \item CryptoNote 2.0
-    \item \href{https://delfr.com/cryptonote-ring-signature/}{Delfr blog post: Cryptonote's Ring Signature Scheme}
+    \item \href{https://www.researchhub.com/paper/821786/monero-cryptonote-v-20}{Original CryptoNote 2.0 Paper}. Makes a reference to Maciej Ula's paper \href{http://arxiv.org/abs/0706.1448}{Rational points on certain hyperelliptic curves over finite fields} as the source of their $H_p$.
+    \item \href{https://delfr.com/cryptonote-ring-signature/}{Delfr blog post: Cryptonote's Ring Signature Scheme}. 
 \end{enumerate}
-
 
 The LibSodium fork has \href{https://github.com/algorand/go-algorand/blob/master/crypto/libsodium-fork/src/libsodium/crypto_core/ed25519/core_ed25519.c#L66}{crypto\_core\_ed25519\_from\_uniform}, a function \href{https://libsodium.gitbook.io/doc/advanced/point-arithmetic#elligator-2-map}{explained in the docs} as mapping a 32 byte vector to a point. It is an implementation of the Elligator 2 map. I am not sure if it is suitable for use here since \href{https://elligator.org/map}{according to the explanation} there exists an inverse map from the point back to the 32 byte vector. Of course, we always hash public keys (public information), and the key image $\tilde{K} = k_\pi H_p(K_\pi)$ itself is a scalar multiplication with the private key and cannot be easily reversed (trap door function).
 
