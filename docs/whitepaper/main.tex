@@ -1,5 +1,8 @@
 \documentclass[9pt]{article}
+
 \usepackage{hyperref}
+
+\usepackage{datetime}
 
 \usepackage[parfill]{parskip}
 
@@ -13,7 +16,6 @@
 
 \title{Project Mahber}
 \author{HashMapsData2Value}
-\date{December 2022}
 
 \begin{document}
 
@@ -32,6 +34,8 @@ Another project, Project Gjallarbro, seeks to introduce cross-chain atomic swaps
 The aim of this paper, Project Mahber to highlight it as a different effort, sets out to show how holders on Algorand could deploy smart contracts that allow for some preservation of privacy in transactions, by only introducing small additions to the AVM. The cryptographic primitive that allow for this are called called ring signatures. They are also a core technology of Monero.
 
 Note that privacy is a nebulous term that can mean a lot of different things. In this context we are referring to privacy of the end recipients, such that Alice can send \textit{Algo/ASA} to Bob (or herself) without anyone being able to \textit{directly} link the two.
+
+Finally, privacy can unfortunately allow for criminals to escape justice.\footnote{Tornado Cash, a mixer service on Ethereum, was famously sanctioned by the United States government after having been used by North Korean hackers. One of the main developers was also apprehended by Dutch authorities. Note that Tornado Cash is built on zk-SNARK merkle proofs requiring a trusted setup and not ring signatures.} Section \ref{subsection:sanctions} details how law enforcement could be included in the verification process, allowing the smart contract to adhere to sanctions and law-abiding users to get some peace of mind.
 
 Mahber (muh-ber) is Tigrinya \begin{geez}ማሕበር\end{geez} and means "association" or "union" in the organizational sense.
 
@@ -171,33 +175,29 @@ Both the public keys and the key images need to be stored. To avoid any hiccups 
 
 With the introduction of Algorand Box, scaling storage has become not much simpler but also made this kind of smart contract possible. Since public keys and key images are both points on the curve, they can be represented with 32 bytes. Box names can be at most 64 bytes long and contain at most 32768 bytes (1024 keys).
 
-At smart contract creation a Box named "PubKeys0" has to be created with an appropriately sized length, perhaps the full 32768 length.
-
 When a public key $K$ is provided in a deposit:
 \begin{enumerate}
     \item Check that $K$ is a valid point.
-    \item Do a box\_create with $K$ set as the name and 0 bytes allocated. If $K$ already exists box\_create will fail, ending the submission. Else continue.
-    \item Use box\_replace to add the bytes for $K$ at an appropriate place in the Box "PubKeys0". The smart contract should check that the bytes are actually empty do not already contain a key, e.g. by incrementing a counter for each inserted key. If the counter is already at the max for the box, force the creation of a new box ("PubKeys1") and use that instead.
+    \item Do a box\_create with $K$ set as the name and 32 bytes allocated. If $K$ already exists box\_create will fail, failing the deposit. Else the public key gets created and the deposit succeeds.
 \end{enumerate}
 
-At withdrawal time, the withdrawing entity can simply provide the names of the boxes as well as the starting/offset place in the box to signify the public keys that make up the ring. As opposed to having to supply the public keys and then having to verified that they actually exist in storage.
-
-When a key image $\tilde{K}$ is provided in a withdrawal alongside the signature and the ring:
+When a key image $\tilde{K}$ is provided in a withdrawal alongside the signature and the ring of public keys:
 \begin{enumerate}
     \item Check that $l\tilde{K} =$ \textbf{0} (the identity)
     \item Do a box\_create with $\tilde{K}$ set as the name and 0 bytes allocated. If $\tilde{K}$ already exists box\_create will fail, ending the submission. Else continue.
     \item Follow the remaining steps of verification as mentioned in section \ref{math:verification}.
 \end{enumerate}
 
-Since a full box of length 32678 is about 13 Algo the initial smart contract creator as well as anyone who subsequently creates a new box might want to get that Algo back. Logic can be created that allows the creator of each box to do that by being able to extract Algo (perhaps at a profit) out of a fund that depositors have to contribute to when their keys and key images are stored.
 
-\subsection{Extracting Funds Safely}
+If the ring provided contains public keys that do not exist as boxes already the withdrawal will fail.
+
+\subsection{Extracting Funds Safely and Privately}
 
 It is absolutely vital that the message $m$ signed with the ring contains the final recipient account and that the smart contract uses it as a reference. If the message is generic it is be possible for rogue nodes to intercept the signature and simply withdraw the funds to themselves.
 
 One issue that can arise is when the funds are meant to be withdrawn to an account that has not been activated on the blockchain yet. Not only does it not have any Algo to meet the minimum balance requirement, it does not have any Algo to pay for the Algorand fees (including verifying the ring signature) to withdraw in the first place.
 
-A solution to this is to add logic that means that while the bulk of the funds (e.g., 99 of the 100 Algo) are sent by the smart contract to an account specified in the message, the remaining Algo (e.g. 1 Algo) goes to the account that triggered the smart contract as a reward. With this logic, the signature and the entire contents of the transaction required for the withdrawal can be sent out to the world and anyone help the withdrawer out by triggering the withdrawal call on their behalf. This would mean that it does not matter to the actual withdrawer if rogue nodes grab and try to "front run" the transaction, in fact they have a monetary incentive to do so and ensure they themselves get the reward.
+A solution to this is to add logic such that while the bulk of the funds (e.g., 99 of the 100 Algo) are sent by the smart contract to an account specified in the message, the remaining Algo (e.g. 1 Algo) goes to the account that triggered the smart contract as a reward. With this logic, the signature and the entire contents of the transaction required for the withdrawal can be sent out to the world and anyone help the withdrawer out by triggering the withdrawal call on their behalf. This would mean that it does not matter to the actual withdrawer if rogue nodes grab and try to "front run" the transaction, in fact they have a monetary incentive to do so and ensure they themselves get the reward.
 
 
 \subsection{Minimum Anonymity Set}
@@ -206,7 +206,28 @@ Ring signatures only afford as much privacy to the signer as the number of publi
 
 It is still a good idea for the smart contract to force withdrawers to sign with a minimum ring size. The reason being, if Alice uses Bob's public key in the ring she creates and Bob later decides to be a cheapskate and create a very small ring signature, it a threat to the privacy of Alice's withdrawal.
 
-The exact ring size number depends on just how low the total opcode cost can be brought down to for the verification of one element of the ring. 
+The exact ring size number depends on just how low the total opcode cost can be brought down to for the verification of one element of the ring.
+
+\subsection{Adhering to Sanctions} \label{subsection:sanctions}
+
+Suppose that an account has been involved in criminal activity and the owner wants to obfuscate their funds through this smart contract. The owner could be anyone from a rug puller to a rogue state known for ransomware attacks. Could this be addressed?
+
+Assume there is a trusted entity that can provides oracle data on-chain of sanctioned accounts. In other words, when pinged with an account address it will either return \textit{true} (sanctioned) or \textit{false} (not sanctioned).
+
+We could adjust our smart contract's deposit and withdrawal methods such that when an account provides their public key (with the corresponding funds) the account address also gets stored. The smart contract could then check at both deposit and withdrawal times if an account is sanctioned. 
+
+At deposit time the smart contract only needs to check one account. At withdrawal time, the smart contract needs to check every account associated with each respective public key provided in the ring.
+
+This hurts the "bad guys" without automatically putting at risk privacy of everyone else.
+
+Typically, by the time a criminal gets sanctioned they will have already been able to move their illicit funds out of their sanctioned account. However, for the sake of privacy, they are unlikely to immediately withdraw their funds. It is thus more likely that criminal would be caught unable to withdraw.
+
+In fact, there could be a time limit inside the smart contract set that ensures a certain amount of time has to have passed before a public key can be used in a ring. It could be trivially checked for by including a timestamp of when the public key was added in its box. This would give "law enforcement" a bigger time buffer. (It goes without saying that immediately withdrawing funds after this time period by making use of a public key that has just become valid could potentially expose someone.)
+
+In the world of cryptocurrency we are naturally suspicious of centralized, trusted entities. A final piece of logic could be added that would allow for a sanctioned key to be used in a ring signature if the withdrawing account is itself the sanctioned account. Users could then be confident that even if their account was mistakenly placed in a sanctions list, they could take their funds back. This assumes that only one sanctioned account is involved, not the keys of multiple sanctioned accounts.
+
+For law enforcement, provided they could get access to the sanctioned account owner they could also reclaim the illicit funds, rather than let them remain in perpetuity in the smart contract.
+
 
 \subsection{Ever-growing Storage}
 
