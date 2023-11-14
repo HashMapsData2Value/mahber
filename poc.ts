@@ -63,9 +63,9 @@ for (let i = 0; i < number_of_other_participants; i++) {
     others_public_keys.push(bls12_381.getPublicKey(bls12_381.utils.randomPrivateKey()));
 }
 
-///////////////////////
-// GENERATE SIGNATURE//
-///////////////////////
+////////////////////////
+// GENERATE SIGNATURE //
+////////////////////////
 
 // The Key Image, unique to the keypair, is used to prevent double spending
 const key_image =  bls12_381.G1.hashToCurve(K_pi).multiply(utils.bytesToNumberBE(k_pi));
