@@ -69,7 +69,12 @@ for(let i = 0; i < number_of_other_participants; i++) {
 }
 
 // RING SIGNATURE IS VALID THIS WILL RETURN TRUE:
-console.log(signature[0] === values_prime[values_prime.length - 1]);
+
+function areEqual(a: Uint8Array, b: Uint8Array): boolean {
+    return a.length === b.length && a.every((val, index) => val === b[index]);
+  }
+
+console.log(areEqual(signature[0], values_prime[values_prime.length - 1]));
 // I.E, c_pi === c'_final
 // Basically the verifier has "looped around" and successfully reconstructed the ring 
 
