@@ -21,8 +21,8 @@ export function generate_fe(): Uint8Array{
     return bls12_381.utils.randomPrivateKey()
 }
 
-export function generate_ge(s: Uint8Array): Uint8Array {
-    return bls12_381.getPublicKey(s);
+export function generate_ge(fe: Uint8Array): Uint8Array {
+    return bls12_381.getPublicKey(fe);
 }
 
 export function ec_add(
