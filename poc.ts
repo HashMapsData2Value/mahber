@@ -5,48 +5,69 @@
 import { bls12_381 } from '@noble/curves/bls12-381';
 import { keccak_256 } from '@noble/hashes/sha3';
 import * as utils from '@noble/curves/abstract/utils';
-import type { H2CPoint } from '@noble/curves/abstract/hash-to-curve';
+import type { ProjPointType } from '@noble/curves/abstract/weierstrass';
 
 /// HELPER FUNCTIONS
-function h2c_hashable_string(
-    p: H2CPoint<bigint>,
-    ): string {
-    return p.toAffine().x.toString() + p.toAffine().y.toString();
-}
-function special_case_a_hash_concat_func(
-    msg: Uint8Array,
-    a: Uint8Array,
-    pk: Uint8Array
-    ): Uint8Array{
 
-        return utils.numberToBytesBE(bls12_381.G1.normPrivateKeyToScalar(keccak_256
-        .create()
-        .update(msg)
-        .update(bls12_381.G1.ProjectivePoint.fromPrivateKey(a).toRawBytes())
-        .update(h2c_hashable_string(bls12_381.G1.hashToCurve(pk).multiply(utils.bytesToNumberBE(a))))
-        .digest()),32);
-
+function hash_to_ge(input: Uint8Array): ProjPointType<bigint> {
+    return bls12_381.G1.ProjectivePoint.fromAffine(bls12_381.G1.hashToCurve(input).toAffine())
 }
-function main_hash_concat_func(
+
+function hash_to_fe(){}
+
+function generate_fe(): Uint8Array{
+    return bls12_381.utils.randomPrivateKey()
+}
+
+function generate_ge(s: Uint8Array): Uint8Array {
+    return bls12_381.getPublicKey(s);
+}
+
+function ec_add(
+    p1: ProjPointType<bigint>,
+    p2: ProjPointType<bigint>): ProjPointType<bigint> {
+        return p1.add(p2);
+    }
+
+function ec_scalar_mul(
+    p: ProjPointType<bigint> | Uint8Array | 1,
+    scalar: Uint8Array): ProjPointType<bigint> {
+
+        // Multiplies group element by field element
+        // 1 is used as a placeholder for the identity element of the group
+        
+        if (p === 1) {
+            return bls12_381.G1.ProjectivePoint.fromPrivateKey(scalar)
+        }
+
+        if (p instanceof Uint8Array) {
+            return bls12_381.G1.ProjectivePoint.fromHex(utils.bytesToHex(p)).multiply(utils.bytesToNumberBE(scalar))
+        }
+        
+        return p.multiply(utils.bytesToNumberBE(scalar));
+    }
+
+function create_ring_link(
     msg: Uint8Array,
     r: Uint8Array,
-    c: Uint8Array,
+    c: Uint8Array | 0,
     pk: Uint8Array,
-    key_image: H2CPoint<BigInt>): Uint8Array{
+    key_image: ProjPointType<bigint> | 0): Uint8Array{
 
-    const r_times_G = bls12_381.G1.ProjectivePoint.fromPrivateKey(r)
-    const c_times_pk = bls12_381.G1.ProjectivePoint.fromHex(utils.bytesToHex(pk)).multiply(utils.bytesToNumberBE(c))
-    const r_times_G_plus_c_times_pk = r_times_G.add(c_times_pk)
-    
-    const r_times_hashtocurve_pk = bls12_381.G1.hashToCurve(pk).multiply(utils.bytesToNumberBE(r))
-    const c_times_key_image = key_image.multiply(utils.bytesToNumberBE(c))
-    const r_times_hashtocurve_pk_plus_c_times_key_image = r_times_hashtocurve_pk.add(c_times_key_image as H2CPoint<bigint>)
+    if ((c === 0) || (key_image === 0)) {
+        return utils.numberToBytesBE(bls12_381.G1.normPrivateKeyToScalar(keccak_256
+            .create()
+            .update(msg)
+            .update(ec_scalar_mul(1, r).toRawBytes())
+            .update(ec_scalar_mul(hash_to_ge(pk),r).toRawBytes())
+            .digest()),32);
+    }
 
     return utils.numberToBytesBE(bls12_381.G1.normPrivateKeyToScalar(keccak_256
     .create()
     .update(msg)
-    .update(r_times_G_plus_c_times_pk.toRawBytes())
-    .update(h2c_hashable_string(r_times_hashtocurve_pk_plus_c_times_key_image))
+    .update(ec_add(ec_scalar_mul(1, r), ec_scalar_mul(pk,c)).toRawBytes())
+    .update(ec_add(ec_scalar_mul(hash_to_ge(pk),r), ec_scalar_mul(key_image, c)).toRawBytes())
     .digest()), 32);
 }
 
@@ -54,13 +75,13 @@ function main_hash_concat_func(
 // Then we generate the 
 // In reality we obviously don't have access to the other participants private keys
 
-const k_pi: Uint8Array = bls12_381.utils.randomPrivateKey();
-const K_pi: Uint8Array = bls12_381.getPublicKey(k_pi);
-const number_of_other_participants = 15;
+const k_pi: Uint8Array = generate_fe();
+const K_pi: Uint8Array = generate_ge(k_pi);
+const number_of_other_participants = 5;
 
 let others_public_keys: Uint8Array[] = [];
 for (let i = 0; i < number_of_other_participants; i++) {
-    others_public_keys.push(bls12_381.getPublicKey(bls12_381.utils.randomPrivateKey()));
+    others_public_keys.push(generate_ge((generate_fe())));
 }
 
 ////////////////////////
@@ -68,21 +89,21 @@ for (let i = 0; i < number_of_other_participants; i++) {
 ////////////////////////
 
 // The Key Image, unique to the keypair, is used to prevent double spending
-const key_image =  bls12_381.G1.hashToCurve(K_pi).multiply(utils.bytesToNumberBE(k_pi));
+const key_image =  ec_scalar_mul(hash_to_ge(K_pi), k_pi);
 
-const msg_string = 'Send 1000 from mixer with key image ' + h2c_hashable_string(key_image);
+const msg_string = 'Send 1000 from mixer with key image ' + key_image.toRawBytes();
 console.log(msg_string);
 const msg = new TextEncoder().encode(msg_string); // this is the message we want to sign
-const a = bls12_381.utils.randomPrivateKey(); // Generate random number, nonce
+const a = generate_fe(); // Generate random number, nonce
 
-let nonces = []
+let nonces: Uint8Array[] = []
 for (let i = 0; i < number_of_other_participants; i++) {
-    nonces.push(bls12_381.utils.randomPrivateKey());
+    nonces.push(generate_fe());
 }
 
-let values: Uint8Array[] = [special_case_a_hash_concat_func(msg, a, K_pi)]
+let values: Uint8Array[] = [create_ring_link(msg, a, 0, K_pi, 0)]
 for(let i = 0; i < number_of_other_participants; i++) {
-    values.push(main_hash_concat_func(msg, nonces[i], values[i], others_public_keys[i], key_image))
+    values.push(create_ring_link(msg, nonces[i], values[i], others_public_keys[i], key_image))
 }
 
 // This is the core of the security of the ring signature
@@ -113,9 +134,9 @@ for(let i = 0; i < number_of_other_participants; i++) {
 //////////////////////
 
 let values_prime: Uint8Array[] = []
-values_prime.push(main_hash_concat_func(msg, signature[1], signature[0], K_pi, key_image))
+values_prime.push(create_ring_link(msg, signature[1], signature[0], K_pi, key_image))
 for(let i = 0; i < number_of_other_participants; i++) {
-    values_prime.push(main_hash_concat_func(msg, signature[i + 2], values_prime[i], others_public_keys[i], key_image));
+    values_prime.push(create_ring_link(msg, signature[i + 2], values_prime[i], others_public_keys[i], key_image));
 }
 
 // RING SIGNATURE IS VALID THIS WILL RETURN TRUE:
