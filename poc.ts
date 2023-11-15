@@ -1,75 +1,4 @@
-// Ideally would have used BN254 for opcode cost reasons but its implementation in
-// noble lacks the hashToCurve function as of 2023-11-14
-// import { bn254 } from '@noble/curves/bn254';
-
-import { bls12_381 } from '@noble/curves/bls12-381';
-import { keccak_256 } from '@noble/hashes/sha3';
-import * as utils from '@noble/curves/abstract/utils';
-import type { ProjPointType } from '@noble/curves/abstract/weierstrass';
-
-/// HELPER FUNCTIONS
-
-function hash_to_ge(input: Uint8Array): ProjPointType<bigint> {
-    return bls12_381.G1.ProjectivePoint.fromAffine(bls12_381.G1.hashToCurve(input).toAffine())
-}
-
-function hash_to_fe(){}
-
-function generate_fe(): Uint8Array{
-    return bls12_381.utils.randomPrivateKey()
-}
-
-function generate_ge(s: Uint8Array): Uint8Array {
-    return bls12_381.getPublicKey(s);
-}
-
-function ec_add(
-    p1: ProjPointType<bigint>,
-    p2: ProjPointType<bigint>): ProjPointType<bigint> {
-        return p1.add(p2);
-    }
-
-function ec_scalar_mul(
-    p: ProjPointType<bigint> | Uint8Array | 1,
-    scalar: Uint8Array): ProjPointType<bigint> {
-
-        // Multiplies group element by field element
-        // 1 is used as a placeholder for the identity element of the group
-        
-        if (p === 1) {
-            return bls12_381.G1.ProjectivePoint.fromPrivateKey(scalar)
-        }
-
-        if (p instanceof Uint8Array) {
-            return bls12_381.G1.ProjectivePoint.fromHex(utils.bytesToHex(p)).multiply(utils.bytesToNumberBE(scalar))
-        }
-        
-        return p.multiply(utils.bytesToNumberBE(scalar));
-    }
-
-function create_ring_link(
-    msg: Uint8Array,
-    r: Uint8Array,
-    c: Uint8Array | 0,
-    pk: Uint8Array,
-    key_image: ProjPointType<bigint> | 0): Uint8Array{
-
-    if ((c === 0) || (key_image === 0)) {
-        return utils.numberToBytesBE(bls12_381.G1.normPrivateKeyToScalar(keccak_256
-            .create()
-            .update(msg)
-            .update(ec_scalar_mul(1, r).toRawBytes())
-            .update(ec_scalar_mul(hash_to_ge(pk),r).toRawBytes())
-            .digest()),32);
-    }
-
-    return utils.numberToBytesBE(bls12_381.G1.normPrivateKeyToScalar(keccak_256
-    .create()
-    .update(msg)
-    .update(ec_add(ec_scalar_mul(1, r), ec_scalar_mul(pk,c)).toRawBytes())
-    .update(ec_add(ec_scalar_mul(hash_to_ge(pk),r), ec_scalar_mul(key_image, c)).toRawBytes())
-    .digest()), 32);
-}
+import {generate_fe, generate_ge, hash_to_ge, create_ring_link, ec_scalar_mul, ec_fe_mul, ec_fe_sub} from './bls12_381_utils';
 
 // First we generate a key pair for the signer and public keys for each other participant.
 // Then we generate the 
@@ -108,7 +37,7 @@ for(let i = 0; i < number_of_other_participants; i++) {
 
 // This is the core of the security of the ring signature
 // The verifier will have access to r_pi, NOT a and DEFINITELY NOT k_pi.
-const r_pi  = utils.numberToBytesBE(bls12_381.G1.normPrivateKeyToScalar(utils.bytesToNumberBE(a) - utils.bytesToNumberBE(values[values.length - 1]) * utils.bytesToNumberBE(k_pi)), 32)
+const r_pi  = ec_fe_sub(a, ec_fe_mul(values[values.length - 1], k_pi))
 
 // Construct the ring signature
 // First add the last value, i.e. c_"pi"
@@ -140,7 +69,7 @@ for(let i = 0; i < number_of_other_participants; i++) {
 }
 
 // RING SIGNATURE IS VALID THIS WILL RETURN TRUE:
-console.log(utils.bytesToHex(signature[0]) === utils.bytesToHex(values_prime[values_prime.length - 1]));
+console.log(signature[0] === values_prime[values_prime.length - 1]);
 // I.E, c_pi === c'_final
 // Basically the verifier has "looped around" and successfully reconstructed the ring 
 
