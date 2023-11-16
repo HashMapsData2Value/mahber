@@ -20,7 +20,7 @@ for (let i = 0; i < number_of_other_participants; i++) {
 // The Key Image, unique to the keypair, is used to prevent double spending
 const key_image =  ec_scalar_mul(hash_to_ge(K_pi), k_pi);
 
-const msg_string = 'Send 1000 from mixer with key image ' + key_image.toRawBytes();
+const msg_string = 'Send 1000 from mixer with key image ' + key_image;
 console.log(msg_string);
 const msg = new TextEncoder().encode(msg_string); // this is the message we want to sign
 const a = generate_fe(); // Generate random number, nonce
