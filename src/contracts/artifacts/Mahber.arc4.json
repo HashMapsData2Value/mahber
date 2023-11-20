@@ -1,0 +1,35 @@
+{
+  "name": "Mahber",
+  "desc": "",
+  "methods": [
+    {
+      "name": "doMath",
+      "args": [
+        {
+          "name": "a",
+          "type": "string",
+          "desc": "The first number"
+        },
+        {
+          "name": "b",
+          "type": "string",
+          "desc": "The second number"
+        }
+      ],
+      "desc": "A method that takes two numbers and does either addition or subtraction",
+      "returns": {
+        "type": "string",
+        "desc": ""
+      }
+    },
+    {
+      "name": "createApplication",
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      },
+      "args": []
+    }
+  ]
+}

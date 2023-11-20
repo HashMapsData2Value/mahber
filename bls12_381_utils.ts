@@ -1,6 +1,21 @@
+// Ideally would have used BN254 for opcode cost reasons but its implementation in
+// noble lacks the hashToCurve export function as of 2023-11-14
+// import { bn254 } from '@noble/curves/bn254';
+
 import { bls12_381 } from '@noble/curves/bls12-381';
 import { keccak_256 } from '@noble/hashes/sha3';
 import * as utils from '@noble/curves/abstract/utils';
+
+// TODO: Ensure that everything is using Uint8Array to pass along data between functions
+// While this might make things less clear in the main file, it will make it easier to switch out
+// from bls12_381 to bn254 in the future, or even ed25519
+
+export function test(): string[] {
+    const t1 = generate_ge(generate_fe())
+    const t2 = generate_ge(generate_fe())
+    const t3 = ec_add(t1, t2)
+    return [utils.bytesToHex(t1), utils.bytesToHex(t2), utils.bytesToHex(t3)]
+}
 
 export function hash_to_ge(input: Uint8Array): Uint8Array {
     return bls12_381.G1.ProjectivePoint.fromAffine(bls12_381.G1.hashToCurve(input).toAffine()).toRawBytes()
