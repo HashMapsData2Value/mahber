@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "generate-client": "algokitgen generate -a contracts/artifacts/Mahber.arc32.json -o contracts/clients/MahberClient.ts",
-    "compile-contract": "tealscript contracts/mahber.algo.ts contracts/artifacts --disable-warnings",
+    "compile-contract": "tealscript contracts/mahber.algo.ts contracts/artifacts",
     "generate-components": "algokit-generate-component contracts/artifacts/Mahber.arc32.json contracts/artifacts/components",
     "build": "npm run compile-contract && npm run generate-client",
     "test": "npm run build && jest",

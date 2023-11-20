@@ -3,23 +3,23 @@
   "desc": "",
   "methods": [
     {
-      "name": "doMath",
+      "name": "add",
       "args": [
         {
           "name": "a",
           "type": "string",
-          "desc": "The first number"
+          "desc": "The first hex string"
         },
         {
           "name": "b",
           "type": "string",
-          "desc": "The second number"
+          "desc": "The second hex string"
         }
       ],
-      "desc": "A method that takes two numbers and does either addition or subtraction",
+      "desc": "A method that takes two hex group elements (strings) and adds them together",
       "returns": {
         "type": "string",
-        "desc": ""
+        "desc": "The result of the operation"
       }
     },
     {

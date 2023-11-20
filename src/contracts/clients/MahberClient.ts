@@ -26,7 +26,7 @@ import { SendTransactionResult, TransactionToSign, SendTransactionFrom } from '@
 import { Algodv2, OnApplicationComplete, Transaction, TransactionWithSigner, AtomicTransactionComposer } from 'algosdk'
 export const APP_SPEC: AppSpec = {
   "hints": {
-    "doMath(string,string)string": {
+    "add(string,string)string": {
       "call_config": {
         "no_op": "CALL"
       }
@@ -65,31 +65,31 @@ export const APP_SPEC: AppSpec = {
     }
   },
   "source": {
-    "approval": "I3ByYWdtYSB2ZXJzaW9uIDkKCi8vIFRoaXMgVEVBTCB3YXMgZ2VuZXJhdGVkIGJ5IFRFQUxTY3JpcHQgdjAuNjIuMgovLyBodHRwczovL2dpdGh1Yi5jb20vYWxnb3JhbmRmb3VuZGF0aW9uL1RFQUxTY3JpcHQKCi8vIFRoaXMgY29udHJhY3QgaXMgY29tcGxpYW50IHdpdGggYW5kL29yIGltcGxlbWVudHMgdGhlIGZvbGxvd2luZyBBUkNzOiBbIEFSQzQgXQoKLy8gVGhlIGZvbGxvd2luZyB0ZW4gbGluZXMgb2YgVEVBTCBoYW5kbGUgaW5pdGlhbCBwcm9ncmFtIGZsb3cKLy8gVGhpcyBwYXR0ZXJuIGlzIHVzZWQgdG8gbWFrZSBpdCBlYXN5IGZvciBhbnlvbmUgdG8gcGFyc2UgdGhlIHN0YXJ0IG9mIHRoZSBwcm9ncmFtIGFuZCBkZXRlcm1pbmUgaWYgYSBzcGVjaWZpYyBhY3Rpb24gaXMgYWxsb3dlZAovLyBIZXJlLCBhY3Rpb24gcmVmZXJzIHRvIHRoZSBPbkNvbXBsZXRlIGluIGNvbWJpbmF0aW9uIHdpdGggd2hldGhlciB0aGUgYXBwIGlzIGJlaW5nIGNyZWF0ZWQgb3IgY2FsbGVkCi8vIEV2ZXJ5IHBvc3NpYmxlIGFjdGlvbiBmb3IgdGhpcyBjb250cmFjdCBpcyByZXByZXNlbnRlZCBpbiB0aGUgc3dpdGNoIHN0YXRlbWVudAovLyBJZiB0aGUgYWN0aW9uIGlzIG5vdCBpbXBsbWVudGVkIGluIHRoZSBjb250cmFjdCwgaXRzIHJlcHNlY3RpdmUgYnJhbmNoIHdpbGwgYmUgIk5PVF9JTVBMTUVOVEVEIiB3aGljaCBqdXN0IGNvbnRhaW5zICJlcnIiCnR4biBBcHBsaWNhdGlvbklECmludCAwCj4KaW50IDYKKgp0eG4gT25Db21wbGV0aW9uCisKc3dpdGNoIGNyZWF0ZV9Ob09wIE5PVF9JTVBMRU1FTlRFRCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIE5PVF9JTVBMRU1FTlRFRCBOT1RfSU1QTEVNRU5URUQgY2FsbF9Ob09wCgpOT1RfSU1QTEVNRU5URUQ6CgllcnIKCi8vIGRvTWF0aChzdHJpbmcsc3RyaW5nKXN0cmluZwovLwovLyBBIG1ldGhvZCB0aGF0IHRha2VzIHR3byBudW1iZXJzIGFuZCBkb2VzIGVpdGhlciBhZGRpdGlvbiBvciBzdWJ0cmFjdGlvbgovLwovLyBAcGFyYW0gYSBUaGUgZmlyc3QgbnVtYmVyCi8vIEBwYXJhbSBiIFRoZSBzZWNvbmQgbnVtYmVyCi8vIEBwYXJhbSBvcGVyYXRpb24gVGhlIG9wZXJhdGlvbiB0byBwZXJmb3JtLiBDYW4gYmUgZWl0aGVyICdzdW0nIG9yICdkaWZmZXJlbmNlJwovLwovLyBAcmV0dXJucyBUaGUgcmVzdWx0IG9mIHRoZSBvcGVyYXRpb24KYWJpX3JvdXRlX2RvTWF0aDoKCWJ5dGUgMHggLy8gcHVzaCBlbXB0eSBieXRlcyB0byBmaWxsIHRoZSBzdGFjayBmcmFtZSBmb3IgdGhpcyBzdWJyb3V0aW5lJ3MgbG9jYWwgdmFyaWFibGVzCgoJLy8gYjogc3RyaW5nCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAyCglleHRyYWN0IDIgMAoKCS8vIGE6IHN0cmluZwoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMQoJZXh0cmFjdCAyIDAKCgkvLyBleGVjdXRlIGRvTWF0aChzdHJpbmcsc3RyaW5nKXN0cmluZwoJY2FsbHN1YiBkb01hdGgKCWludCAxCglyZXR1cm4KCmRvTWF0aDoKCXByb3RvIDMgMAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxNgoJLy8gcmVzdWx0ID0gJ2hlaicKCWJ5dGUgMHg2ODY1NmEgLy8gImhlaiIKCWZyYW1lX2J1cnkgLTMgLy8gcmVzdWx0OiBieXRlcwoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxNwoJLy8gcmV0dXJuIHJlc3VsdDsKCWJ5dGUgMHgxNTFmN2M3NTAwMDM2ODY1NmEKCWxvZwoJcmV0c3ViCgphYmlfcm91dGVfY3JlYXRlQXBwbGljYXRpb246CglpbnQgMQoJcmV0dXJuCgpjcmVhdGVfTm9PcDoKCW1ldGhvZCAiY3JlYXRlQXBwbGljYXRpb24oKXZvaWQiCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAwCgltYXRjaCBhYmlfcm91dGVfY3JlYXRlQXBwbGljYXRpb24KCWVycgoKY2FsbF9Ob09wOgoJbWV0aG9kICJkb01hdGgoc3RyaW5nLHN0cmluZylzdHJpbmciCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAwCgltYXRjaCBhYmlfcm91dGVfZG9NYXRoCgllcnI=",
-    "clear": "I3ByYWdtYSB2ZXJzaW9uIDk="
+    "approval": "I3ByYWdtYSB2ZXJzaW9uIDEwCgovLyBUaGlzIFRFQUwgd2FzIGdlbmVyYXRlZCBieSBURUFMU2NyaXB0IHYwLjYyLjIKLy8gaHR0cHM6Ly9naXRodWIuY29tL2FsZ29yYW5kZm91bmRhdGlvbi9URUFMU2NyaXB0CgovLyBUaGlzIGNvbnRyYWN0IGlzIGNvbXBsaWFudCB3aXRoIGFuZC9vciBpbXBsZW1lbnRzIHRoZSBmb2xsb3dpbmcgQVJDczogWyBBUkM0IF0KCi8vIFRoZSBmb2xsb3dpbmcgdGVuIGxpbmVzIG9mIFRFQUwgaGFuZGxlIGluaXRpYWwgcHJvZ3JhbSBmbG93Ci8vIFRoaXMgcGF0dGVybiBpcyB1c2VkIHRvIG1ha2UgaXQgZWFzeSBmb3IgYW55b25lIHRvIHBhcnNlIHRoZSBzdGFydCBvZiB0aGUgcHJvZ3JhbSBhbmQgZGV0ZXJtaW5lIGlmIGEgc3BlY2lmaWMgYWN0aW9uIGlzIGFsbG93ZWQKLy8gSGVyZSwgYWN0aW9uIHJlZmVycyB0byB0aGUgT25Db21wbGV0ZSBpbiBjb21iaW5hdGlvbiB3aXRoIHdoZXRoZXIgdGhlIGFwcCBpcyBiZWluZyBjcmVhdGVkIG9yIGNhbGxlZAovLyBFdmVyeSBwb3NzaWJsZSBhY3Rpb24gZm9yIHRoaXMgY29udHJhY3QgaXMgcmVwcmVzZW50ZWQgaW4gdGhlIHN3aXRjaCBzdGF0ZW1lbnQKLy8gSWYgdGhlIGFjdGlvbiBpcyBub3QgaW1wbG1lbnRlZCBpbiB0aGUgY29udHJhY3QsIGl0cyByZXBzZWN0aXZlIGJyYW5jaCB3aWxsIGJlICJOT1RfSU1QTE1FTlRFRCIgd2hpY2gganVzdCBjb250YWlucyAiZXJyIgp0eG4gQXBwbGljYXRpb25JRAppbnQgMAo+CmludCA2CioKdHhuIE9uQ29tcGxldGlvbgorCnN3aXRjaCBjcmVhdGVfTm9PcCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIE5PVF9JTVBMRU1FTlRFRCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIGNhbGxfTm9PcAoKTk9UX0lNUExFTUVOVEVEOgoJZXJyCgovLyBhZGQoc3RyaW5nLHN0cmluZylzdHJpbmcKLy8KLy8gQSBtZXRob2QgdGhhdCB0YWtlcyB0d28gaGV4IGdyb3VwIGVsZW1lbnRzIChzdHJpbmdzKSBhbmQgYWRkcyB0aGVtIHRvZ2V0aGVyCi8vIEBwYXJhbSBhIFRoZSBmaXJzdCBoZXggc3RyaW5nCi8vIEBwYXJhbSBiIFRoZSBzZWNvbmQgaGV4IHN0cmluZwovLwovLyBAcmV0dXJucyBUaGUgcmVzdWx0IG9mIHRoZSBvcGVyYXRpb24KYWJpX3JvdXRlX2FkZDoKCWJ5dGUgMHggLy8gcHVzaCBlbXB0eSBieXRlcyB0byBmaWxsIHRoZSBzdGFjayBmcmFtZSBmb3IgdGhpcyBzdWJyb3V0aW5lJ3MgbG9jYWwgdmFyaWFibGVzCgoJLy8gYjogc3RyaW5nCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAyCglleHRyYWN0IDIgMAoKCS8vIGE6IHN0cmluZwoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMQoJZXh0cmFjdCAyIDAKCgkvLyBleGVjdXRlIGFkZChzdHJpbmcsc3RyaW5nKXN0cmluZwoJY2FsbHN1YiBhZGQKCWludCAxCglyZXR1cm4KCmFkZDoKCXByb3RvIDMgMAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxNgoJLy8gcmVzdWx0ID0gZWNfYWRkKEJMUzEyXzM4MWcxLCBoZXgoYSksIGhleChiKSkKCWVjX2FkZCBCTFMxMl8zODFnMQoJZnJhbWVfYnVyeSAtMyAvLyByZXN1bHQ6IGJ5dGVzCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjE3CgkvLyByZXR1cm4gcmVzdWx0OwoJZnJhbWVfZGlnIC0zIC8vIHJlc3VsdDogYnl0ZXMKCWR1cAoJbGVuCglpdG9iCglleHRyYWN0IDYgMgoJc3dhcAoJY29uY2F0CglieXRlIDB4MTUxZjdjNzUKCXN3YXAKCWNvbmNhdAoJbG9nCglyZXRzdWIKCmFiaV9yb3V0ZV9jcmVhdGVBcHBsaWNhdGlvbjoKCWludCAxCglyZXR1cm4KCmNyZWF0ZV9Ob09wOgoJbWV0aG9kICJjcmVhdGVBcHBsaWNhdGlvbigpdm9pZCIKCXR4bmEgQXBwbGljYXRpb25BcmdzIDAKCW1hdGNoIGFiaV9yb3V0ZV9jcmVhdGVBcHBsaWNhdGlvbgoJZXJyCgpjYWxsX05vT3A6CgltZXRob2QgImFkZChzdHJpbmcsc3RyaW5nKXN0cmluZyIKCXR4bmEgQXBwbGljYXRpb25BcmdzIDAKCW1hdGNoIGFiaV9yb3V0ZV9hZGQKCWVycg==",
+    "clear": "I3ByYWdtYSB2ZXJzaW9uIDEw"
   },
   "contract": {
     "name": "Mahber",
     "desc": "",
     "methods": [
       {
-        "name": "doMath",
+        "name": "add",
         "args": [
           {
             "name": "a",
             "type": "string",
-            "desc": "The first number"
+            "desc": "The first hex string"
           },
           {
             "name": "b",
             "type": "string",
-            "desc": "The second number"
+            "desc": "The second hex string"
           }
         ],
-        "desc": "A method that takes two numbers and does either addition or subtraction",
+        "desc": "A method that takes two hex group elements (strings) and adds them together",
         "returns": {
           "type": "string",
-          "desc": ""
+          "desc": "The result of the operation"
         }
       },
       {
@@ -160,18 +160,21 @@ export type Mahber = {
    * Maps method signatures / names to their argument and return types.
    */
   methods:
-    & Record<'doMath(string,string)string' | 'doMath', {
+    & Record<'add(string,string)string' | 'add', {
       argsObj: {
         /**
-         * The first number
+         * The first hex string
          */
         a: string
         /**
-         * The second number
+         * The second hex string
          */
         b: string
       }
       argsTuple: [a: string, b: string]
+      /**
+       * The result of the operation
+       */
       returns: string
     }>
     & Record<'createApplication()void' | 'createApplication', {
@@ -253,17 +256,17 @@ export abstract class MahberCallFactory {
   }
 
   /**
-   * Constructs a no op call for the doMath(string,string)string ABI method
+   * Constructs a no op call for the add(string,string)string ABI method
    *
-   * A method that takes two numbers and does either addition or subtraction
+   * A method that takes two hex group elements (strings) and adds them together
    *
    * @param args Any args for the contract call
    * @param params Any additional parameters for the call
    * @returns A TypedCallParams object for the call
    */
-  static doMath(args: MethodArgs<'doMath(string,string)string'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
+  static add(args: MethodArgs<'add(string,string)string'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
     return {
-      method: 'doMath(string,string)string' as const,
+      method: 'add(string,string)string' as const,
       methodArgs: Array.isArray(args) ? args : [args.a, args.b],
       ...params,
     }
@@ -368,16 +371,16 @@ export class MahberClient {
   }
 
   /**
-   * Calls the doMath(string,string)string ABI method.
+   * Calls the add(string,string)string ABI method.
    *
-   * A method that takes two numbers and does either addition or subtraction
+   * A method that takes two hex group elements (strings) and adds them together
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
-   * @returns The result of the call
+   * @returns The result of the call: The result of the operation
    */
-  public doMath(args: MethodArgs<'doMath(string,string)string'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
-    return this.call(MahberCallFactory.doMath(args, params))
+  public add(args: MethodArgs<'add(string,string)string'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
+    return this.call(MahberCallFactory.add(args, params))
   }
 
   public compose(): MahberComposer {
@@ -386,8 +389,8 @@ export class MahberClient {
     let promiseChain:Promise<unknown> = Promise.resolve()
     const resultMappers: Array<undefined | ((x: any) => any)> = []
     return {
-      doMath(args: MethodArgs<'doMath(string,string)string'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
-        promiseChain = promiseChain.then(() => client.doMath(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
+      add(args: MethodArgs<'add(string,string)string'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
+        promiseChain = promiseChain.then(() => client.add(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
         resultMappers.push(undefined)
         return this
       },
@@ -417,15 +420,15 @@ export class MahberClient {
 }
 export type MahberComposer<TReturns extends [...any[]] = []> = {
   /**
-   * Calls the doMath(string,string)string ABI method.
+   * Calls the add(string,string)string ABI method.
    *
-   * A method that takes two numbers and does either addition or subtraction
+   * A method that takes two hex group elements (strings) and adds them together
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
    * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
    */
-  doMath(args: MethodArgs<'doMath(string,string)string'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'doMath(string,string)string'>]>
+  add(args: MethodArgs<'add(string,string)string'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'add(string,string)string'>]>
 
   /**
    * Makes a clear_state call to an existing instance of the Mahber smart contract.
