@@ -4,19 +4,8 @@
   "methods": [
     {
       "name": "add",
-      "args": [
-        {
-          "name": "a",
-          "type": "string",
-          "desc": "The first hex string"
-        },
-        {
-          "name": "b",
-          "type": "string",
-          "desc": "The second hex string"
-        }
-      ],
-      "desc": "A method that takes two hex group elements (strings) and adds them together",
+      "args": [],
+      "desc": "",
       "returns": {
         "type": "string",
         "desc": "The result of the operation"
