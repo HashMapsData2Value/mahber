@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@algorandfoundation/algokit-utils": "^2.2.0",
+    "@noble/curves": "^1.2.0",
     "algosdk": "^2.4.0"
   },
   "devDependencies": {

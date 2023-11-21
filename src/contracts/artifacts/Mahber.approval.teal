@@ -22,14 +22,14 @@ switch create_NoOp NOT_IMPLEMENTED NOT_IMPLEMENTED NOT_IMPLEMENTED NOT_IMPLEMENT
 NOT_IMPLEMENTED:
 	err
 
-// add()string
+// add()byte[]
 //
 //
 // @returns The result of the operation
 abi_route_add:
 	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
 
-	// execute add()string
+	// execute add()byte[]
 	callsub add
 	int 1
 	return
@@ -40,15 +40,19 @@ add:
 	// contracts/mahber.algo.ts:11
 	// result = ec_add(
 	//       'BLS12_381g1',
-	//       hex('a9a0c9f0289bb8f54de7b13917b410c649d417e1b48dd18d249afc6c96088a0f6e4d72e446186213b27b62827e12c8a5'),
-	//       hex('81ff68baa963706b4fefe341bde81c5873b964acd75f3f0b0fdffb83cfc0edac6be550aede9e91b79cbf85f51191fd1b')
+	//       hex(
+	//         '17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1'
+	//       ),
+	//       hex(
+	//         '17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1'
+	//       )
 	//     )
-	byte 0xa9a0c9f0289bb8f54de7b13917b410c649d417e1b48dd18d249afc6c96088a0f6e4d72e446186213b27b62827e12c8a5
-	byte 0x81ff68baa963706b4fefe341bde81c5873b964acd75f3f0b0fdffb83cfc0edac6be550aede9e91b79cbf85f51191fd1b
+	byte 0x17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1
+	byte 0x17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1
 	ec_add BLS12_381g1
 	frame_bury -1 // result: bytes
 
-	// contracts/mahber.algo.ts:16
+	// contracts/mahber.algo.ts:20
 	// return result;
 	frame_dig -1 // result: bytes
 	dup
@@ -74,7 +78,7 @@ create_NoOp:
 	err
 
 call_NoOp:
-	method "add()string"
+	method "add()byte[]"
 	txna ApplicationArgs 0
 	match abi_route_add
 	err

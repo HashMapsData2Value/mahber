@@ -7,7 +7,7 @@
       "args": [],
       "desc": "",
       "returns": {
-        "type": "string",
+        "type": "byte[]",
         "desc": "The result of the operation"
       }
     },

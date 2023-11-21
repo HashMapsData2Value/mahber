@@ -27,7 +27,7 @@ import type { TransactionWithSigner } from 'algosdk'
 import { Algodv2, OnApplicationComplete, Transaction, AtomicTransactionComposer } from 'algosdk'
 export const APP_SPEC: AppSpec = {
   "hints": {
-    "add()string": {
+    "add()byte[]": {
       "call_config": {
         "no_op": "CALL"
       }
@@ -66,7 +66,7 @@ export const APP_SPEC: AppSpec = {
     }
   },
   "source": {
-    "approval": "I3ByYWdtYSB2ZXJzaW9uIDEwCgovLyBUaGlzIFRFQUwgd2FzIGdlbmVyYXRlZCBieSBURUFMU2NyaXB0IHYwLjYzLjAKLy8gaHR0cHM6Ly9naXRodWIuY29tL2FsZ29yYW5kZm91bmRhdGlvbi9URUFMU2NyaXB0CgovLyBUaGlzIGNvbnRyYWN0IGlzIGNvbXBsaWFudCB3aXRoIGFuZC9vciBpbXBsZW1lbnRzIHRoZSBmb2xsb3dpbmcgQVJDczogWyBBUkM0IF0KCi8vIFRoZSBmb2xsb3dpbmcgdGVuIGxpbmVzIG9mIFRFQUwgaGFuZGxlIGluaXRpYWwgcHJvZ3JhbSBmbG93Ci8vIFRoaXMgcGF0dGVybiBpcyB1c2VkIHRvIG1ha2UgaXQgZWFzeSBmb3IgYW55b25lIHRvIHBhcnNlIHRoZSBzdGFydCBvZiB0aGUgcHJvZ3JhbSBhbmQgZGV0ZXJtaW5lIGlmIGEgc3BlY2lmaWMgYWN0aW9uIGlzIGFsbG93ZWQKLy8gSGVyZSwgYWN0aW9uIHJlZmVycyB0byB0aGUgT25Db21wbGV0ZSBpbiBjb21iaW5hdGlvbiB3aXRoIHdoZXRoZXIgdGhlIGFwcCBpcyBiZWluZyBjcmVhdGVkIG9yIGNhbGxlZAovLyBFdmVyeSBwb3NzaWJsZSBhY3Rpb24gZm9yIHRoaXMgY29udHJhY3QgaXMgcmVwcmVzZW50ZWQgaW4gdGhlIHN3aXRjaCBzdGF0ZW1lbnQKLy8gSWYgdGhlIGFjdGlvbiBpcyBub3QgaW1wbG1lbnRlZCBpbiB0aGUgY29udHJhY3QsIGl0cyByZXBzZWN0aXZlIGJyYW5jaCB3aWxsIGJlICJOT1RfSU1QTE1FTlRFRCIgd2hpY2gganVzdCBjb250YWlucyAiZXJyIgp0eG4gQXBwbGljYXRpb25JRAppbnQgMAo+CmludCA2CioKdHhuIE9uQ29tcGxldGlvbgorCnN3aXRjaCBjcmVhdGVfTm9PcCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIE5PVF9JTVBMRU1FTlRFRCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIGNhbGxfTm9PcAoKTk9UX0lNUExFTUVOVEVEOgoJZXJyCgovLyBhZGQoKXN0cmluZwovLwovLwovLyBAcmV0dXJucyBUaGUgcmVzdWx0IG9mIHRoZSBvcGVyYXRpb24KYWJpX3JvdXRlX2FkZDoKCWJ5dGUgMHggLy8gcHVzaCBlbXB0eSBieXRlcyB0byBmaWxsIHRoZSBzdGFjayBmcmFtZSBmb3IgdGhpcyBzdWJyb3V0aW5lJ3MgbG9jYWwgdmFyaWFibGVzCgoJLy8gZXhlY3V0ZSBhZGQoKXN0cmluZwoJY2FsbHN1YiBhZGQKCWludCAxCglyZXR1cm4KCmFkZDoKCXByb3RvIDEgMAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxMQoJLy8gcmVzdWx0ID0gZWNfYWRkKAoJLy8gICAgICAgJ0JMUzEyXzM4MWcxJywKCS8vICAgICAgIGhleCgnYTlhMGM5ZjAyODliYjhmNTRkZTdiMTM5MTdiNDEwYzY0OWQ0MTdlMWI0OGRkMThkMjQ5YWZjNmM5NjA4OGEwZjZlNGQ3MmU0NDYxODYyMTNiMjdiNjI4MjdlMTJjOGE1JyksCgkvLyAgICAgICBoZXgoJzgxZmY2OGJhYTk2MzcwNmI0ZmVmZTM0MWJkZTgxYzU4NzNiOTY0YWNkNzVmM2YwYjBmZGZmYjgzY2ZjMGVkYWM2YmU1NTBhZWRlOWU5MWI3OWNiZjg1ZjUxMTkxZmQxYicpCgkvLyAgICAgKQoJYnl0ZSAweGE5YTBjOWYwMjg5YmI4ZjU0ZGU3YjEzOTE3YjQxMGM2NDlkNDE3ZTFiNDhkZDE4ZDI0OWFmYzZjOTYwODhhMGY2ZTRkNzJlNDQ2MTg2MjEzYjI3YjYyODI3ZTEyYzhhNQoJYnl0ZSAweDgxZmY2OGJhYTk2MzcwNmI0ZmVmZTM0MWJkZTgxYzU4NzNiOTY0YWNkNzVmM2YwYjBmZGZmYjgzY2ZjMGVkYWM2YmU1NTBhZWRlOWU5MWI3OWNiZjg1ZjUxMTkxZmQxYgoJZWNfYWRkIEJMUzEyXzM4MWcxCglmcmFtZV9idXJ5IC0xIC8vIHJlc3VsdDogYnl0ZXMKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MTYKCS8vIHJldHVybiByZXN1bHQ7CglmcmFtZV9kaWcgLTEgLy8gcmVzdWx0OiBieXRlcwoJZHVwCglsZW4KCWl0b2IKCWV4dHJhY3QgNiAyCglzd2FwCgljb25jYXQKCWJ5dGUgMHgxNTFmN2M3NQoJc3dhcAoJY29uY2F0Cglsb2cKCXJldHN1YgoKYWJpX3JvdXRlX2NyZWF0ZUFwcGxpY2F0aW9uOgoJaW50IDEKCXJldHVybgoKY3JlYXRlX05vT3A6CgltZXRob2QgImNyZWF0ZUFwcGxpY2F0aW9uKCl2b2lkIgoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMAoJbWF0Y2ggYWJpX3JvdXRlX2NyZWF0ZUFwcGxpY2F0aW9uCgllcnIKCmNhbGxfTm9PcDoKCW1ldGhvZCAiYWRkKClzdHJpbmciCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAwCgltYXRjaCBhYmlfcm91dGVfYWRkCgllcnI=",
+    "approval": "I3ByYWdtYSB2ZXJzaW9uIDEwCgovLyBUaGlzIFRFQUwgd2FzIGdlbmVyYXRlZCBieSBURUFMU2NyaXB0IHYwLjYzLjAKLy8gaHR0cHM6Ly9naXRodWIuY29tL2FsZ29yYW5kZm91bmRhdGlvbi9URUFMU2NyaXB0CgovLyBUaGlzIGNvbnRyYWN0IGlzIGNvbXBsaWFudCB3aXRoIGFuZC9vciBpbXBsZW1lbnRzIHRoZSBmb2xsb3dpbmcgQVJDczogWyBBUkM0IF0KCi8vIFRoZSBmb2xsb3dpbmcgdGVuIGxpbmVzIG9mIFRFQUwgaGFuZGxlIGluaXRpYWwgcHJvZ3JhbSBmbG93Ci8vIFRoaXMgcGF0dGVybiBpcyB1c2VkIHRvIG1ha2UgaXQgZWFzeSBmb3IgYW55b25lIHRvIHBhcnNlIHRoZSBzdGFydCBvZiB0aGUgcHJvZ3JhbSBhbmQgZGV0ZXJtaW5lIGlmIGEgc3BlY2lmaWMgYWN0aW9uIGlzIGFsbG93ZWQKLy8gSGVyZSwgYWN0aW9uIHJlZmVycyB0byB0aGUgT25Db21wbGV0ZSBpbiBjb21iaW5hdGlvbiB3aXRoIHdoZXRoZXIgdGhlIGFwcCBpcyBiZWluZyBjcmVhdGVkIG9yIGNhbGxlZAovLyBFdmVyeSBwb3NzaWJsZSBhY3Rpb24gZm9yIHRoaXMgY29udHJhY3QgaXMgcmVwcmVzZW50ZWQgaW4gdGhlIHN3aXRjaCBzdGF0ZW1lbnQKLy8gSWYgdGhlIGFjdGlvbiBpcyBub3QgaW1wbG1lbnRlZCBpbiB0aGUgY29udHJhY3QsIGl0cyByZXBzZWN0aXZlIGJyYW5jaCB3aWxsIGJlICJOT1RfSU1QTE1FTlRFRCIgd2hpY2gganVzdCBjb250YWlucyAiZXJyIgp0eG4gQXBwbGljYXRpb25JRAppbnQgMAo+CmludCA2CioKdHhuIE9uQ29tcGxldGlvbgorCnN3aXRjaCBjcmVhdGVfTm9PcCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIE5PVF9JTVBMRU1FTlRFRCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIGNhbGxfTm9PcAoKTk9UX0lNUExFTUVOVEVEOgoJZXJyCgovLyBhZGQoKWJ5dGVbXQovLwovLwovLyBAcmV0dXJucyBUaGUgcmVzdWx0IG9mIHRoZSBvcGVyYXRpb24KYWJpX3JvdXRlX2FkZDoKCWJ5dGUgMHggLy8gcHVzaCBlbXB0eSBieXRlcyB0byBmaWxsIHRoZSBzdGFjayBmcmFtZSBmb3IgdGhpcyBzdWJyb3V0aW5lJ3MgbG9jYWwgdmFyaWFibGVzCgoJLy8gZXhlY3V0ZSBhZGQoKWJ5dGVbXQoJY2FsbHN1YiBhZGQKCWludCAxCglyZXR1cm4KCmFkZDoKCXByb3RvIDEgMAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxMQoJLy8gcmVzdWx0ID0gZWNfYWRkKAoJLy8gICAgICAgJ0JMUzEyXzM4MWcxJywKCS8vICAgICAgIGhleCgKCS8vICAgICAgICAgJzE3ZjFkM2E3MzE5N2Q3OTQyNjk1NjM4YzRmYTlhYzBmYzM2ODhjNGY5Nzc0YjkwNWExNGUzYTNmMTcxYmFjNTg2YzU1ZTgzZmY5N2ExYWVmZmIzYWYwMGFkYjIyYzZiYjA4YjNmNDgxZTNhYWEwZjFhMDllMzBlZDc0MWQ4YWU0ZmNmNWUwOTVkNWQwMGFmNjAwZGIxOGNiMmMwNGIzZWRkMDNjYzc0NGEyODg4YWU0MGNhYTIzMjk0NmM1ZTdlMScKCS8vICAgICAgICksCgkvLyAgICAgICBoZXgoCgkvLyAgICAgICAgICcxN2YxZDNhNzMxOTdkNzk0MjY5NTYzOGM0ZmE5YWMwZmMzNjg4YzRmOTc3NGI5MDVhMTRlM2EzZjE3MWJhYzU4NmM1NWU4M2ZmOTdhMWFlZmZiM2FmMDBhZGIyMmM2YmIwOGIzZjQ4MWUzYWFhMGYxYTA5ZTMwZWQ3NDFkOGFlNGZjZjVlMDk1ZDVkMDBhZjYwMGRiMThjYjJjMDRiM2VkZDAzY2M3NDRhMjg4OGFlNDBjYWEyMzI5NDZjNWU3ZTEnCgkvLyAgICAgICApCgkvLyAgICAgKQoJYnl0ZSAweDE3ZjFkM2E3MzE5N2Q3OTQyNjk1NjM4YzRmYTlhYzBmYzM2ODhjNGY5Nzc0YjkwNWExNGUzYTNmMTcxYmFjNTg2YzU1ZTgzZmY5N2ExYWVmZmIzYWYwMGFkYjIyYzZiYjA4YjNmNDgxZTNhYWEwZjFhMDllMzBlZDc0MWQ4YWU0ZmNmNWUwOTVkNWQwMGFmNjAwZGIxOGNiMmMwNGIzZWRkMDNjYzc0NGEyODg4YWU0MGNhYTIzMjk0NmM1ZTdlMQoJYnl0ZSAweDE3ZjFkM2E3MzE5N2Q3OTQyNjk1NjM4YzRmYTlhYzBmYzM2ODhjNGY5Nzc0YjkwNWExNGUzYTNmMTcxYmFjNTg2YzU1ZTgzZmY5N2ExYWVmZmIzYWYwMGFkYjIyYzZiYjA4YjNmNDgxZTNhYWEwZjFhMDllMzBlZDc0MWQ4YWU0ZmNmNWUwOTVkNWQwMGFmNjAwZGIxOGNiMmMwNGIzZWRkMDNjYzc0NGEyODg4YWU0MGNhYTIzMjk0NmM1ZTdlMQoJZWNfYWRkIEJMUzEyXzM4MWcxCglmcmFtZV9idXJ5IC0xIC8vIHJlc3VsdDogYnl0ZXMKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MjAKCS8vIHJldHVybiByZXN1bHQ7CglmcmFtZV9kaWcgLTEgLy8gcmVzdWx0OiBieXRlcwoJZHVwCglsZW4KCWl0b2IKCWV4dHJhY3QgNiAyCglzd2FwCgljb25jYXQKCWJ5dGUgMHgxNTFmN2M3NQoJc3dhcAoJY29uY2F0Cglsb2cKCXJldHN1YgoKYWJpX3JvdXRlX2NyZWF0ZUFwcGxpY2F0aW9uOgoJaW50IDEKCXJldHVybgoKY3JlYXRlX05vT3A6CgltZXRob2QgImNyZWF0ZUFwcGxpY2F0aW9uKCl2b2lkIgoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMAoJbWF0Y2ggYWJpX3JvdXRlX2NyZWF0ZUFwcGxpY2F0aW9uCgllcnIKCmNhbGxfTm9PcDoKCW1ldGhvZCAiYWRkKClieXRlW10iCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAwCgltYXRjaCBhYmlfcm91dGVfYWRkCgllcnI=",
     "clear": "I3ByYWdtYSB2ZXJzaW9uIDEw"
   },
   "contract": {
@@ -78,7 +78,7 @@ export const APP_SPEC: AppSpec = {
         "args": [],
         "desc": "",
         "returns": {
-          "type": "string",
+          "type": "byte[]",
           "desc": "The result of the operation"
         }
       },
@@ -150,14 +150,14 @@ export type Mahber = {
    * Maps method signatures / names to their argument and return types.
    */
   methods:
-    & Record<'add()string' | 'add', {
+    & Record<'add()byte[]' | 'add', {
       argsObj: {
       }
       argsTuple: []
       /**
        * The result of the operation
        */
-      returns: string
+      returns: Uint8Array
     }>
     & Record<'createApplication()void' | 'createApplication', {
       argsObj: {
@@ -238,15 +238,15 @@ export abstract class MahberCallFactory {
   }
 
   /**
-   * Constructs a no op call for the add()string ABI method
+   * Constructs a no op call for the add()byte[] ABI method
    *
    * @param args Any args for the contract call
    * @param params Any additional parameters for the call
    * @returns A TypedCallParams object for the call
    */
-  static add(args: MethodArgs<'add()string'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
+  static add(args: MethodArgs<'add()byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
     return {
-      method: 'add()string' as const,
+      method: 'add()byte[]' as const,
       methodArgs: Array.isArray(args) ? args : [],
       ...params,
     }
@@ -351,13 +351,13 @@ export class MahberClient {
   }
 
   /**
-   * Calls the add()string ABI method.
+   * Calls the add()byte[] ABI method.
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
    * @returns The result of the call: The result of the operation
    */
-  public add(args: MethodArgs<'add()string'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
+  public add(args: MethodArgs<'add()byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
     return this.call(MahberCallFactory.add(args, params))
   }
 
@@ -367,7 +367,7 @@ export class MahberClient {
     let promiseChain:Promise<unknown> = Promise.resolve()
     const resultMappers: Array<undefined | ((x: any) => any)> = []
     return {
-      add(args: MethodArgs<'add()string'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
+      add(args: MethodArgs<'add()byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
         promiseChain = promiseChain.then(() => client.add(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
         resultMappers.push(undefined)
         return this
@@ -398,13 +398,13 @@ export class MahberClient {
 }
 export type MahberComposer<TReturns extends [...any[]] = []> = {
   /**
-   * Calls the add()string ABI method.
+   * Calls the add()byte[] ABI method.
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
    * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
    */
-  add(args: MethodArgs<'add()string'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'add()string'>]>
+  add(args: MethodArgs<'add()byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'add()byte[]'>]>
 
   /**
    * Makes a clear_state call to an existing instance of the Mahber smart contract.
