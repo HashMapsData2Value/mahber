@@ -1,0 +1,24 @@
+{
+  "name": "Mahber",
+  "desc": "",
+  "methods": [
+    {
+      "name": "add",
+      "args": [],
+      "desc": "",
+      "returns": {
+        "type": "byte[]",
+        "desc": "The result of the operation"
+      }
+    },
+    {
+      "name": "createApplication",
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      },
+      "args": []
+    }
+  ]
+}

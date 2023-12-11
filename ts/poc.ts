@@ -1,8 +1,8 @@
 import {generate_fe, generate_ge, hash_to_ge, create_ring_link, ec_scalar_mul, ec_fe_mul, ec_fe_sub} from './bls12_381_utils';
 
 // First we generate a key pair for the signer and public keys for each other participant.
-// Then we generate the 
-// In reality we obviously don't have access to the other participants private keys
+// Then we generate the public keys of the other participants, based on the specified number.
+// (In reality we obviously don't have access to the other participants private keys)
 
 const k_pi: Uint8Array = generate_fe();
 const K_pi: Uint8Array = generate_ge(k_pi);

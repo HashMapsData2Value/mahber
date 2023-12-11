@@ -1,7 +1,20 @@
+// Ideally would have used BN254 for opcode cost reasons but its implementation in
+// noble lacks the hashToCurve export function as of 2023-11-14
+// import { bn254 } from '@noble/curves/bn254';
+
 import { bls12_381 } from '@noble/curves/bls12-381';
 import { keccak_256 } from '@noble/hashes/sha3';
 import * as utils from '@noble/curves/abstract/utils';
+import { AffinePoint } from '@noble/curves/abstract/curve';
 
+
+// TODO: Ensure that everything is using Uint8Array to pass along data between functions
+// While this might make things less clear in the main file, it will make it easier to switch out
+// from bls12_381 to bn254 in the future, or even ed25519
+
+function ninetysix_bytes_rep(p: AffinePoint<bigint>): string {
+    return utils.bytesToHex(utils.concatBytes(utils.numberToBytesBE(p.x, 48), utils.numberToBytesBE(p.y, 48)))
+}
 export function hash_to_ge(input: Uint8Array): Uint8Array {
     return bls12_381.G1.ProjectivePoint.fromAffine(bls12_381.G1.hashToCurve(input).toAffine()).toRawBytes()
 }
