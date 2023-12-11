@@ -3,11 +3,38 @@
   "desc": "",
   "methods": [
     {
-      "name": "add",
+      "name": "pointAdd",
       "args": [],
-      "desc": "",
+      "desc": "Point add",
       "returns": {
         "type": "byte[]",
+        "desc": "The result of the operation"
+      }
+    },
+    {
+      "name": "scalarMult",
+      "args": [],
+      "desc": "Scalar Mult",
+      "returns": {
+        "type": "byte[]",
+        "desc": "The result of the operation"
+      }
+    },
+    {
+      "name": "scalarMultBase",
+      "args": [],
+      "desc": "Scalar Mult BaseScalar multiplication of the base point",
+      "returns": {
+        "type": "byte[]",
+        "desc": "The result of the operation"
+      }
+    },
+    {
+      "name": "pointSubgroup",
+      "args": [],
+      "desc": "Point Check",
+      "returns": {
+        "type": "bool",
         "desc": "The result of the operation"
       }
     },

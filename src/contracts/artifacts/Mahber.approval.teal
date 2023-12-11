@@ -22,19 +22,20 @@ switch create_NoOp NOT_IMPLEMENTED NOT_IMPLEMENTED NOT_IMPLEMENTED NOT_IMPLEMENT
 NOT_IMPLEMENTED:
 	err
 
-// add()byte[]
+// pointAdd()byte[]
 //
+// Point add
 //
 // @returns The result of the operation
-abi_route_add:
+abi_route_pointAdd:
 	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
 
-	// execute add()byte[]
-	callsub add
+	// execute pointAdd()byte[]
+	callsub pointAdd
 	int 1
 	return
 
-add:
+pointAdd:
 	proto 1 0
 
 	// contracts/mahber.algo.ts:11
@@ -67,6 +68,128 @@ add:
 	log
 	retsub
 
+// scalarMult()byte[]
+//
+// Scalar Mult
+//
+// @returns The result of the operation
+abi_route_scalarMult:
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+
+	// execute scalarMult()byte[]
+	callsub scalarMult
+	int 1
+	return
+
+scalarMult:
+	proto 1 0
+
+	// contracts/mahber.algo.ts:29
+	// result = ec_scalar_mul('BN254g1', hex(''), hex(''))
+	byte 0x
+	byte 0x
+	ec_scalar_mul BN254g1
+	frame_bury -1 // result: bytes
+
+	// contracts/mahber.algo.ts:30
+	// return result;
+	frame_dig -1 // result: bytes
+	dup
+	len
+	itob
+	extract 6 2
+	swap
+	concat
+	byte 0x151f7c75
+	swap
+	concat
+	log
+	retsub
+
+// scalarMultBase()byte[]
+//
+// Scalar Mult Base
+// Scalar multiplication of the base point
+// @returns The result of the operation
+abi_route_scalarMultBase:
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+
+	// execute scalarMultBase()byte[]
+	callsub scalarMultBase
+	int 1
+	return
+
+scalarMultBase:
+	proto 1 0
+
+	// contracts/mahber.algo.ts:39
+	// result = ec_scalar_mul(
+	//       'BN254g1',
+	//       hex(
+	//         '00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002'
+	//       ),
+	//       '1'
+	//     )
+	byte 0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002
+	byte 0x31 // "1"
+	ec_scalar_mul BN254g1
+	frame_bury -1 // result: bytes
+
+	// contracts/mahber.algo.ts:46
+	// return result;
+	frame_dig -1 // result: bytes
+	dup
+	len
+	itob
+	extract 6 2
+	swap
+	concat
+	byte 0x151f7c75
+	swap
+	concat
+	log
+	retsub
+
+// pointSubgroup()bool
+//
+// Point Check
+//
+// @returns The result of the operation
+abi_route_pointSubgroup:
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+
+	// execute pointSubgroup()bool
+	callsub pointSubgroup
+	int 1
+	return
+
+pointSubgroup:
+	proto 1 0
+
+	// contracts/mahber.algo.ts:55
+	// check1 = ec_subgroup_check(
+	//       'BN254g1',
+	//       hex(
+	//         '00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002'
+	//       )
+	//     )
+	byte 0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002
+	ec_subgroup_check BN254g1
+	frame_bury -1 // check1: bool
+
+	// contracts/mahber.algo.ts:72
+	// return check1;
+	frame_dig -1 // check1: bool
+	byte 0x00
+	int 0
+	uncover 2
+	setbit
+	byte 0x151f7c75
+	swap
+	concat
+	log
+	retsub
+
 abi_route_createApplication:
 	int 1
 	return
@@ -78,7 +201,10 @@ create_NoOp:
 	err
 
 call_NoOp:
-	method "add()byte[]"
+	method "pointAdd()byte[]"
+	method "scalarMult()byte[]"
+	method "scalarMultBase()byte[]"
+	method "pointSubgroup()bool"
 	txna ApplicationArgs 0
-	match abi_route_add
+	match abi_route_pointAdd abi_route_scalarMult abi_route_scalarMultBase abi_route_pointSubgroup
 	err
