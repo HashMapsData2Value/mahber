@@ -22,84 +22,26 @@ switch create_NoOp NOT_IMPLEMENTED NOT_IMPLEMENTED NOT_IMPLEMENTED NOT_IMPLEMENT
 NOT_IMPLEMENTED:
 	err
 
-// pointAdd()byte[]
+// dummyOpUp(uint64)uint64
 //
-// Point add
-//
-// @returns The result of the operation
-abi_route_pointAdd:
-	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+// Dummy Op Up
+abi_route_dummyOpUp:
+	// i: uint64
+	txna ApplicationArgs 1
+	btoi
 
-	// execute pointAdd()byte[]
-	callsub pointAdd
+	// execute dummyOpUp(uint64)uint64
+	callsub dummyOpUp
 	int 1
 	return
 
-pointAdd:
+dummyOpUp:
 	proto 1 0
 
-	// contracts/mahber.algo.ts:11
-	// result = ec_add(
-	//       'BLS12_381g1',
-	//       hex(
-	//         '17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1'
-	//       ),
-	//       hex(
-	//         '17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1'
-	//       )
-	//     )
-	byte 0x17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1
-	byte 0x17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1
-	ec_add BLS12_381g1
-	frame_bury -1 // result: bytes
-
-	// contracts/mahber.algo.ts:20
-	// return result;
-	frame_dig -1 // result: bytes
-	dup
-	len
+	// contracts/mahber.algo.ts:10
+	// return i;
+	frame_dig -1 // i: uint64
 	itob
-	extract 6 2
-	swap
-	concat
-	byte 0x151f7c75
-	swap
-	concat
-	log
-	retsub
-
-// scalarMult()byte[]
-//
-// Scalar Mult
-//
-// @returns The result of the operation
-abi_route_scalarMult:
-	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
-
-	// execute scalarMult()byte[]
-	callsub scalarMult
-	int 1
-	return
-
-scalarMult:
-	proto 1 0
-
-	// contracts/mahber.algo.ts:29
-	// result = ec_scalar_mul('BN254g1', hex(''), hex(''))
-	byte 0x
-	byte 0x
-	ec_scalar_mul BN254g1
-	frame_bury -1 // result: bytes
-
-	// contracts/mahber.algo.ts:30
-	// return result;
-	frame_dig -1 // result: bytes
-	dup
-	len
-	itob
-	extract 6 2
-	swap
-	concat
 	byte 0x151f7c75
 	swap
 	concat
@@ -122,20 +64,20 @@ abi_route_scalarMultBase:
 scalarMultBase:
 	proto 1 0
 
-	// contracts/mahber.algo.ts:39
+	// contracts/mahber.algo.ts:19
 	// result = ec_scalar_mul(
-	//       'BN254g1',
+	//       "BN254g1",
 	//       hex(
-	//         '00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002'
+	//         "00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002"
 	//       ),
-	//       '1'
+	//       hex("01")
 	//     )
 	byte 0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002
-	byte 0x31 // "1"
+	byte 0x01
 	ec_scalar_mul BN254g1
 	frame_bury -1 // result: bytes
 
-	// contracts/mahber.algo.ts:46
+	// contracts/mahber.algo.ts:26
 	// return result;
 	frame_dig -1 // result: bytes
 	dup
@@ -166,24 +108,70 @@ abi_route_pointSubgroup:
 pointSubgroup:
 	proto 1 0
 
-	// contracts/mahber.algo.ts:55
+	// contracts/mahber.algo.ts:35
 	// check1 = ec_subgroup_check(
-	//       'BN254g1',
+	//       "BN254g1",
 	//       hex(
-	//         '00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002'
+	//         "00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002"
 	//       )
 	//     )
 	byte 0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002
 	ec_subgroup_check BN254g1
 	frame_bury -1 // check1: bool
 
-	// contracts/mahber.algo.ts:72
+	// contracts/mahber.algo.ts:52
 	// return check1;
 	frame_dig -1 // check1: bool
 	byte 0x00
 	int 0
 	uncover 2
 	setbit
+	byte 0x151f7c75
+	swap
+	concat
+	log
+	retsub
+
+// pointAdd()byte[]
+//
+// Point add
+//
+// @returns The result of the operation
+abi_route_pointAdd:
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+
+	// execute pointAdd()byte[]
+	callsub pointAdd
+	int 1
+	return
+
+pointAdd:
+	proto 1 0
+
+	// contracts/mahber.algo.ts:71
+	// result = ec_add(
+	//       "BLS12_381g1",
+	//       hex(
+	//         "17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1"
+	//       ),
+	//       hex(
+	//         "17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1"
+	//       )
+	//     )
+	byte 0x17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1
+	byte 0x17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1
+	ec_add BLS12_381g1
+	frame_bury -1 // result: bytes
+
+	// contracts/mahber.algo.ts:80
+	// return result;
+	frame_dig -1 // result: bytes
+	dup
+	len
+	itob
+	extract 6 2
+	swap
+	concat
 	byte 0x151f7c75
 	swap
 	concat
@@ -201,10 +189,10 @@ create_NoOp:
 	err
 
 call_NoOp:
-	method "pointAdd()byte[]"
-	method "scalarMult()byte[]"
+	method "dummyOpUp(uint64)uint64"
 	method "scalarMultBase()byte[]"
 	method "pointSubgroup()bool"
+	method "pointAdd()byte[]"
 	txna ApplicationArgs 0
-	match abi_route_pointAdd abi_route_scalarMult abi_route_scalarMultBase abi_route_pointSubgroup
+	match abi_route_dummyOpUp abi_route_scalarMultBase abi_route_pointSubgroup abi_route_pointAdd
 	err

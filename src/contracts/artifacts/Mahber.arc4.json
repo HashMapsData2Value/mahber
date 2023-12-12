@@ -3,21 +3,18 @@
   "desc": "",
   "methods": [
     {
-      "name": "pointAdd",
-      "args": [],
-      "desc": "Point add",
+      "name": "dummyOpUp",
+      "args": [
+        {
+          "name": "i",
+          "type": "uint64",
+          "desc": ""
+        }
+      ],
+      "desc": "Dummy Op Up",
       "returns": {
-        "type": "byte[]",
-        "desc": "The result of the operation"
-      }
-    },
-    {
-      "name": "scalarMult",
-      "args": [],
-      "desc": "Scalar Mult",
-      "returns": {
-        "type": "byte[]",
-        "desc": "The result of the operation"
+        "type": "uint64",
+        "desc": ""
       }
     },
     {
@@ -35,6 +32,15 @@
       "desc": "Point Check",
       "returns": {
         "type": "bool",
+        "desc": "The result of the operation"
+      }
+    },
+    {
+      "name": "pointAdd",
+      "args": [],
+      "desc": "Point add",
+      "returns": {
+        "type": "byte[]",
         "desc": "The result of the operation"
       }
     },

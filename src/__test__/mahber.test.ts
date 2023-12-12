@@ -1,12 +1,12 @@
-import { describe, test, expect, beforeAll, beforeEach } from '@jest/globals';
-import { algorandFixture } from '@algorandfoundation/algokit-utils/testing';
-import { MahberClient } from '../contracts/clients/MahberClient';
+import { describe, test, expect, beforeAll, beforeEach } from "@jest/globals";
+import { algorandFixture } from "@algorandfoundation/algokit-utils/testing";
+import { MahberClient } from "../contracts/clients/MahberClient";
 
 const fixture = algorandFixture();
 
 let appClient: MahberClient;
 
-describe('Mahber', () => {
+describe("Mahber", () => {
   beforeEach(fixture.beforeEach);
 
   beforeAll(async () => {
@@ -16,7 +16,7 @@ describe('Mahber', () => {
     appClient = new MahberClient(
       {
         sender: testAccount,
-        resolveBy: 'id',
+        resolveBy: "id",
         id: 0,
       },
       algod
@@ -25,7 +25,7 @@ describe('Mahber', () => {
     await appClient.create.createApplication({});
   });
 
-  test.skip('bls12_381g1_add', async () => {
+  test.skip("bls12_381g1_add", async () => {
     const sum = await appClient.pointAdd({});
     expect(sum.return?.valueOf()).toStrictEqual([
       5, 114, 203, 234, 144, 77, 103, 70, 136, 8, 200, 235, 80, 169, 69, 12, 151, 33, 219, 48, 145, 40, 1, 37, 67, 144,
@@ -35,17 +35,37 @@ describe('Mahber', () => {
     ]);
   });
 
-  test('scalarMultBase', async () => {
-    const sum = await appClient.scalarMultBase({});
-    console.log(sum);
-    expect(sum.return?.valueOf()).toStrictEqual([
-      5, 137, 244, 216, 137, 136, 193, 189, 222, 252, 117, 169, 93, 186, 178, 170, 206, 245, 86, 120, 124, 230, 226,
-      125, 140, 167, 170, 25, 12, 157, 77, 114, 33, 155, 124, 133, 168, 95, 19, 126, 75, 243, 146, 32, 158, 2, 105, 155,
-      22, 210, 212, 191, 87, 123, 196, 223, 194, 178, 17, 21, 171, 101, 223, 235,
+  test("scalarMultBase - 1", async () => {
+    const res = await appClient
+      .compose()
+      .dummyOpUp({ i: 1 })
+      .dummyOpUp({ i: 2 })
+      .scalarMultBase({ scalar: [1] })
+      .execute();
+
+    const a = res.returns?.valueOf() as Array<bigint | Array<number>>;
+    expect(a[2]).toEqual([
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
     ]);
   });
 
-  test.skip('pointCheck', async () => {
+  test("scalarMultBase - sk to pk", async () => {
+    const res = await appClient
+      .compose()
+      .dummyOpUp({ i: 1 })
+      .dummyOpUp({ i: 2 })
+      .scalarMultBase({ scalar: [1] })
+      .execute();
+
+    const a = res.returns?.valueOf() as Array<bigint | Array<number>>;
+    expect(a[2]).toEqual([
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+    ]);
+  });
+
+  test.skip("pointCheck", async () => {
     const sum = await appClient.pointSubgroup({});
     expect(sum.return?.valueOf()).toStrictEqual(true);
   });
