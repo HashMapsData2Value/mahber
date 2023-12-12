@@ -48,7 +48,7 @@ dummyOpUp:
 	log
 	retsub
 
-// scalarMultBase()byte[]
+// scalarMultBase(bytes)byte[]
 //
 // Scalar Mult Base
 // Scalar multiplication of the base point
@@ -56,13 +56,17 @@ dummyOpUp:
 abi_route_scalarMultBase:
 	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
 
-	// execute scalarMultBase()byte[]
+	// scalar: byte[]
+	txna ApplicationArgs 1
+	extract 2 0
+
+	// execute scalarMultBase(bytes)byte[]
 	callsub scalarMultBase
 	int 1
 	return
 
 scalarMultBase:
-	proto 1 0
+	proto 2 0
 
 	// contracts/mahber.algo.ts:19
 	// result = ec_scalar_mul(
@@ -70,16 +74,16 @@ scalarMultBase:
 	//       hex(
 	//         "00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002"
 	//       ),
-	//       hex("01")
+	//       scalar
 	//     )
 	byte 0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002
-	byte 0x01
+	frame_dig -1 // scalar: bytes
 	ec_scalar_mul BN254g1
-	frame_bury -1 // result: bytes
+	frame_bury -2 // result: bytes
 
 	// contracts/mahber.algo.ts:26
 	// return result;
-	frame_dig -1 // result: bytes
+	frame_dig -2 // result: bytes
 	dup
 	len
 	itob
@@ -190,7 +194,7 @@ create_NoOp:
 
 call_NoOp:
 	method "dummyOpUp(uint64)uint64"
-	method "scalarMultBase()byte[]"
+	method "scalarMultBase(byte[])byte[]"
 	method "pointSubgroup()bool"
 	method "pointAdd()byte[]"
 	txna ApplicationArgs 0

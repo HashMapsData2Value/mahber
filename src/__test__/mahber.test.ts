@@ -35,33 +35,45 @@ describe("Mahber", () => {
     ]);
   });
 
-  test("scalarMultBase - 1", async () => {
+  test("scalarMultBase - 1 to base", async () => {
+    const b = new Uint8Array([1]);
     const res = await appClient
       .compose()
       .dummyOpUp({ i: 1 })
       .dummyOpUp({ i: 2 })
-      .scalarMultBase({ scalar: [1] })
+      .scalarMultBase({ scalar: b })
       .execute();
 
     const a = res.returns?.valueOf() as Array<bigint | Array<number>>;
+
+    console.log("scalarMultBase 1", a);
+
     expect(a[2]).toEqual([
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
     ]);
   });
 
-  test("scalarMultBase - sk to pk", async () => {
+  test("scalarMultBase - scalar to point", async () => {
+    const b = new Uint8Array([
+      43, 43, 74, 87, 118, 68, 161, 190, 119, 52, 7, 77, 232, 183, 32, 169, 64, 29, 214, 97, 221, 184, 208, 198, 18, 7,
+      185, 226, 87, 128, 207, 23,
+    ]);
     const res = await appClient
       .compose()
-      .dummyOpUp({ i: 1 })
-      .dummyOpUp({ i: 2 })
-      .scalarMultBase({ scalar: [1] })
+      .dummyOpUp({ i: 11 })
+      .dummyOpUp({ i: 22 })
+      .scalarMultBase({
+        scalar: b,
+      })
       .execute();
 
     const a = res.returns?.valueOf() as Array<bigint | Array<number>>;
+
     expect(a[2]).toEqual([
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+      2, 211, 59, 206, 168, 18, 112, 41, 206, 16, 18, 168, 234, 92, 245, 113, 75, 26, 107, 230, 28, 69, 66, 139, 31,
+      238, 254, 241, 207, 190, 99, 118, 12, 134, 251, 66, 223, 28, 63, 75, 200, 249, 117, 254, 180, 244, 169, 35, 47,
+      51, 76, 253, 113, 191, 129, 166, 85, 134, 43, 73, 71, 94, 113, 120,
     ]);
   });
 

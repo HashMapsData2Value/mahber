@@ -19,7 +19,13 @@
     },
     {
       "name": "scalarMultBase",
-      "args": [],
+      "args": [
+        {
+          "name": "scalar",
+          "type": "byte[]",
+          "desc": ""
+        }
+      ],
       "desc": "Scalar Mult BaseScalar multiplication of the base point",
       "returns": {
         "type": "byte[]",

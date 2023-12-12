@@ -14,14 +14,14 @@ class Mahber extends Contract {
    * Scalar multiplication of the base point
    * @returns The result of the operation
    */
-  scalarMultBase(): bytes {
+  scalarMultBase(scalar: bytes): bytes {
     // @ts-ignore
     const result = ec_scalar_mul(
       "BN254g1",
       hex(
         "00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002"
       ),
-      hex("01")
+      scalar
     );
     return result;
   }
