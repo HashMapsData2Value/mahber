@@ -3,8 +3,9 @@ import { Contract } from "@algorandfoundation/tealscript";
 // eslint-disable-next-line no-unused-vars
 class Mahber extends Contract {
   /** Dummy Op Up
-   *
-   *
+   * Dummy operation to get more opcode budget
+   * @i - The number to return, necssary to deduplicate the name
+   * @returns the number (but we do nothing with it)
    */
   dummyOpUp(i: number): number {
     return i;
@@ -12,7 +13,8 @@ class Mahber extends Contract {
 
   /** Scalar Mult Base
    * Scalar multiplication of the base point
-   * @returns The result of the operation
+   * @scalar - The scalar to multiply the basepoint by.
+   * @returns a point on the curve
    */
   scalarMultBase(scalar: bytes): bytes {
     // @ts-ignore
@@ -26,69 +28,55 @@ class Mahber extends Contract {
     return result;
   }
 
-  /** Point Check
-   *
-   * @returns The result of the operation
+  /** Scalar Mult
+   * Scalar multiplication with a supplied point
+   * @scalar - The scalar to multiply the point with
+   * @point - The point that is multiplied with the scalar
+   * @returns a point on the curve
    */
-  pointSubgroup(): boolean {
+  scalarMult(scalar: bytes, point: bytes): bytes {
     // @ts-ignore
-    const check1 = ec_subgroup_check(
-      "BN254g1",
-      hex(
-        "00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002"
-      )
-    );
-    /**
-     
-    const check2 = ec_subgroup_check(
-      'BN254g1',
-      hex(
-        '09d3a257b99f1ad804a9e2354ea71c72da7fa518f4ca7904c6951d924b4045b4174be12ae3fd899d55d3e487fa103f951a24ca0f670ecae802209b2518ccca6c'
-        )
-        );
-        * 
-        */
-
-    return check1; // && check2;
-  }
-
-  // /** Scalar Mult
-  //  *
-  //  * @returns The result of the operation
-  //  */
-  // scalarMult(): bytes {
-  //   // @ts-ignore
-  //   const result = ec_scalar_mul('BN254g1', hex(''), hex(''));
-  //   return result;
-  // }
-
-  /** Point add
-   *
-   * @returns The result of the operation
-   */
-  pointAdd(): bytes {
-    // @ts-ignore
-    const result = ec_add(
-      "BLS12_381g1",
-      hex(
-        "17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1"
-      ),
-      hex(
-        "17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1"
-      )
-    );
+    const result = ec_scalar_mul("BN254g1", point, scalar);
     return result;
   }
 
-  // /** Scalar Mult Base
-  //  *
-  //  * @returns The result of the operation
-  //  */
-  // hashToPoint(): bytes {
-  //   // @ts-ignore
-  //   const s = 'Hello World';
-  //   const h = sha256(s);
-  //   const result = ec_map_to('BN254g1', hex(h));
-  //   return result;
-  // }
+  /** validPoint
+   * Checks if the point is valid (on curve)
+   * @point - The point to check
+   * @returns true if the point is valid, false otherwise
+   */
+  validPoint(point: bytes): boolean {
+    // @ts-ignore
+    return ec_subgroup_check("BN254g1", point);
+  }
+
+  /** Point add
+   *  Adds two points on the curve
+   * @param pointA - The first point
+   * @param pointB - The second point
+   * @returns The result of the operation
+   */
+  pointAdd(pointA: bytes, pointB: bytes): bytes {
+    // @ts-ignore
+    const result = ec_add("BN254g1", pointA, pointB);
+    return result;
+  }
+
+  /** hashPointToPoint
+   *  Hashes a point to a point on the curve
+   * NOTE: ec_map_to maps fp_element to curve point. We use hash and then mod to map bytes to fp_element first.
+   * What is inside ec_map_to (accessed Dec 13th 2023):
+   *    https://github.com/algorand/go-algorand/blob/master/data/transactions/logic/pairing.go#L862
+   *    https://pkg.go.dev/github.com/consensys/gnark-crypto/ecc/bn254#MapToG1
+   *    https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fp/element.go#L42
+   * @param point - The point to hash
+   * @returns The result of the operation
+   */
+  hashToPoint(point: bytes): bytes {
+    // @ts-ignore
+    const hash = sha256(point);
+    const fpElement = btoi(hash) % btoi(hex("30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47")); // 21888242871839275222246405745257275088548364400416034343698204186575808495617;
+    const result = ec_map_to("BN254g1", fpElement);
+    return result;
+  }
 }

@@ -11,10 +11,10 @@
           "desc": ""
         }
       ],
-      "desc": "Dummy Op Up",
+      "desc": "Dummy Op UpDummy operation to get more opcode budget@i- The number to return, necssary to deduplicate the name",
       "returns": {
         "type": "uint64",
-        "desc": ""
+        "desc": "the number (but we do nothing with it)"
       }
     },
     {
@@ -26,25 +26,62 @@
           "desc": ""
         }
       ],
-      "desc": "Scalar Mult BaseScalar multiplication of the base point",
+      "desc": "Scalar Mult BaseScalar multiplication of the base point@scalar- The scalar to multiply the basepoint by.",
       "returns": {
         "type": "byte[]",
-        "desc": "The result of the operation"
+        "desc": "a point on the curve"
       }
     },
     {
-      "name": "pointSubgroup",
-      "args": [],
-      "desc": "Point Check",
+      "name": "scalarMult",
+      "args": [
+        {
+          "name": "scalar",
+          "type": "byte[]",
+          "desc": ""
+        },
+        {
+          "name": "point",
+          "type": "byte[]",
+          "desc": ""
+        }
+      ],
+      "desc": "Scalar MultScalar multiplication with a supplied point@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar",
+      "returns": {
+        "type": "byte[]",
+        "desc": "a point on the curve"
+      }
+    },
+    {
+      "name": "validPoint",
+      "args": [
+        {
+          "name": "point",
+          "type": "byte[]",
+          "desc": ""
+        }
+      ],
+      "desc": "validPointChecks if the point is valid (on curve)@point- The point to check",
       "returns": {
         "type": "bool",
-        "desc": "The result of the operation"
+        "desc": "true if the point is valid, false otherwise"
       }
     },
     {
       "name": "pointAdd",
-      "args": [],
-      "desc": "Point add",
+      "args": [
+        {
+          "name": "pointA",
+          "type": "byte[]",
+          "desc": "The first point"
+        },
+        {
+          "name": "pointB",
+          "type": "byte[]",
+          "desc": "The second point"
+        }
+      ],
+      "desc": "Point addAdds two points on the curve",
       "returns": {
         "type": "byte[]",
         "desc": "The result of the operation"

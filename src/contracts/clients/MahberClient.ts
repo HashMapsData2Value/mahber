@@ -37,12 +37,17 @@ export const APP_SPEC: AppSpec = {
         "no_op": "CALL"
       }
     },
-    "pointSubgroup()bool": {
+    "scalarMult(byte[],byte[])byte[]": {
       "call_config": {
         "no_op": "CALL"
       }
     },
-    "pointAdd()byte[]": {
+    "validPoint(byte[])bool": {
+      "call_config": {
+        "no_op": "CALL"
+      }
+    },
+    "pointAdd(byte[],byte[])byte[]": {
       "call_config": {
         "no_op": "CALL"
       }
@@ -81,7 +86,7 @@ export const APP_SPEC: AppSpec = {
     }
   },
   "source": {
-    "approval": "I3ByYWdtYSB2ZXJzaW9uIDEwCgovLyBUaGlzIFRFQUwgd2FzIGdlbmVyYXRlZCBieSBURUFMU2NyaXB0IHYwLjYzLjAKLy8gaHR0cHM6Ly9naXRodWIuY29tL2FsZ29yYW5kZm91bmRhdGlvbi9URUFMU2NyaXB0CgovLyBUaGlzIGNvbnRyYWN0IGlzIGNvbXBsaWFudCB3aXRoIGFuZC9vciBpbXBsZW1lbnRzIHRoZSBmb2xsb3dpbmcgQVJDczogWyBBUkM0IF0KCi8vIFRoZSBmb2xsb3dpbmcgdGVuIGxpbmVzIG9mIFRFQUwgaGFuZGxlIGluaXRpYWwgcHJvZ3JhbSBmbG93Ci8vIFRoaXMgcGF0dGVybiBpcyB1c2VkIHRvIG1ha2UgaXQgZWFzeSBmb3IgYW55b25lIHRvIHBhcnNlIHRoZSBzdGFydCBvZiB0aGUgcHJvZ3JhbSBhbmQgZGV0ZXJtaW5lIGlmIGEgc3BlY2lmaWMgYWN0aW9uIGlzIGFsbG93ZWQKLy8gSGVyZSwgYWN0aW9uIHJlZmVycyB0byB0aGUgT25Db21wbGV0ZSBpbiBjb21iaW5hdGlvbiB3aXRoIHdoZXRoZXIgdGhlIGFwcCBpcyBiZWluZyBjcmVhdGVkIG9yIGNhbGxlZAovLyBFdmVyeSBwb3NzaWJsZSBhY3Rpb24gZm9yIHRoaXMgY29udHJhY3QgaXMgcmVwcmVzZW50ZWQgaW4gdGhlIHN3aXRjaCBzdGF0ZW1lbnQKLy8gSWYgdGhlIGFjdGlvbiBpcyBub3QgaW1wbG1lbnRlZCBpbiB0aGUgY29udHJhY3QsIGl0cyByZXBzZWN0aXZlIGJyYW5jaCB3aWxsIGJlICJOT1RfSU1QTE1FTlRFRCIgd2hpY2gganVzdCBjb250YWlucyAiZXJyIgp0eG4gQXBwbGljYXRpb25JRAppbnQgMAo+CmludCA2CioKdHhuIE9uQ29tcGxldGlvbgorCnN3aXRjaCBjcmVhdGVfTm9PcCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIE5PVF9JTVBMRU1FTlRFRCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIGNhbGxfTm9PcAoKTk9UX0lNUExFTUVOVEVEOgoJZXJyCgovLyBkdW1teU9wVXAodWludDY0KXVpbnQ2NAovLwovLyBEdW1teSBPcCBVcAphYmlfcm91dGVfZHVtbXlPcFVwOgoJLy8gaTogdWludDY0Cgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglidG9pCgoJLy8gZXhlY3V0ZSBkdW1teU9wVXAodWludDY0KXVpbnQ2NAoJY2FsbHN1YiBkdW1teU9wVXAKCWludCAxCglyZXR1cm4KCmR1bW15T3BVcDoKCXByb3RvIDEgMAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxMAoJLy8gcmV0dXJuIGk7CglmcmFtZV9kaWcgLTEgLy8gaTogdWludDY0CglpdG9iCglieXRlIDB4MTUxZjdjNzUKCXN3YXAKCWNvbmNhdAoJbG9nCglyZXRzdWIKCi8vIHNjYWxhck11bHRCYXNlKGJ5dGVzKWJ5dGVbXQovLwovLyBTY2FsYXIgTXVsdCBCYXNlCi8vIFNjYWxhciBtdWx0aXBsaWNhdGlvbiBvZiB0aGUgYmFzZSBwb2ludAovLyBAcmV0dXJucyBUaGUgcmVzdWx0IG9mIHRoZSBvcGVyYXRpb24KYWJpX3JvdXRlX3NjYWxhck11bHRCYXNlOgoJYnl0ZSAweCAvLyBwdXNoIGVtcHR5IGJ5dGVzIHRvIGZpbGwgdGhlIHN0YWNrIGZyYW1lIGZvciB0aGlzIHN1YnJvdXRpbmUncyBsb2NhbCB2YXJpYWJsZXMKCgkvLyBzY2FsYXI6IGJ5dGVbXQoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMQoJZXh0cmFjdCAyIDAKCgkvLyBleGVjdXRlIHNjYWxhck11bHRCYXNlKGJ5dGVzKWJ5dGVbXQoJY2FsbHN1YiBzY2FsYXJNdWx0QmFzZQoJaW50IDEKCXJldHVybgoKc2NhbGFyTXVsdEJhc2U6Cglwcm90byAyIDAKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MTkKCS8vIHJlc3VsdCA9IGVjX3NjYWxhcl9tdWwoCgkvLyAgICAgICAiQk4yNTRnMSIsCgkvLyAgICAgICBoZXgoCgkvLyAgICAgICAgICIwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAxMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMiIKCS8vICAgICAgICksCgkvLyAgICAgICBzY2FsYXIKCS8vICAgICApCglieXRlIDB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMTAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDIKCWZyYW1lX2RpZyAtMSAvLyBzY2FsYXI6IGJ5dGVzCgllY19zY2FsYXJfbXVsIEJOMjU0ZzEKCWZyYW1lX2J1cnkgLTIgLy8gcmVzdWx0OiBieXRlcwoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoyNgoJLy8gcmV0dXJuIHJlc3VsdDsKCWZyYW1lX2RpZyAtMiAvLyByZXN1bHQ6IGJ5dGVzCglkdXAKCWxlbgoJaXRvYgoJZXh0cmFjdCA2IDIKCXN3YXAKCWNvbmNhdAoJYnl0ZSAweDE1MWY3Yzc1Cglzd2FwCgljb25jYXQKCWxvZwoJcmV0c3ViCgovLyBwb2ludFN1Ymdyb3VwKClib29sCi8vCi8vIFBvaW50IENoZWNrCi8vCi8vIEByZXR1cm5zIFRoZSByZXN1bHQgb2YgdGhlIG9wZXJhdGlvbgphYmlfcm91dGVfcG9pbnRTdWJncm91cDoKCWJ5dGUgMHggLy8gcHVzaCBlbXB0eSBieXRlcyB0byBmaWxsIHRoZSBzdGFjayBmcmFtZSBmb3IgdGhpcyBzdWJyb3V0aW5lJ3MgbG9jYWwgdmFyaWFibGVzCgoJLy8gZXhlY3V0ZSBwb2ludFN1Ymdyb3VwKClib29sCgljYWxsc3ViIHBvaW50U3ViZ3JvdXAKCWludCAxCglyZXR1cm4KCnBvaW50U3ViZ3JvdXA6Cglwcm90byAxIDAKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MzUKCS8vIGNoZWNrMSA9IGVjX3N1Ymdyb3VwX2NoZWNrKAoJLy8gICAgICAgIkJOMjU0ZzEiLAoJLy8gICAgICAgaGV4KAoJLy8gICAgICAgICAiMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMTAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDIiCgkvLyAgICAgICApCgkvLyAgICAgKQoJYnl0ZSAweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAyCgllY19zdWJncm91cF9jaGVjayBCTjI1NGcxCglmcmFtZV9idXJ5IC0xIC8vIGNoZWNrMTogYm9vbAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czo1MgoJLy8gcmV0dXJuIGNoZWNrMTsKCWZyYW1lX2RpZyAtMSAvLyBjaGVjazE6IGJvb2wKCWJ5dGUgMHgwMAoJaW50IDAKCXVuY292ZXIgMgoJc2V0Yml0CglieXRlIDB4MTUxZjdjNzUKCXN3YXAKCWNvbmNhdAoJbG9nCglyZXRzdWIKCi8vIHBvaW50QWRkKClieXRlW10KLy8KLy8gUG9pbnQgYWRkCi8vCi8vIEByZXR1cm5zIFRoZSByZXN1bHQgb2YgdGhlIG9wZXJhdGlvbgphYmlfcm91dGVfcG9pbnRBZGQ6CglieXRlIDB4IC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoKCS8vIGV4ZWN1dGUgcG9pbnRBZGQoKWJ5dGVbXQoJY2FsbHN1YiBwb2ludEFkZAoJaW50IDEKCXJldHVybgoKcG9pbnRBZGQ6Cglwcm90byAxIDAKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6NzEKCS8vIHJlc3VsdCA9IGVjX2FkZCgKCS8vICAgICAgICJCTFMxMl8zODFnMSIsCgkvLyAgICAgICBoZXgoCgkvLyAgICAgICAgICIxN2YxZDNhNzMxOTdkNzk0MjY5NTYzOGM0ZmE5YWMwZmMzNjg4YzRmOTc3NGI5MDVhMTRlM2EzZjE3MWJhYzU4NmM1NWU4M2ZmOTdhMWFlZmZiM2FmMDBhZGIyMmM2YmIwOGIzZjQ4MWUzYWFhMGYxYTA5ZTMwZWQ3NDFkOGFlNGZjZjVlMDk1ZDVkMDBhZjYwMGRiMThjYjJjMDRiM2VkZDAzY2M3NDRhMjg4OGFlNDBjYWEyMzI5NDZjNWU3ZTEiCgkvLyAgICAgICApLAoJLy8gICAgICAgaGV4KAoJLy8gICAgICAgICAiMTdmMWQzYTczMTk3ZDc5NDI2OTU2MzhjNGZhOWFjMGZjMzY4OGM0Zjk3NzRiOTA1YTE0ZTNhM2YxNzFiYWM1ODZjNTVlODNmZjk3YTFhZWZmYjNhZjAwYWRiMjJjNmJiMDhiM2Y0ODFlM2FhYTBmMWEwOWUzMGVkNzQxZDhhZTRmY2Y1ZTA5NWQ1ZDAwYWY2MDBkYjE4Y2IyYzA0YjNlZGQwM2NjNzQ0YTI4ODhhZTQwY2FhMjMyOTQ2YzVlN2UxIgoJLy8gICAgICAgKQoJLy8gICAgICkKCWJ5dGUgMHgxN2YxZDNhNzMxOTdkNzk0MjY5NTYzOGM0ZmE5YWMwZmMzNjg4YzRmOTc3NGI5MDVhMTRlM2EzZjE3MWJhYzU4NmM1NWU4M2ZmOTdhMWFlZmZiM2FmMDBhZGIyMmM2YmIwOGIzZjQ4MWUzYWFhMGYxYTA5ZTMwZWQ3NDFkOGFlNGZjZjVlMDk1ZDVkMDBhZjYwMGRiMThjYjJjMDRiM2VkZDAzY2M3NDRhMjg4OGFlNDBjYWEyMzI5NDZjNWU3ZTEKCWJ5dGUgMHgxN2YxZDNhNzMxOTdkNzk0MjY5NTYzOGM0ZmE5YWMwZmMzNjg4YzRmOTc3NGI5MDVhMTRlM2EzZjE3MWJhYzU4NmM1NWU4M2ZmOTdhMWFlZmZiM2FmMDBhZGIyMmM2YmIwOGIzZjQ4MWUzYWFhMGYxYTA5ZTMwZWQ3NDFkOGFlNGZjZjVlMDk1ZDVkMDBhZjYwMGRiMThjYjJjMDRiM2VkZDAzY2M3NDRhMjg4OGFlNDBjYWEyMzI5NDZjNWU3ZTEKCWVjX2FkZCBCTFMxMl8zODFnMQoJZnJhbWVfYnVyeSAtMSAvLyByZXN1bHQ6IGJ5dGVzCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjgwCgkvLyByZXR1cm4gcmVzdWx0OwoJZnJhbWVfZGlnIC0xIC8vIHJlc3VsdDogYnl0ZXMKCWR1cAoJbGVuCglpdG9iCglleHRyYWN0IDYgMgoJc3dhcAoJY29uY2F0CglieXRlIDB4MTUxZjdjNzUKCXN3YXAKCWNvbmNhdAoJbG9nCglyZXRzdWIKCmFiaV9yb3V0ZV9jcmVhdGVBcHBsaWNhdGlvbjoKCWludCAxCglyZXR1cm4KCmNyZWF0ZV9Ob09wOgoJbWV0aG9kICJjcmVhdGVBcHBsaWNhdGlvbigpdm9pZCIKCXR4bmEgQXBwbGljYXRpb25BcmdzIDAKCW1hdGNoIGFiaV9yb3V0ZV9jcmVhdGVBcHBsaWNhdGlvbgoJZXJyCgpjYWxsX05vT3A6CgltZXRob2QgImR1bW15T3BVcCh1aW50NjQpdWludDY0IgoJbWV0aG9kICJzY2FsYXJNdWx0QmFzZShieXRlW10pYnl0ZVtdIgoJbWV0aG9kICJwb2ludFN1Ymdyb3VwKClib29sIgoJbWV0aG9kICJwb2ludEFkZCgpYnl0ZVtdIgoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMAoJbWF0Y2ggYWJpX3JvdXRlX2R1bW15T3BVcCBhYmlfcm91dGVfc2NhbGFyTXVsdEJhc2UgYWJpX3JvdXRlX3BvaW50U3ViZ3JvdXAgYWJpX3JvdXRlX3BvaW50QWRkCgllcnI=",
+    "approval": "I3ByYWdtYSB2ZXJzaW9uIDEwCgovLyBUaGlzIFRFQUwgd2FzIGdlbmVyYXRlZCBieSBURUFMU2NyaXB0IHYwLjYzLjAKLy8gaHR0cHM6Ly9naXRodWIuY29tL2FsZ29yYW5kZm91bmRhdGlvbi9URUFMU2NyaXB0CgovLyBUaGlzIGNvbnRyYWN0IGlzIGNvbXBsaWFudCB3aXRoIGFuZC9vciBpbXBsZW1lbnRzIHRoZSBmb2xsb3dpbmcgQVJDczogWyBBUkM0IF0KCi8vIFRoZSBmb2xsb3dpbmcgdGVuIGxpbmVzIG9mIFRFQUwgaGFuZGxlIGluaXRpYWwgcHJvZ3JhbSBmbG93Ci8vIFRoaXMgcGF0dGVybiBpcyB1c2VkIHRvIG1ha2UgaXQgZWFzeSBmb3IgYW55b25lIHRvIHBhcnNlIHRoZSBzdGFydCBvZiB0aGUgcHJvZ3JhbSBhbmQgZGV0ZXJtaW5lIGlmIGEgc3BlY2lmaWMgYWN0aW9uIGlzIGFsbG93ZWQKLy8gSGVyZSwgYWN0aW9uIHJlZmVycyB0byB0aGUgT25Db21wbGV0ZSBpbiBjb21iaW5hdGlvbiB3aXRoIHdoZXRoZXIgdGhlIGFwcCBpcyBiZWluZyBjcmVhdGVkIG9yIGNhbGxlZAovLyBFdmVyeSBwb3NzaWJsZSBhY3Rpb24gZm9yIHRoaXMgY29udHJhY3QgaXMgcmVwcmVzZW50ZWQgaW4gdGhlIHN3aXRjaCBzdGF0ZW1lbnQKLy8gSWYgdGhlIGFjdGlvbiBpcyBub3QgaW1wbG1lbnRlZCBpbiB0aGUgY29udHJhY3QsIGl0cyByZXBzZWN0aXZlIGJyYW5jaCB3aWxsIGJlICJOT1RfSU1QTE1FTlRFRCIgd2hpY2gganVzdCBjb250YWlucyAiZXJyIgp0eG4gQXBwbGljYXRpb25JRAppbnQgMAo+CmludCA2CioKdHhuIE9uQ29tcGxldGlvbgorCnN3aXRjaCBjcmVhdGVfTm9PcCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIE5PVF9JTVBMRU1FTlRFRCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIGNhbGxfTm9PcAoKTk9UX0lNUExFTUVOVEVEOgoJZXJyCgovLyBkdW1teU9wVXAodWludDY0KXVpbnQ2NAovLwovLyBEdW1teSBPcCBVcAovLyBEdW1teSBvcGVyYXRpb24gdG8gZ2V0IG1vcmUgb3Bjb2RlIGJ1ZGdldAovLyBAaSAtIFRoZSBudW1iZXIgdG8gcmV0dXJuLCBuZWNzc2FyeSB0byBkZWR1cGxpY2F0ZSB0aGUgbmFtZQovLyBAcmV0dXJucyB0aGUgbnVtYmVyIChidXQgd2UgZG8gbm90aGluZyB3aXRoIGl0KQphYmlfcm91dGVfZHVtbXlPcFVwOgoJLy8gaTogdWludDY0Cgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglidG9pCgoJLy8gZXhlY3V0ZSBkdW1teU9wVXAodWludDY0KXVpbnQ2NAoJY2FsbHN1YiBkdW1teU9wVXAKCWludCAxCglyZXR1cm4KCmR1bW15T3BVcDoKCXByb3RvIDEgMAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxMQoJLy8gcmV0dXJuIGk7CglmcmFtZV9kaWcgLTEgLy8gaTogdWludDY0CglpdG9iCglieXRlIDB4MTUxZjdjNzUKCXN3YXAKCWNvbmNhdAoJbG9nCglyZXRzdWIKCi8vIHNjYWxhck11bHRCYXNlKGJ5dGVzKWJ5dGVbXQovLwovLyBTY2FsYXIgTXVsdCBCYXNlCi8vIFNjYWxhciBtdWx0aXBsaWNhdGlvbiBvZiB0aGUgYmFzZSBwb2ludAovLyBAc2NhbGFyIC0gVGhlIHNjYWxhciB0byBtdWx0aXBseSB0aGUgYmFzZXBvaW50IGJ5LgovLyBAcmV0dXJucyBhIHBvaW50IG9uIHRoZSBjdXJ2ZQphYmlfcm91dGVfc2NhbGFyTXVsdEJhc2U6CglieXRlIDB4IC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoKCS8vIHNjYWxhcjogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglleHRyYWN0IDIgMAoKCS8vIGV4ZWN1dGUgc2NhbGFyTXVsdEJhc2UoYnl0ZXMpYnl0ZVtdCgljYWxsc3ViIHNjYWxhck11bHRCYXNlCglpbnQgMQoJcmV0dXJuCgpzY2FsYXJNdWx0QmFzZToKCXByb3RvIDIgMAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoyMQoJLy8gcmVzdWx0ID0gZWNfc2NhbGFyX211bCgKCS8vICAgICAgICJCTjI1NGcxIiwKCS8vICAgICAgIGhleCgKCS8vICAgICAgICAgIjAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAyIgoJLy8gICAgICAgKSwKCS8vICAgICAgIHNjYWxhcgoJLy8gICAgICkKCWJ5dGUgMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAxMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMgoJZnJhbWVfZGlnIC0xIC8vIHNjYWxhcjogYnl0ZXMKCWVjX3NjYWxhcl9tdWwgQk4yNTRnMQoJZnJhbWVfYnVyeSAtMiAvLyByZXN1bHQ6IGJ5dGVzCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjI4CgkvLyByZXR1cm4gcmVzdWx0OwoJZnJhbWVfZGlnIC0yIC8vIHJlc3VsdDogYnl0ZXMKCWR1cAoJbGVuCglpdG9iCglleHRyYWN0IDYgMgoJc3dhcAoJY29uY2F0CglieXRlIDB4MTUxZjdjNzUKCXN3YXAKCWNvbmNhdAoJbG9nCglyZXRzdWIKCi8vIHNjYWxhck11bHQoYnl0ZXMsYnl0ZXMpYnl0ZVtdCi8vCi8vIFNjYWxhciBNdWx0Ci8vIFNjYWxhciBtdWx0aXBsaWNhdGlvbiB3aXRoIGEgc3VwcGxpZWQgcG9pbnQKLy8gQHNjYWxhciAtIFRoZSBzY2FsYXIgdG8gbXVsdGlwbHkgdGhlIHBvaW50IHdpdGgKLy8gQHBvaW50IC0gVGhlIHBvaW50IHRoYXQgaXMgbXVsdGlwbGllZCB3aXRoIHRoZSBzY2FsYXIKLy8gQHJldHVybnMgYSBwb2ludCBvbiB0aGUgY3VydmUKYWJpX3JvdXRlX3NjYWxhck11bHQ6CglieXRlIDB4IC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoKCS8vIHBvaW50OiBieXRlW10KCXR4bmEgQXBwbGljYXRpb25BcmdzIDIKCWV4dHJhY3QgMiAwCgoJLy8gc2NhbGFyOiBieXRlW10KCXR4bmEgQXBwbGljYXRpb25BcmdzIDEKCWV4dHJhY3QgMiAwCgoJLy8gZXhlY3V0ZSBzY2FsYXJNdWx0KGJ5dGVzLGJ5dGVzKWJ5dGVbXQoJY2FsbHN1YiBzY2FsYXJNdWx0CglpbnQgMQoJcmV0dXJuCgpzY2FsYXJNdWx0OgoJcHJvdG8gMyAwCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjM5CgkvLyByZXN1bHQgPSBlY19zY2FsYXJfbXVsKCJCTjI1NGcxIiwgcG9pbnQsIHNjYWxhcikKCWZyYW1lX2RpZyAtMiAvLyBwb2ludDogYnl0ZXMKCWZyYW1lX2RpZyAtMSAvLyBzY2FsYXI6IGJ5dGVzCgllY19zY2FsYXJfbXVsIEJOMjU0ZzEKCWZyYW1lX2J1cnkgLTMgLy8gcmVzdWx0OiBieXRlcwoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czo0MAoJLy8gcmV0dXJuIHJlc3VsdDsKCWZyYW1lX2RpZyAtMyAvLyByZXN1bHQ6IGJ5dGVzCglkdXAKCWxlbgoJaXRvYgoJZXh0cmFjdCA2IDIKCXN3YXAKCWNvbmNhdAoJYnl0ZSAweDE1MWY3Yzc1Cglzd2FwCgljb25jYXQKCWxvZwoJcmV0c3ViCgovLyB2YWxpZFBvaW50KGJ5dGVzKWJvb2wKLy8KLy8gdmFsaWRQb2ludAovLyBDaGVja3MgaWYgdGhlIHBvaW50IGlzIHZhbGlkIChvbiBjdXJ2ZSkKLy8gQHBvaW50IC0gVGhlIHBvaW50IHRvIGNoZWNrCi8vIEByZXR1cm5zIHRydWUgaWYgdGhlIHBvaW50IGlzIHZhbGlkLCBmYWxzZSBvdGhlcndpc2UKYWJpX3JvdXRlX3ZhbGlkUG9pbnQ6CgkvLyBwb2ludDogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglleHRyYWN0IDIgMAoKCS8vIGV4ZWN1dGUgdmFsaWRQb2ludChieXRlcylib29sCgljYWxsc3ViIHZhbGlkUG9pbnQKCWludCAxCglyZXR1cm4KCnZhbGlkUG9pbnQ6Cglwcm90byAxIDAKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6NTAKCS8vIHJldHVybiBlY19zdWJncm91cF9jaGVjaygiQk4yNTRnMSIsIHBvaW50KTsKCWZyYW1lX2RpZyAtMSAvLyBwb2ludDogYnl0ZXMKCWVjX3N1Ymdyb3VwX2NoZWNrIEJOMjU0ZzEKCWJ5dGUgMHgwMAoJaW50IDAKCXVuY292ZXIgMgoJc2V0Yml0CglieXRlIDB4MTUxZjdjNzUKCXN3YXAKCWNvbmNhdAoJbG9nCglyZXRzdWIKCi8vIHBvaW50QWRkKGJ5dGVzLGJ5dGVzKWJ5dGVbXQovLwovLyBQb2ludCBhZGQKLy8gQWRkcyB0d28gcG9pbnRzIG9uIHRoZSBjdXJ2ZQovLyBAcGFyYW0gcG9pbnRBIC0gVGhlIGZpcnN0IHBvaW50Ci8vIEBwYXJhbSBwb2ludEIgLSBUaGUgc2Vjb25kIHBvaW50Ci8vIEByZXR1cm5zIFRoZSByZXN1bHQgb2YgdGhlIG9wZXJhdGlvbgphYmlfcm91dGVfcG9pbnRBZGQ6CglieXRlIDB4IC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoKCS8vIHBvaW50QjogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAyCglleHRyYWN0IDIgMAoKCS8vIHBvaW50QTogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglleHRyYWN0IDIgMAoKCS8vIGV4ZWN1dGUgcG9pbnRBZGQoYnl0ZXMsYnl0ZXMpYnl0ZVtdCgljYWxsc3ViIHBvaW50QWRkCglpbnQgMQoJcmV0dXJuCgpwb2ludEFkZDoKCXByb3RvIDMgMAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czo2MQoJLy8gcmVzdWx0ID0gZWNfYWRkKCJCTjI1NGcxIiwgcG9pbnRBLCBwb2ludEIpCglmcmFtZV9kaWcgLTEgLy8gcG9pbnRBOiBieXRlcwoJZnJhbWVfZGlnIC0yIC8vIHBvaW50QjogYnl0ZXMKCWVjX2FkZCBCTjI1NGcxCglmcmFtZV9idXJ5IC0zIC8vIHJlc3VsdDogYnl0ZXMKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6NjIKCS8vIHJldHVybiByZXN1bHQ7CglmcmFtZV9kaWcgLTMgLy8gcmVzdWx0OiBieXRlcwoJZHVwCglsZW4KCWl0b2IKCWV4dHJhY3QgNiAyCglzd2FwCgljb25jYXQKCWJ5dGUgMHgxNTFmN2M3NQoJc3dhcAoJY29uY2F0Cglsb2cKCXJldHN1YgoKYWJpX3JvdXRlX2NyZWF0ZUFwcGxpY2F0aW9uOgoJaW50IDEKCXJldHVybgoKY3JlYXRlX05vT3A6CgltZXRob2QgImNyZWF0ZUFwcGxpY2F0aW9uKCl2b2lkIgoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMAoJbWF0Y2ggYWJpX3JvdXRlX2NyZWF0ZUFwcGxpY2F0aW9uCgllcnIKCmNhbGxfTm9PcDoKCW1ldGhvZCAiZHVtbXlPcFVwKHVpbnQ2NCl1aW50NjQiCgltZXRob2QgInNjYWxhck11bHRCYXNlKGJ5dGVbXSlieXRlW10iCgltZXRob2QgInNjYWxhck11bHQoYnl0ZVtdLGJ5dGVbXSlieXRlW10iCgltZXRob2QgInZhbGlkUG9pbnQoYnl0ZVtdKWJvb2wiCgltZXRob2QgInBvaW50QWRkKGJ5dGVbXSxieXRlW10pYnl0ZVtdIgoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMAoJbWF0Y2ggYWJpX3JvdXRlX2R1bW15T3BVcCBhYmlfcm91dGVfc2NhbGFyTXVsdEJhc2UgYWJpX3JvdXRlX3NjYWxhck11bHQgYWJpX3JvdXRlX3ZhbGlkUG9pbnQgYWJpX3JvdXRlX3BvaW50QWRkCgllcnI=",
     "clear": "I3ByYWdtYSB2ZXJzaW9uIDEw"
   },
   "contract": {
@@ -97,10 +102,10 @@ export const APP_SPEC: AppSpec = {
             "desc": ""
           }
         ],
-        "desc": "Dummy Op Up",
+        "desc": "Dummy Op UpDummy operation to get more opcode budget@i- The number to return, necssary to deduplicate the name",
         "returns": {
           "type": "uint64",
-          "desc": ""
+          "desc": "the number (but we do nothing with it)"
         }
       },
       {
@@ -112,25 +117,62 @@ export const APP_SPEC: AppSpec = {
             "desc": ""
           }
         ],
-        "desc": "Scalar Mult BaseScalar multiplication of the base point",
+        "desc": "Scalar Mult BaseScalar multiplication of the base point@scalar- The scalar to multiply the basepoint by.",
         "returns": {
           "type": "byte[]",
-          "desc": "The result of the operation"
+          "desc": "a point on the curve"
         }
       },
       {
-        "name": "pointSubgroup",
-        "args": [],
-        "desc": "Point Check",
+        "name": "scalarMult",
+        "args": [
+          {
+            "name": "scalar",
+            "type": "byte[]",
+            "desc": ""
+          },
+          {
+            "name": "point",
+            "type": "byte[]",
+            "desc": ""
+          }
+        ],
+        "desc": "Scalar MultScalar multiplication with a supplied point@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar",
+        "returns": {
+          "type": "byte[]",
+          "desc": "a point on the curve"
+        }
+      },
+      {
+        "name": "validPoint",
+        "args": [
+          {
+            "name": "point",
+            "type": "byte[]",
+            "desc": ""
+          }
+        ],
+        "desc": "validPointChecks if the point is valid (on curve)@point- The point to check",
         "returns": {
           "type": "bool",
-          "desc": "The result of the operation"
+          "desc": "true if the point is valid, false otherwise"
         }
       },
       {
         "name": "pointAdd",
-        "args": [],
-        "desc": "Point add",
+        "args": [
+          {
+            "name": "pointA",
+            "type": "byte[]",
+            "desc": "The first point"
+          },
+          {
+            "name": "pointB",
+            "type": "byte[]",
+            "desc": "The second point"
+          }
+        ],
+        "desc": "Point addAdds two points on the curve",
         "returns": {
           "type": "byte[]",
           "desc": "The result of the operation"
@@ -209,6 +251,9 @@ export type Mahber = {
         i: bigint | number
       }
       argsTuple: [i: bigint | number]
+      /**
+       * the number (but we do nothing with it)
+       */
       returns: bigint
     }>
     & Record<'scalarMultBase(byte[])byte[]' | 'scalarMultBase', {
@@ -217,23 +262,43 @@ export type Mahber = {
       }
       argsTuple: [scalar: Uint8Array]
       /**
-       * The result of the operation
+       * a point on the curve
        */
       returns: Uint8Array
     }>
-    & Record<'pointSubgroup()bool' | 'pointSubgroup', {
+    & Record<'scalarMult(byte[],byte[])byte[]' | 'scalarMult', {
       argsObj: {
+        scalar: Uint8Array
+        point: Uint8Array
       }
-      argsTuple: []
+      argsTuple: [scalar: Uint8Array, point: Uint8Array]
       /**
-       * The result of the operation
+       * a point on the curve
+       */
+      returns: Uint8Array
+    }>
+    & Record<'validPoint(byte[])bool' | 'validPoint', {
+      argsObj: {
+        point: Uint8Array
+      }
+      argsTuple: [point: Uint8Array]
+      /**
+       * true if the point is valid, false otherwise
        */
       returns: boolean
     }>
-    & Record<'pointAdd()byte[]' | 'pointAdd', {
+    & Record<'pointAdd(byte[],byte[])byte[]' | 'pointAdd', {
       argsObj: {
+        /**
+         * The first point
+         */
+        pointA: Uint8Array
+        /**
+         * The second point
+         */
+        pointB: Uint8Array
       }
-      argsTuple: []
+      argsTuple: [pointA: Uint8Array, pointB: Uint8Array]
       /**
        * The result of the operation
        */
@@ -320,7 +385,7 @@ export abstract class MahberCallFactory {
   /**
    * Constructs a no op call for the dummyOpUp(uint64)uint64 ABI method
    *
-   * Dummy Op Up
+   * Dummy Op UpDummy operation to get more opcode budget@i- The number to return, necssary to deduplicate the name
    *
    * @param args Any args for the contract call
    * @param params Any additional parameters for the call
@@ -336,7 +401,7 @@ export abstract class MahberCallFactory {
   /**
    * Constructs a no op call for the scalarMultBase(byte[])byte[] ABI method
    *
-   * Scalar Mult BaseScalar multiplication of the base point
+   * Scalar Mult BaseScalar multiplication of the base point@scalar- The scalar to multiply the basepoint by.
    *
    * @param args Any args for the contract call
    * @param params Any additional parameters for the call
@@ -350,34 +415,50 @@ export abstract class MahberCallFactory {
     }
   }
   /**
-   * Constructs a no op call for the pointSubgroup()bool ABI method
+   * Constructs a no op call for the scalarMult(byte[],byte[])byte[] ABI method
    *
-   * Point Check
+   * Scalar MultScalar multiplication with a supplied point@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar
    *
    * @param args Any args for the contract call
    * @param params Any additional parameters for the call
    * @returns A TypedCallParams object for the call
    */
-  static pointSubgroup(args: MethodArgs<'pointSubgroup()bool'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
+  static scalarMult(args: MethodArgs<'scalarMult(byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
     return {
-      method: 'pointSubgroup()bool' as const,
-      methodArgs: Array.isArray(args) ? args : [],
+      method: 'scalarMult(byte[],byte[])byte[]' as const,
+      methodArgs: Array.isArray(args) ? args : [args.scalar, args.point],
       ...params,
     }
   }
   /**
-   * Constructs a no op call for the pointAdd()byte[] ABI method
+   * Constructs a no op call for the validPoint(byte[])bool ABI method
    *
-   * Point add
+   * validPointChecks if the point is valid (on curve)@point- The point to check
    *
    * @param args Any args for the contract call
    * @param params Any additional parameters for the call
    * @returns A TypedCallParams object for the call
    */
-  static pointAdd(args: MethodArgs<'pointAdd()byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
+  static validPoint(args: MethodArgs<'validPoint(byte[])bool'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
     return {
-      method: 'pointAdd()byte[]' as const,
-      methodArgs: Array.isArray(args) ? args : [],
+      method: 'validPoint(byte[])bool' as const,
+      methodArgs: Array.isArray(args) ? args : [args.point],
+      ...params,
+    }
+  }
+  /**
+   * Constructs a no op call for the pointAdd(byte[],byte[])byte[] ABI method
+   *
+   * Point addAdds two points on the curve
+   *
+   * @param args Any args for the contract call
+   * @param params Any additional parameters for the call
+   * @returns A TypedCallParams object for the call
+   */
+  static pointAdd(args: MethodArgs<'pointAdd(byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
+    return {
+      method: 'pointAdd(byte[],byte[])byte[]' as const,
+      methodArgs: Array.isArray(args) ? args : [args.pointA, args.pointB],
       ...params,
     }
   }
@@ -483,11 +564,11 @@ export class MahberClient {
   /**
    * Calls the dummyOpUp(uint64)uint64 ABI method.
    *
-   * Dummy Op Up
+   * Dummy Op UpDummy operation to get more opcode budget@i- The number to return, necssary to deduplicate the name
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
-   * @returns The result of the call
+   * @returns The result of the call: the number (but we do nothing with it)
    */
   public dummyOpUp(args: MethodArgs<'dummyOpUp(uint64)uint64'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
     return this.call(MahberCallFactory.dummyOpUp(args, params))
@@ -496,39 +577,52 @@ export class MahberClient {
   /**
    * Calls the scalarMultBase(byte[])byte[] ABI method.
    *
-   * Scalar Mult BaseScalar multiplication of the base point
+   * Scalar Mult BaseScalar multiplication of the base point@scalar- The scalar to multiply the basepoint by.
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
-   * @returns The result of the call: The result of the operation
+   * @returns The result of the call: a point on the curve
    */
   public scalarMultBase(args: MethodArgs<'scalarMultBase(byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
     return this.call(MahberCallFactory.scalarMultBase(args, params))
   }
 
   /**
-   * Calls the pointSubgroup()bool ABI method.
+   * Calls the scalarMult(byte[],byte[])byte[] ABI method.
    *
-   * Point Check
+   * Scalar MultScalar multiplication with a supplied point@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
-   * @returns The result of the call: The result of the operation
+   * @returns The result of the call: a point on the curve
    */
-  public pointSubgroup(args: MethodArgs<'pointSubgroup()bool'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
-    return this.call(MahberCallFactory.pointSubgroup(args, params))
+  public scalarMult(args: MethodArgs<'scalarMult(byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
+    return this.call(MahberCallFactory.scalarMult(args, params))
   }
 
   /**
-   * Calls the pointAdd()byte[] ABI method.
+   * Calls the validPoint(byte[])bool ABI method.
    *
-   * Point add
+   * validPointChecks if the point is valid (on curve)@point- The point to check
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The result of the call: true if the point is valid, false otherwise
+   */
+  public validPoint(args: MethodArgs<'validPoint(byte[])bool'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
+    return this.call(MahberCallFactory.validPoint(args, params))
+  }
+
+  /**
+   * Calls the pointAdd(byte[],byte[])byte[] ABI method.
+   *
+   * Point addAdds two points on the curve
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
    * @returns The result of the call: The result of the operation
    */
-  public pointAdd(args: MethodArgs<'pointAdd()byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
+  public pointAdd(args: MethodArgs<'pointAdd(byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
     return this.call(MahberCallFactory.pointAdd(args, params))
   }
 
@@ -548,12 +642,17 @@ export class MahberClient {
         resultMappers.push(undefined)
         return this
       },
-      pointSubgroup(args: MethodArgs<'pointSubgroup()bool'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
-        promiseChain = promiseChain.then(() => client.pointSubgroup(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
+      scalarMult(args: MethodArgs<'scalarMult(byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
+        promiseChain = promiseChain.then(() => client.scalarMult(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
         resultMappers.push(undefined)
         return this
       },
-      pointAdd(args: MethodArgs<'pointAdd()byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
+      validPoint(args: MethodArgs<'validPoint(byte[])bool'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
+        promiseChain = promiseChain.then(() => client.validPoint(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
+        resultMappers.push(undefined)
+        return this
+      },
+      pointAdd(args: MethodArgs<'pointAdd(byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
         promiseChain = promiseChain.then(() => client.pointAdd(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
         resultMappers.push(undefined)
         return this
@@ -586,7 +685,7 @@ export type MahberComposer<TReturns extends [...any[]] = []> = {
   /**
    * Calls the dummyOpUp(uint64)uint64 ABI method.
    *
-   * Dummy Op Up
+   * Dummy Op UpDummy operation to get more opcode budget@i- The number to return, necssary to deduplicate the name
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
@@ -597,7 +696,7 @@ export type MahberComposer<TReturns extends [...any[]] = []> = {
   /**
    * Calls the scalarMultBase(byte[])byte[] ABI method.
    *
-   * Scalar Mult BaseScalar multiplication of the base point
+   * Scalar Mult BaseScalar multiplication of the base point@scalar- The scalar to multiply the basepoint by.
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
@@ -606,26 +705,37 @@ export type MahberComposer<TReturns extends [...any[]] = []> = {
   scalarMultBase(args: MethodArgs<'scalarMultBase(byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'scalarMultBase(byte[])byte[]'>]>
 
   /**
-   * Calls the pointSubgroup()bool ABI method.
+   * Calls the scalarMult(byte[],byte[])byte[] ABI method.
    *
-   * Point Check
+   * Scalar MultScalar multiplication with a supplied point@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
    * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
    */
-  pointSubgroup(args: MethodArgs<'pointSubgroup()bool'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'pointSubgroup()bool'>]>
+  scalarMult(args: MethodArgs<'scalarMult(byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'scalarMult(byte[],byte[])byte[]'>]>
 
   /**
-   * Calls the pointAdd()byte[] ABI method.
+   * Calls the validPoint(byte[])bool ABI method.
    *
-   * Point add
+   * validPointChecks if the point is valid (on curve)@point- The point to check
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
    * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
    */
-  pointAdd(args: MethodArgs<'pointAdd()byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'pointAdd()byte[]'>]>
+  validPoint(args: MethodArgs<'validPoint(byte[])bool'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'validPoint(byte[])bool'>]>
+
+  /**
+   * Calls the pointAdd(byte[],byte[])byte[] ABI method.
+   *
+   * Point addAdds two points on the curve
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  pointAdd(args: MethodArgs<'pointAdd(byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'pointAdd(byte[],byte[])byte[]'>]>
 
   /**
    * Makes a clear_state call to an existing instance of the Mahber smart contract.

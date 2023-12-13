@@ -25,6 +25,9 @@ NOT_IMPLEMENTED:
 // dummyOpUp(uint64)uint64
 //
 // Dummy Op Up
+// Dummy operation to get more opcode budget
+// @i - The number to return, necssary to deduplicate the name
+// @returns the number (but we do nothing with it)
 abi_route_dummyOpUp:
 	// i: uint64
 	txna ApplicationArgs 1
@@ -38,7 +41,7 @@ abi_route_dummyOpUp:
 dummyOpUp:
 	proto 1 0
 
-	// contracts/mahber.algo.ts:10
+	// contracts/mahber.algo.ts:11
 	// return i;
 	frame_dig -1 // i: uint64
 	itob
@@ -52,7 +55,8 @@ dummyOpUp:
 //
 // Scalar Mult Base
 // Scalar multiplication of the base point
-// @returns The result of the operation
+// @scalar - The scalar to multiply the basepoint by.
+// @returns a point on the curve
 abi_route_scalarMultBase:
 	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
 
@@ -68,7 +72,7 @@ abi_route_scalarMultBase:
 scalarMultBase:
 	proto 2 0
 
-	// contracts/mahber.algo.ts:19
+	// contracts/mahber.algo.ts:21
 	// result = ec_scalar_mul(
 	//       "BN254g1",
 	//       hex(
@@ -81,7 +85,7 @@ scalarMultBase:
 	ec_scalar_mul BN254g1
 	frame_bury -2 // result: bytes
 
-	// contracts/mahber.algo.ts:26
+	// contracts/mahber.algo.ts:28
 	// return result;
 	frame_dig -2 // result: bytes
 	dup
@@ -96,36 +100,77 @@ scalarMultBase:
 	log
 	retsub
 
-// pointSubgroup()bool
+// scalarMult(bytes,bytes)byte[]
 //
-// Point Check
-//
-// @returns The result of the operation
-abi_route_pointSubgroup:
+// Scalar Mult
+// Scalar multiplication with a supplied point
+// @scalar - The scalar to multiply the point with
+// @point - The point that is multiplied with the scalar
+// @returns a point on the curve
+abi_route_scalarMult:
 	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
 
-	// execute pointSubgroup()bool
-	callsub pointSubgroup
+	// point: byte[]
+	txna ApplicationArgs 2
+	extract 2 0
+
+	// scalar: byte[]
+	txna ApplicationArgs 1
+	extract 2 0
+
+	// execute scalarMult(bytes,bytes)byte[]
+	callsub scalarMult
 	int 1
 	return
 
-pointSubgroup:
+scalarMult:
+	proto 3 0
+
+	// contracts/mahber.algo.ts:39
+	// result = ec_scalar_mul("BN254g1", point, scalar)
+	frame_dig -2 // point: bytes
+	frame_dig -1 // scalar: bytes
+	ec_scalar_mul BN254g1
+	frame_bury -3 // result: bytes
+
+	// contracts/mahber.algo.ts:40
+	// return result;
+	frame_dig -3 // result: bytes
+	dup
+	len
+	itob
+	extract 6 2
+	swap
+	concat
+	byte 0x151f7c75
+	swap
+	concat
+	log
+	retsub
+
+// validPoint(bytes)bool
+//
+// validPoint
+// Checks if the point is valid (on curve)
+// @point - The point to check
+// @returns true if the point is valid, false otherwise
+abi_route_validPoint:
+	// point: byte[]
+	txna ApplicationArgs 1
+	extract 2 0
+
+	// execute validPoint(bytes)bool
+	callsub validPoint
+	int 1
+	return
+
+validPoint:
 	proto 1 0
 
-	// contracts/mahber.algo.ts:35
-	// check1 = ec_subgroup_check(
-	//       "BN254g1",
-	//       hex(
-	//         "00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002"
-	//       )
-	//     )
-	byte 0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002
+	// contracts/mahber.algo.ts:50
+	// return ec_subgroup_check("BN254g1", point);
+	frame_dig -1 // point: bytes
 	ec_subgroup_check BN254g1
-	frame_bury -1 // check1: bool
-
-	// contracts/mahber.algo.ts:52
-	// return check1;
-	frame_dig -1 // check1: bool
 	byte 0x00
 	int 0
 	uncover 2
@@ -136,40 +181,42 @@ pointSubgroup:
 	log
 	retsub
 
-// pointAdd()byte[]
+// pointAdd(bytes,bytes)byte[]
 //
 // Point add
-//
+// Adds two points on the curve
+// @param pointA - The first point
+// @param pointB - The second point
 // @returns The result of the operation
 abi_route_pointAdd:
 	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
 
-	// execute pointAdd()byte[]
+	// pointB: byte[]
+	txna ApplicationArgs 2
+	extract 2 0
+
+	// pointA: byte[]
+	txna ApplicationArgs 1
+	extract 2 0
+
+	// execute pointAdd(bytes,bytes)byte[]
 	callsub pointAdd
 	int 1
 	return
 
 pointAdd:
-	proto 1 0
+	proto 3 0
 
-	// contracts/mahber.algo.ts:71
-	// result = ec_add(
-	//       "BLS12_381g1",
-	//       hex(
-	//         "17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1"
-	//       ),
-	//       hex(
-	//         "17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1"
-	//       )
-	//     )
-	byte 0x17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1
-	byte 0x17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1
-	ec_add BLS12_381g1
-	frame_bury -1 // result: bytes
+	// contracts/mahber.algo.ts:61
+	// result = ec_add("BN254g1", pointA, pointB)
+	frame_dig -1 // pointA: bytes
+	frame_dig -2 // pointB: bytes
+	ec_add BN254g1
+	frame_bury -3 // result: bytes
 
-	// contracts/mahber.algo.ts:80
+	// contracts/mahber.algo.ts:62
 	// return result;
-	frame_dig -1 // result: bytes
+	frame_dig -3 // result: bytes
 	dup
 	len
 	itob
@@ -195,8 +242,9 @@ create_NoOp:
 call_NoOp:
 	method "dummyOpUp(uint64)uint64"
 	method "scalarMultBase(byte[])byte[]"
-	method "pointSubgroup()bool"
-	method "pointAdd()byte[]"
+	method "scalarMult(byte[],byte[])byte[]"
+	method "validPoint(byte[])bool"
+	method "pointAdd(byte[],byte[])byte[]"
 	txna ApplicationArgs 0
-	match abi_route_dummyOpUp abi_route_scalarMultBase abi_route_pointSubgroup abi_route_pointAdd
+	match abi_route_dummyOpUp abi_route_scalarMultBase abi_route_scalarMult abi_route_validPoint abi_route_pointAdd
 	err
