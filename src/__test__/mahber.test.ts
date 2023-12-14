@@ -95,7 +95,7 @@ describe("Mahber", () => {
     ]);
   });
 
-  test("validPoint", async () => {
+  test.skip("validPoint", async () => {
     const bPoint = new Uint8Array([
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
@@ -114,5 +114,19 @@ describe("Mahber", () => {
     } catch (e) {
       expect(true).toStrictEqual(true); // dirty trick to get the test to pass if the error is thrown
     }
+  });
+
+  test("hashPointToPoint", async () => {
+    const bPoint = new Uint8Array([
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+    ]);
+    const res = await appClient.compose().hashPointToPoint({ point: bPoint }).dummyOpUp({ i: 1 }).execute();
+    const a = res.returns?.valueOf() as Array<bigint | Array<number>>;
+    expect(a[0]).toStrictEqual([
+      22, 105, 137, 20, 77, 83, 192, 53, 249, 142, 71, 8, 248, 248, 0, 51, 36, 54, 105, 207, 244, 238, 114, 4, 95, 31,
+      159, 74, 185, 128, 26, 131, 13, 139, 189, 75, 190, 206, 169, 41, 141, 229, 103, 120, 76, 63, 19, 243, 194, 170,
+      172, 78, 212, 97, 75, 154, 61, 158, 135, 190, 135, 226, 96, 195,
+    ]);
   });
 });

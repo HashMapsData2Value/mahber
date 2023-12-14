@@ -64,7 +64,8 @@ class Mahber extends Contract {
 
   /** hashPointToPoint
    *  Hashes a point to a point on the curve
-   * NOTE: ec_map_to maps fp_element to curve point. We use hash and then mod to map bytes to fp_element first.
+   * NOTE: ec_map_to maps fp_element to curve point. We use hash and then mod to
+   * map the point's X and Y bytes to fp_element first.
    * What is inside ec_map_to (accessed Dec 13th 2023):
    *    https://github.com/algorand/go-algorand/blob/master/data/transactions/logic/pairing.go#L862
    *    https://pkg.go.dev/github.com/consensys/gnark-crypto/ecc/bn254#MapToG1
@@ -72,9 +73,10 @@ class Mahber extends Contract {
    * @param point - The point to hash
    * @returns The result of the operation
    */
-  hashToPoint(point: bytes): bytes {
+  hashPointToPoint(point: bytes): bytes {
     const hash = sha256(point);
-    const fpElement = btoi(hash) % btoi(hex("30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47")); // 21888242871839275222246405745257275088548364400416034343698204186575808495617;
+    const fpElement =
+      btobigint(hash) % btobigint(hex("30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47")); // 21888242871839275222246405745257275088548364400416034343698204186575808495617;
     // @ts-ignore
     const result = ec_map_to("BN254g1", fpElement);
     return result;

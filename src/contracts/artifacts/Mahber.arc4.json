@@ -88,6 +88,21 @@
       }
     },
     {
+      "name": "hashPointToPoint",
+      "args": [
+        {
+          "name": "point",
+          "type": "byte[]",
+          "desc": "The point to hash"
+        }
+      ],
+      "desc": "hashPointToPointHashes a point to a point on the curveNOTE: ec_map_to maps fp_element to curve point. We use hash and then mod to map bytes to fp_element first.What is inside ec_map_to (accessed Dec 13th 2023):https://github.com/algorand/go-algorand/blob/master/data/transactions/logic/pairing.go#L862https://pkg.go.dev/github.com/consensys/gnark-crypto/ecc/bn254#MapToG1https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fp/element.go#L42",
+      "returns": {
+        "type": "byte[]",
+        "desc": "The result of the operation"
+      }
+    },
+    {
       "name": "createApplication",
       "desc": "",
       "returns": {

@@ -229,6 +229,67 @@ pointAdd:
 	log
 	retsub
 
+// hashPointToPoint(bytes)byte[]
+//
+// hashPointToPoint
+// Hashes a point to a point on the curve
+// NOTE: ec_map_to maps fp_element to curve point. We use hash and then mod to map bytes to fp_element first.
+// What is inside ec_map_to (accessed Dec 13th 2023):
+// https://github.com/algorand/go-algorand/blob/master/data/transactions/logic/pairing.go#L862
+// https://pkg.go.dev/github.com/consensys/gnark-crypto/ecc/bn254#MapToG1
+// https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fp/element.go#L42
+// @param point - The point to hash
+// @returns The result of the operation
+abi_route_hashPointToPoint:
+	byte 0x; dupn 2 // push empty bytes to fill the stack frame for this subroutine's local variables
+
+	// point: byte[]
+	txna ApplicationArgs 1
+	extract 2 0
+
+	// execute hashPointToPoint(bytes)byte[]
+	callsub hashPointToPoint
+	int 1
+	return
+
+hashPointToPoint:
+	proto 4 0
+
+	// contracts/mahber.algo.ts:76
+	// hash = sha256(point)
+	frame_dig -1 // point: bytes
+	sha256
+	frame_bury -2 // hash: byte[32]
+
+	// contracts/mahber.algo.ts:77
+	// fpElement =
+	//       btobigint(hash) % btobigint(hex("30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47"))
+	frame_dig -2 // hash: byte[32]
+	byte 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47
+	b%
+	frame_bury -3 // fpElement: bigint
+
+	// contracts/mahber.algo.ts:80
+	// result = ec_map_to("BN254g1", fpElement)
+	frame_dig -3 // fpElement: bigint
+	ec_map_to BN254g1
+	frame_bury -4 // result: bytes
+
+	// contracts/mahber.algo.ts:81
+	// return result;
+	frame_dig -4 // result: bytes
+	dup
+	len
+	itob
+	extract 6 2
+	swap
+	concat
+	byte 0x151f7c75
+	swap
+	concat
+	log
+	retsub
+
 abi_route_createApplication:
 	int 1
 	return
@@ -245,6 +306,7 @@ call_NoOp:
 	method "scalarMult(byte[],byte[])byte[]"
 	method "validPoint(byte[])bool"
 	method "pointAdd(byte[],byte[])byte[]"
+	method "hashPointToPoint(byte[])byte[]"
 	txna ApplicationArgs 0
-	match abi_route_dummyOpUp abi_route_scalarMultBase abi_route_scalarMult abi_route_validPoint abi_route_pointAdd
+	match abi_route_dummyOpUp abi_route_scalarMultBase abi_route_scalarMult abi_route_validPoint abi_route_pointAdd abi_route_hashPointToPoint
 	err
