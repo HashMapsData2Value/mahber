@@ -51,233 +51,130 @@ dummyOpUp:
 	log
 	retsub
 
-// scalarMultBase(bytes)byte[]
+// challenge(bytes,bytes,bytes,bytes,bytes)byte[]
 //
-// Scalar Mult Base
-// Scalar multiplication of the base point
-// @scalar - The scalar to multiply the basepoint by.
-// @returns a point on the curve
-abi_route_scalarMultBase:
-	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+// challenge
+// Produce the challenge, i.e. an individual iteration in the ring sig verification.
+// We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42
+// c_{i+1} = Hs(m || r_{i} * G + c_{i} * K_{i} || r_{i}*Hp(K_{i}) + c_{i} * I) mod |fr|
+// @param msg - The message to be signed
+// @param nonce - The nonce, part of the ring signature itself, aka one of the fake secret keys
+// @param cPrev - The previous challenge, or the base challenge if this is the first link (in which case it is part of the ring sig)
+// @param pk - The specific public key in the ring (indexed from the array of public keys)
+// @param keyImage - The key image of the signer, required for linkabiltiy to prevent double spending
+// @returns
+abi_route_challenge:
+	byte 0x; dupn 8 // push empty bytes to fill the stack frame for this subroutine's local variables
 
-	// scalar: byte[]
+	// keyImage: byte[]
+	txna ApplicationArgs 5
+	extract 2 0
+
+	// pk: byte[]
+	txna ApplicationArgs 4
+	extract 2 0
+
+	// cPrev: byte[]
+	txna ApplicationArgs 3
+	extract 2 0
+
+	// nonce: byte[]
+	txna ApplicationArgs 2
+	extract 2 0
+
+	// msg: byte[]
 	txna ApplicationArgs 1
 	extract 2 0
 
-	// execute scalarMultBase(bytes)byte[]
-	callsub scalarMultBase
+	// execute challenge(bytes,bytes,bytes,bytes,bytes)byte[]
+	callsub challenge
 	int 1
 	return
 
-scalarMultBase:
-	proto 2 0
+challenge:
+	proto 14 0
 
-	// contracts/mahber.algo.ts:21
-	// result = ec_scalar_mul(
+	// contracts/mahber.algo.ts:125
+	// leftleft = ec_scalar_mul(
 	//       "BN254g1",
 	//       hex(
 	//         "00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002"
 	//       ),
-	//       scalar
+	//       nonce
 	//     )
 	byte 0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002
-	frame_dig -1 // scalar: bytes
+	frame_dig -2 // nonce: bytes
 	ec_scalar_mul BN254g1
-	frame_bury -2 // result: bytes
+	frame_bury -6 // leftleft: bytes
 
-	// contracts/mahber.algo.ts:28
-	// return result;
-	frame_dig -2 // result: bytes
-	dup
-	len
-	itob
-	extract 6 2
-	swap
-	concat
-	byte 0x151f7c75
-	swap
-	concat
-	log
-	retsub
-
-// scalarMult(bytes,bytes)byte[]
-//
-// Scalar Mult
-// Scalar multiplication with a supplied point
-// @scalar - The scalar to multiply the point with
-// @point - The point that is multiplied with the scalar
-// @returns a point on the curve
-abi_route_scalarMult:
-	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
-
-	// point: byte[]
-	txna ApplicationArgs 2
-	extract 2 0
-
-	// scalar: byte[]
-	txna ApplicationArgs 1
-	extract 2 0
-
-	// execute scalarMult(bytes,bytes)byte[]
-	callsub scalarMult
-	int 1
-	return
-
-scalarMult:
-	proto 3 0
-
-	// contracts/mahber.algo.ts:39
-	// result = ec_scalar_mul("BN254g1", point, scalar)
-	frame_dig -2 // point: bytes
-	frame_dig -1 // scalar: bytes
+	// contracts/mahber.algo.ts:134
+	// leftright = ec_scalar_mul("BN254g1", pk, cPrev)
+	frame_dig -4 // pk: bytes
+	frame_dig -3 // cPrev: bytes
 	ec_scalar_mul BN254g1
-	frame_bury -3 // result: bytes
+	frame_bury -7 // leftright: bytes
 
-	// contracts/mahber.algo.ts:40
-	// return result;
-	frame_dig -3 // result: bytes
-	dup
-	len
-	itob
-	extract 6 2
-	swap
-	concat
-	byte 0x151f7c75
-	swap
-	concat
-	log
-	retsub
-
-// validPoint(bytes)bool
-//
-// validPoint
-// Checks if the point is valid (on curve)
-// @point - The point to check
-// @returns true if the point is valid, false otherwise
-abi_route_validPoint:
-	// point: byte[]
-	txna ApplicationArgs 1
-	extract 2 0
-
-	// execute validPoint(bytes)bool
-	callsub validPoint
-	int 1
-	return
-
-validPoint:
-	proto 1 0
-
-	// contracts/mahber.algo.ts:50
-	// return ec_subgroup_check("BN254g1", point);
-	frame_dig -1 // point: bytes
-	ec_subgroup_check BN254g1
-	byte 0x00
-	int 0
-	uncover 2
-	setbit
-	byte 0x151f7c75
-	swap
-	concat
-	log
-	retsub
-
-// pointAdd(bytes,bytes)byte[]
-//
-// Point add
-// Adds two points on the curve
-// @param pointA - The first point
-// @param pointB - The second point
-// @returns The result of the operation
-abi_route_pointAdd:
-	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
-
-	// pointB: byte[]
-	txna ApplicationArgs 2
-	extract 2 0
-
-	// pointA: byte[]
-	txna ApplicationArgs 1
-	extract 2 0
-
-	// execute pointAdd(bytes,bytes)byte[]
-	callsub pointAdd
-	int 1
-	return
-
-pointAdd:
-	proto 3 0
-
-	// contracts/mahber.algo.ts:61
-	// result = ec_add("BN254g1", pointA, pointB)
-	frame_dig -1 // pointA: bytes
-	frame_dig -2 // pointB: bytes
+	// contracts/mahber.algo.ts:137
+	// left = ec_add("BN254g1", leftleft, leftright)
+	frame_dig -6 // leftleft: bytes
+	frame_dig -7 // leftright: bytes
 	ec_add BN254g1
-	frame_bury -3 // result: bytes
+	frame_bury -8 // left: bytes
 
-	// contracts/mahber.algo.ts:62
-	// return result;
-	frame_dig -3 // result: bytes
-	dup
-	len
-	itob
-	extract 6 2
-	swap
-	concat
-	byte 0x151f7c75
-	swap
-	concat
-	log
-	retsub
-
-// hashPointToPoint(bytes)byte[]
-//
-// hashPointToPoint
-// Hashes a point to a point on the curve
-// NOTE: ec_map_to maps fp_element to curve point. We use hash and then mod to map bytes to fp_element first.
-// What is inside ec_map_to (accessed Dec 13th 2023):
-// https://github.com/algorand/go-algorand/blob/master/data/transactions/logic/pairing.go#L862
-// https://pkg.go.dev/github.com/consensys/gnark-crypto/ecc/bn254#MapToG1
-// https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fp/element.go#L42
-// @param point - The point to hash
-// @returns The result of the operation
-abi_route_hashPointToPoint:
-	byte 0x; dupn 2 // push empty bytes to fill the stack frame for this subroutine's local variables
-
-	// point: byte[]
-	txna ApplicationArgs 1
-	extract 2 0
-
-	// execute hashPointToPoint(bytes)byte[]
-	callsub hashPointToPoint
-	int 1
-	return
-
-hashPointToPoint:
-	proto 4 0
-
-	// contracts/mahber.algo.ts:76
-	// hash = sha256(point)
-	frame_dig -1 // point: bytes
-	sha256
-	frame_bury -2 // hash: byte[32]
-
-	// contracts/mahber.algo.ts:77
+	// contracts/mahber.algo.ts:149
 	// fpElement =
-	//       btobigint(hash) % btobigint(hex("30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47"))
-	frame_dig -2 // hash: byte[32]
+	//       btobigint(sha256(pk)) % btobigint(hex("30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47"))
+	frame_dig -4 // pk: bytes
+	sha256
 	byte 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47
 	b%
-	frame_bury -3 // fpElement: bigint
+	frame_bury -9 // fpElement: bigint
 
-	// contracts/mahber.algo.ts:80
-	// result = ec_map_to("BN254g1", fpElement)
-	frame_dig -3 // fpElement: bigint
+	// contracts/mahber.algo.ts:152
+	// rightleftright = ec_map_to("BN254g1", fpElement)
+	frame_dig -9 // fpElement: bigint
 	ec_map_to BN254g1
-	frame_bury -4 // result: bytes
+	frame_bury -10 // rightleftright: bytes
 
-	// contracts/mahber.algo.ts:81
-	// return result;
-	frame_dig -4 // result: bytes
+	// End of HashPointToPoint
+	// contracts/mahber.algo.ts:156
+	// rightleft = ec_scalar_mul("BN254g1", rightleftright, nonce)
+	frame_dig -10 // rightleftright: bytes
+	frame_dig -2 // nonce: bytes
+	ec_scalar_mul BN254g1
+	frame_bury -11 // rightleft: bytes
+
+	// contracts/mahber.algo.ts:159
+	// rightright = ec_scalar_mul("BN254g1", keyImage, cPrev)
+	frame_dig -5 // keyImage: bytes
+	frame_dig -3 // cPrev: bytes
+	ec_scalar_mul BN254g1
+	frame_bury -12 // rightright: bytes
+
+	// contracts/mahber.algo.ts:162
+	// right = ec_add("BN254g1", rightleft, rightright)
+	frame_dig -11 // rightleft: bytes
+	frame_dig -12 // rightright: bytes
+	ec_add BN254g1
+	frame_bury -13 // right: bytes
+
+	// contracts/mahber.algo.ts:169
+	// h =
+	//       btobigint(sha256(concat(concat(msg, left), right))) %
+	//       btobigint(hex("0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001"))
+	frame_dig -1 // msg: bytes
+	frame_dig -8 // left: bytes
+	concat
+	frame_dig -13 // right: bytes
+	concat
+	sha256
+	byte 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001
+	b%
+	frame_bury -14 // h: bigint
+
+	// contracts/mahber.algo.ts:174
+	// return h as bytes;
+	frame_dig -14 // h: bigint
 	dup
 	len
 	itob
@@ -302,11 +199,7 @@ create_NoOp:
 
 call_NoOp:
 	method "dummyOpUp(uint64)uint64"
-	method "scalarMultBase(byte[])byte[]"
-	method "scalarMult(byte[],byte[])byte[]"
-	method "validPoint(byte[])bool"
-	method "pointAdd(byte[],byte[])byte[]"
-	method "hashPointToPoint(byte[])byte[]"
+	method "challenge(byte[],byte[],byte[],byte[],byte[])byte[]"
 	txna ApplicationArgs 0
-	match abi_route_dummyOpUp abi_route_scalarMultBase abi_route_scalarMult abi_route_validPoint abi_route_pointAdd abi_route_hashPointToPoint
+	match abi_route_dummyOpUp abi_route_challenge
 	err

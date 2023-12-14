@@ -32,27 +32,7 @@ export const APP_SPEC: AppSpec = {
         "no_op": "CALL"
       }
     },
-    "scalarMultBase(byte[])byte[]": {
-      "call_config": {
-        "no_op": "CALL"
-      }
-    },
-    "scalarMult(byte[],byte[])byte[]": {
-      "call_config": {
-        "no_op": "CALL"
-      }
-    },
-    "validPoint(byte[])bool": {
-      "call_config": {
-        "no_op": "CALL"
-      }
-    },
-    "pointAdd(byte[],byte[])byte[]": {
-      "call_config": {
-        "no_op": "CALL"
-      }
-    },
-    "hashPointToPoint(byte[])byte[]": {
+    "challenge(byte[],byte[],byte[],byte[],byte[])byte[]": {
       "call_config": {
         "no_op": "CALL"
       }
@@ -91,7 +71,7 @@ export const APP_SPEC: AppSpec = {
     }
   },
   "source": {
-    "approval": "I3ByYWdtYSB2ZXJzaW9uIDEwCgovLyBUaGlzIFRFQUwgd2FzIGdlbmVyYXRlZCBieSBURUFMU2NyaXB0IHYwLjYzLjAKLy8gaHR0cHM6Ly9naXRodWIuY29tL2FsZ29yYW5kZm91bmRhdGlvbi9URUFMU2NyaXB0CgovLyBUaGlzIGNvbnRyYWN0IGlzIGNvbXBsaWFudCB3aXRoIGFuZC9vciBpbXBsZW1lbnRzIHRoZSBmb2xsb3dpbmcgQVJDczogWyBBUkM0IF0KCi8vIFRoZSBmb2xsb3dpbmcgdGVuIGxpbmVzIG9mIFRFQUwgaGFuZGxlIGluaXRpYWwgcHJvZ3JhbSBmbG93Ci8vIFRoaXMgcGF0dGVybiBpcyB1c2VkIHRvIG1ha2UgaXQgZWFzeSBmb3IgYW55b25lIHRvIHBhcnNlIHRoZSBzdGFydCBvZiB0aGUgcHJvZ3JhbSBhbmQgZGV0ZXJtaW5lIGlmIGEgc3BlY2lmaWMgYWN0aW9uIGlzIGFsbG93ZWQKLy8gSGVyZSwgYWN0aW9uIHJlZmVycyB0byB0aGUgT25Db21wbGV0ZSBpbiBjb21iaW5hdGlvbiB3aXRoIHdoZXRoZXIgdGhlIGFwcCBpcyBiZWluZyBjcmVhdGVkIG9yIGNhbGxlZAovLyBFdmVyeSBwb3NzaWJsZSBhY3Rpb24gZm9yIHRoaXMgY29udHJhY3QgaXMgcmVwcmVzZW50ZWQgaW4gdGhlIHN3aXRjaCBzdGF0ZW1lbnQKLy8gSWYgdGhlIGFjdGlvbiBpcyBub3QgaW1wbG1lbnRlZCBpbiB0aGUgY29udHJhY3QsIGl0cyByZXBzZWN0aXZlIGJyYW5jaCB3aWxsIGJlICJOT1RfSU1QTE1FTlRFRCIgd2hpY2gganVzdCBjb250YWlucyAiZXJyIgp0eG4gQXBwbGljYXRpb25JRAppbnQgMAo+CmludCA2CioKdHhuIE9uQ29tcGxldGlvbgorCnN3aXRjaCBjcmVhdGVfTm9PcCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIE5PVF9JTVBMRU1FTlRFRCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIGNhbGxfTm9PcAoKTk9UX0lNUExFTUVOVEVEOgoJZXJyCgovLyBkdW1teU9wVXAodWludDY0KXVpbnQ2NAovLwovLyBEdW1teSBPcCBVcAovLyBEdW1teSBvcGVyYXRpb24gdG8gZ2V0IG1vcmUgb3Bjb2RlIGJ1ZGdldAovLyBAaSAtIFRoZSBudW1iZXIgdG8gcmV0dXJuLCBuZWNzc2FyeSB0byBkZWR1cGxpY2F0ZSB0aGUgbmFtZQovLyBAcmV0dXJucyB0aGUgbnVtYmVyIChidXQgd2UgZG8gbm90aGluZyB3aXRoIGl0KQphYmlfcm91dGVfZHVtbXlPcFVwOgoJLy8gaTogdWludDY0Cgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglidG9pCgoJLy8gZXhlY3V0ZSBkdW1teU9wVXAodWludDY0KXVpbnQ2NAoJY2FsbHN1YiBkdW1teU9wVXAKCWludCAxCglyZXR1cm4KCmR1bW15T3BVcDoKCXByb3RvIDEgMAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxMQoJLy8gcmV0dXJuIGk7CglmcmFtZV9kaWcgLTEgLy8gaTogdWludDY0CglpdG9iCglieXRlIDB4MTUxZjdjNzUKCXN3YXAKCWNvbmNhdAoJbG9nCglyZXRzdWIKCi8vIHNjYWxhck11bHRCYXNlKGJ5dGVzKWJ5dGVbXQovLwovLyBTY2FsYXIgTXVsdCBCYXNlCi8vIFNjYWxhciBtdWx0aXBsaWNhdGlvbiBvZiB0aGUgYmFzZSBwb2ludAovLyBAc2NhbGFyIC0gVGhlIHNjYWxhciB0byBtdWx0aXBseSB0aGUgYmFzZXBvaW50IGJ5LgovLyBAcmV0dXJucyBhIHBvaW50IG9uIHRoZSBjdXJ2ZQphYmlfcm91dGVfc2NhbGFyTXVsdEJhc2U6CglieXRlIDB4IC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoKCS8vIHNjYWxhcjogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglleHRyYWN0IDIgMAoKCS8vIGV4ZWN1dGUgc2NhbGFyTXVsdEJhc2UoYnl0ZXMpYnl0ZVtdCgljYWxsc3ViIHNjYWxhck11bHRCYXNlCglpbnQgMQoJcmV0dXJuCgpzY2FsYXJNdWx0QmFzZToKCXByb3RvIDIgMAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoyMQoJLy8gcmVzdWx0ID0gZWNfc2NhbGFyX211bCgKCS8vICAgICAgICJCTjI1NGcxIiwKCS8vICAgICAgIGhleCgKCS8vICAgICAgICAgIjAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAyIgoJLy8gICAgICAgKSwKCS8vICAgICAgIHNjYWxhcgoJLy8gICAgICkKCWJ5dGUgMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAxMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMgoJZnJhbWVfZGlnIC0xIC8vIHNjYWxhcjogYnl0ZXMKCWVjX3NjYWxhcl9tdWwgQk4yNTRnMQoJZnJhbWVfYnVyeSAtMiAvLyByZXN1bHQ6IGJ5dGVzCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjI4CgkvLyByZXR1cm4gcmVzdWx0OwoJZnJhbWVfZGlnIC0yIC8vIHJlc3VsdDogYnl0ZXMKCWR1cAoJbGVuCglpdG9iCglleHRyYWN0IDYgMgoJc3dhcAoJY29uY2F0CglieXRlIDB4MTUxZjdjNzUKCXN3YXAKCWNvbmNhdAoJbG9nCglyZXRzdWIKCi8vIHNjYWxhck11bHQoYnl0ZXMsYnl0ZXMpYnl0ZVtdCi8vCi8vIFNjYWxhciBNdWx0Ci8vIFNjYWxhciBtdWx0aXBsaWNhdGlvbiB3aXRoIGEgc3VwcGxpZWQgcG9pbnQKLy8gQHNjYWxhciAtIFRoZSBzY2FsYXIgdG8gbXVsdGlwbHkgdGhlIHBvaW50IHdpdGgKLy8gQHBvaW50IC0gVGhlIHBvaW50IHRoYXQgaXMgbXVsdGlwbGllZCB3aXRoIHRoZSBzY2FsYXIKLy8gQHJldHVybnMgYSBwb2ludCBvbiB0aGUgY3VydmUKYWJpX3JvdXRlX3NjYWxhck11bHQ6CglieXRlIDB4IC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoKCS8vIHBvaW50OiBieXRlW10KCXR4bmEgQXBwbGljYXRpb25BcmdzIDIKCWV4dHJhY3QgMiAwCgoJLy8gc2NhbGFyOiBieXRlW10KCXR4bmEgQXBwbGljYXRpb25BcmdzIDEKCWV4dHJhY3QgMiAwCgoJLy8gZXhlY3V0ZSBzY2FsYXJNdWx0KGJ5dGVzLGJ5dGVzKWJ5dGVbXQoJY2FsbHN1YiBzY2FsYXJNdWx0CglpbnQgMQoJcmV0dXJuCgpzY2FsYXJNdWx0OgoJcHJvdG8gMyAwCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjM5CgkvLyByZXN1bHQgPSBlY19zY2FsYXJfbXVsKCJCTjI1NGcxIiwgcG9pbnQsIHNjYWxhcikKCWZyYW1lX2RpZyAtMiAvLyBwb2ludDogYnl0ZXMKCWZyYW1lX2RpZyAtMSAvLyBzY2FsYXI6IGJ5dGVzCgllY19zY2FsYXJfbXVsIEJOMjU0ZzEKCWZyYW1lX2J1cnkgLTMgLy8gcmVzdWx0OiBieXRlcwoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czo0MAoJLy8gcmV0dXJuIHJlc3VsdDsKCWZyYW1lX2RpZyAtMyAvLyByZXN1bHQ6IGJ5dGVzCglkdXAKCWxlbgoJaXRvYgoJZXh0cmFjdCA2IDIKCXN3YXAKCWNvbmNhdAoJYnl0ZSAweDE1MWY3Yzc1Cglzd2FwCgljb25jYXQKCWxvZwoJcmV0c3ViCgovLyB2YWxpZFBvaW50KGJ5dGVzKWJvb2wKLy8KLy8gdmFsaWRQb2ludAovLyBDaGVja3MgaWYgdGhlIHBvaW50IGlzIHZhbGlkIChvbiBjdXJ2ZSkKLy8gQHBvaW50IC0gVGhlIHBvaW50IHRvIGNoZWNrCi8vIEByZXR1cm5zIHRydWUgaWYgdGhlIHBvaW50IGlzIHZhbGlkLCBmYWxzZSBvdGhlcndpc2UKYWJpX3JvdXRlX3ZhbGlkUG9pbnQ6CgkvLyBwb2ludDogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglleHRyYWN0IDIgMAoKCS8vIGV4ZWN1dGUgdmFsaWRQb2ludChieXRlcylib29sCgljYWxsc3ViIHZhbGlkUG9pbnQKCWludCAxCglyZXR1cm4KCnZhbGlkUG9pbnQ6Cglwcm90byAxIDAKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6NTAKCS8vIHJldHVybiBlY19zdWJncm91cF9jaGVjaygiQk4yNTRnMSIsIHBvaW50KTsKCWZyYW1lX2RpZyAtMSAvLyBwb2ludDogYnl0ZXMKCWVjX3N1Ymdyb3VwX2NoZWNrIEJOMjU0ZzEKCWJ5dGUgMHgwMAoJaW50IDAKCXVuY292ZXIgMgoJc2V0Yml0CglieXRlIDB4MTUxZjdjNzUKCXN3YXAKCWNvbmNhdAoJbG9nCglyZXRzdWIKCi8vIHBvaW50QWRkKGJ5dGVzLGJ5dGVzKWJ5dGVbXQovLwovLyBQb2ludCBhZGQKLy8gQWRkcyB0d28gcG9pbnRzIG9uIHRoZSBjdXJ2ZQovLyBAcGFyYW0gcG9pbnRBIC0gVGhlIGZpcnN0IHBvaW50Ci8vIEBwYXJhbSBwb2ludEIgLSBUaGUgc2Vjb25kIHBvaW50Ci8vIEByZXR1cm5zIFRoZSByZXN1bHQgb2YgdGhlIG9wZXJhdGlvbgphYmlfcm91dGVfcG9pbnRBZGQ6CglieXRlIDB4IC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoKCS8vIHBvaW50QjogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAyCglleHRyYWN0IDIgMAoKCS8vIHBvaW50QTogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglleHRyYWN0IDIgMAoKCS8vIGV4ZWN1dGUgcG9pbnRBZGQoYnl0ZXMsYnl0ZXMpYnl0ZVtdCgljYWxsc3ViIHBvaW50QWRkCglpbnQgMQoJcmV0dXJuCgpwb2ludEFkZDoKCXByb3RvIDMgMAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czo2MQoJLy8gcmVzdWx0ID0gZWNfYWRkKCJCTjI1NGcxIiwgcG9pbnRBLCBwb2ludEIpCglmcmFtZV9kaWcgLTEgLy8gcG9pbnRBOiBieXRlcwoJZnJhbWVfZGlnIC0yIC8vIHBvaW50QjogYnl0ZXMKCWVjX2FkZCBCTjI1NGcxCglmcmFtZV9idXJ5IC0zIC8vIHJlc3VsdDogYnl0ZXMKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6NjIKCS8vIHJldHVybiByZXN1bHQ7CglmcmFtZV9kaWcgLTMgLy8gcmVzdWx0OiBieXRlcwoJZHVwCglsZW4KCWl0b2IKCWV4dHJhY3QgNiAyCglzd2FwCgljb25jYXQKCWJ5dGUgMHgxNTFmN2M3NQoJc3dhcAoJY29uY2F0Cglsb2cKCXJldHN1YgoKLy8gaGFzaFBvaW50VG9Qb2ludChieXRlcylieXRlW10KLy8KLy8gaGFzaFBvaW50VG9Qb2ludAovLyBIYXNoZXMgYSBwb2ludCB0byBhIHBvaW50IG9uIHRoZSBjdXJ2ZQovLyBOT1RFOiBlY19tYXBfdG8gbWFwcyBmcF9lbGVtZW50IHRvIGN1cnZlIHBvaW50LiBXZSB1c2UgaGFzaCBhbmQgdGhlbiBtb2QgdG8gbWFwIGJ5dGVzIHRvIGZwX2VsZW1lbnQgZmlyc3QuCi8vIFdoYXQgaXMgaW5zaWRlIGVjX21hcF90byAoYWNjZXNzZWQgRGVjIDEzdGggMjAyMyk6Ci8vIGh0dHBzOi8vZ2l0aHViLmNvbS9hbGdvcmFuZC9nby1hbGdvcmFuZC9ibG9iL21hc3Rlci9kYXRhL3RyYW5zYWN0aW9ucy9sb2dpYy9wYWlyaW5nLmdvI0w4NjIKLy8gaHR0cHM6Ly9wa2cuZ28uZGV2L2dpdGh1Yi5jb20vY29uc2Vuc3lzL2duYXJrLWNyeXB0by9lY2MvYm4yNTQjTWFwVG9HMQovLyBodHRwczovL2dpdGh1Yi5jb20vQ29uc2Vuc3lzL2duYXJrLWNyeXB0by9ibG9iL21hc3Rlci9lY2MvYm4yNTQvZnAvZWxlbWVudC5nbyNMNDIKLy8gQHBhcmFtIHBvaW50IC0gVGhlIHBvaW50IHRvIGhhc2gKLy8gQHJldHVybnMgVGhlIHJlc3VsdCBvZiB0aGUgb3BlcmF0aW9uCmFiaV9yb3V0ZV9oYXNoUG9pbnRUb1BvaW50OgoJYnl0ZSAweDsgZHVwbiAyIC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoKCS8vIHBvaW50OiBieXRlW10KCXR4bmEgQXBwbGljYXRpb25BcmdzIDEKCWV4dHJhY3QgMiAwCgoJLy8gZXhlY3V0ZSBoYXNoUG9pbnRUb1BvaW50KGJ5dGVzKWJ5dGVbXQoJY2FsbHN1YiBoYXNoUG9pbnRUb1BvaW50CglpbnQgMQoJcmV0dXJuCgpoYXNoUG9pbnRUb1BvaW50OgoJcHJvdG8gNCAwCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjc2CgkvLyBoYXNoID0gc2hhMjU2KHBvaW50KQoJZnJhbWVfZGlnIC0xIC8vIHBvaW50OiBieXRlcwoJc2hhMjU2CglmcmFtZV9idXJ5IC0yIC8vIGhhc2g6IGJ5dGVbMzJdCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjc3CgkvLyBmcEVsZW1lbnQgPQoJLy8gICAgICAgYnRvYmlnaW50KGhhc2gpICUgYnRvYmlnaW50KGhleCgiMzA2NDRlNzJlMTMxYTAyOWI4NTA0NWI2ODE4MTU4NWQ5NzgxNmE5MTY4NzFjYThkM2MyMDhjMTZkODdjZmQ0NyIpKQoJZnJhbWVfZGlnIC0yIC8vIGhhc2g6IGJ5dGVbMzJdCglieXRlIDB4MzA2NDRlNzJlMTMxYTAyOWI4NTA0NWI2ODE4MTU4NWQ5NzgxNmE5MTY4NzFjYThkM2MyMDhjMTZkODdjZmQ0NwoJYiUKCWZyYW1lX2J1cnkgLTMgLy8gZnBFbGVtZW50OiBiaWdpbnQKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6ODAKCS8vIHJlc3VsdCA9IGVjX21hcF90bygiQk4yNTRnMSIsIGZwRWxlbWVudCkKCWZyYW1lX2RpZyAtMyAvLyBmcEVsZW1lbnQ6IGJpZ2ludAoJZWNfbWFwX3RvIEJOMjU0ZzEKCWZyYW1lX2J1cnkgLTQgLy8gcmVzdWx0OiBieXRlcwoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czo4MQoJLy8gcmV0dXJuIHJlc3VsdDsKCWZyYW1lX2RpZyAtNCAvLyByZXN1bHQ6IGJ5dGVzCglkdXAKCWxlbgoJaXRvYgoJZXh0cmFjdCA2IDIKCXN3YXAKCWNvbmNhdAoJYnl0ZSAweDE1MWY3Yzc1Cglzd2FwCgljb25jYXQKCWxvZwoJcmV0c3ViCgphYmlfcm91dGVfY3JlYXRlQXBwbGljYXRpb246CglpbnQgMQoJcmV0dXJuCgpjcmVhdGVfTm9PcDoKCW1ldGhvZCAiY3JlYXRlQXBwbGljYXRpb24oKXZvaWQiCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAwCgltYXRjaCBhYmlfcm91dGVfY3JlYXRlQXBwbGljYXRpb24KCWVycgoKY2FsbF9Ob09wOgoJbWV0aG9kICJkdW1teU9wVXAodWludDY0KXVpbnQ2NCIKCW1ldGhvZCAic2NhbGFyTXVsdEJhc2UoYnl0ZVtdKWJ5dGVbXSIKCW1ldGhvZCAic2NhbGFyTXVsdChieXRlW10sYnl0ZVtdKWJ5dGVbXSIKCW1ldGhvZCAidmFsaWRQb2ludChieXRlW10pYm9vbCIKCW1ldGhvZCAicG9pbnRBZGQoYnl0ZVtdLGJ5dGVbXSlieXRlW10iCgltZXRob2QgImhhc2hQb2ludFRvUG9pbnQoYnl0ZVtdKWJ5dGVbXSIKCXR4bmEgQXBwbGljYXRpb25BcmdzIDAKCW1hdGNoIGFiaV9yb3V0ZV9kdW1teU9wVXAgYWJpX3JvdXRlX3NjYWxhck11bHRCYXNlIGFiaV9yb3V0ZV9zY2FsYXJNdWx0IGFiaV9yb3V0ZV92YWxpZFBvaW50IGFiaV9yb3V0ZV9wb2ludEFkZCBhYmlfcm91dGVfaGFzaFBvaW50VG9Qb2ludAoJZXJy",
+    "approval": "I3ByYWdtYSB2ZXJzaW9uIDEwCgovLyBUaGlzIFRFQUwgd2FzIGdlbmVyYXRlZCBieSBURUFMU2NyaXB0IHYwLjYzLjAKLy8gaHR0cHM6Ly9naXRodWIuY29tL2FsZ29yYW5kZm91bmRhdGlvbi9URUFMU2NyaXB0CgovLyBUaGlzIGNvbnRyYWN0IGlzIGNvbXBsaWFudCB3aXRoIGFuZC9vciBpbXBsZW1lbnRzIHRoZSBmb2xsb3dpbmcgQVJDczogWyBBUkM0IF0KCi8vIFRoZSBmb2xsb3dpbmcgdGVuIGxpbmVzIG9mIFRFQUwgaGFuZGxlIGluaXRpYWwgcHJvZ3JhbSBmbG93Ci8vIFRoaXMgcGF0dGVybiBpcyB1c2VkIHRvIG1ha2UgaXQgZWFzeSBmb3IgYW55b25lIHRvIHBhcnNlIHRoZSBzdGFydCBvZiB0aGUgcHJvZ3JhbSBhbmQgZGV0ZXJtaW5lIGlmIGEgc3BlY2lmaWMgYWN0aW9uIGlzIGFsbG93ZWQKLy8gSGVyZSwgYWN0aW9uIHJlZmVycyB0byB0aGUgT25Db21wbGV0ZSBpbiBjb21iaW5hdGlvbiB3aXRoIHdoZXRoZXIgdGhlIGFwcCBpcyBiZWluZyBjcmVhdGVkIG9yIGNhbGxlZAovLyBFdmVyeSBwb3NzaWJsZSBhY3Rpb24gZm9yIHRoaXMgY29udHJhY3QgaXMgcmVwcmVzZW50ZWQgaW4gdGhlIHN3aXRjaCBzdGF0ZW1lbnQKLy8gSWYgdGhlIGFjdGlvbiBpcyBub3QgaW1wbG1lbnRlZCBpbiB0aGUgY29udHJhY3QsIGl0cyByZXBzZWN0aXZlIGJyYW5jaCB3aWxsIGJlICJOT1RfSU1QTE1FTlRFRCIgd2hpY2gganVzdCBjb250YWlucyAiZXJyIgp0eG4gQXBwbGljYXRpb25JRAppbnQgMAo+CmludCA2CioKdHhuIE9uQ29tcGxldGlvbgorCnN3aXRjaCBjcmVhdGVfTm9PcCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIE5PVF9JTVBMRU1FTlRFRCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIGNhbGxfTm9PcAoKTk9UX0lNUExFTUVOVEVEOgoJZXJyCgovLyBkdW1teU9wVXAodWludDY0KXVpbnQ2NAovLwovLyBEdW1teSBPcCBVcAovLyBEdW1teSBvcGVyYXRpb24gdG8gZ2V0IG1vcmUgb3Bjb2RlIGJ1ZGdldAovLyBAaSAtIFRoZSBudW1iZXIgdG8gcmV0dXJuLCBuZWNzc2FyeSB0byBkZWR1cGxpY2F0ZSB0aGUgbmFtZQovLyBAcmV0dXJucyB0aGUgbnVtYmVyIChidXQgd2UgZG8gbm90aGluZyB3aXRoIGl0KQphYmlfcm91dGVfZHVtbXlPcFVwOgoJLy8gaTogdWludDY0Cgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglidG9pCgoJLy8gZXhlY3V0ZSBkdW1teU9wVXAodWludDY0KXVpbnQ2NAoJY2FsbHN1YiBkdW1teU9wVXAKCWludCAxCglyZXR1cm4KCmR1bW15T3BVcDoKCXByb3RvIDEgMAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxMQoJLy8gcmV0dXJuIGk7CglmcmFtZV9kaWcgLTEgLy8gaTogdWludDY0CglpdG9iCglieXRlIDB4MTUxZjdjNzUKCXN3YXAKCWNvbmNhdAoJbG9nCglyZXRzdWIKCi8vIGNoYWxsZW5nZShieXRlcyxieXRlcyxieXRlcyxieXRlcyxieXRlcylieXRlW10KLy8KLy8gY2hhbGxlbmdlCi8vIFByb2R1Y2UgdGhlIGNoYWxsZW5nZSwgaS5lLiBhbiBpbmRpdmlkdWFsIGl0ZXJhdGlvbiBpbiB0aGUgcmluZyBzaWcgdmVyaWZpY2F0aW9uLgovLyBXZSBtb2QgYnkgb3JkZXIgb2YgZnIgaHR0cHM6Ly9naXRodWIuY29tL0NvbnNlbnN5cy9nbmFyay1jcnlwdG8vYmxvYi9tYXN0ZXIvZWNjL2JuMjU0L2ZyL2VsZW1lbnQuZ28jTDQyCi8vIGNfe2krMX0gPSBIcyhtIHx8IHJfe2l9ICogRyArIGNfe2l9ICogS197aX0gfHwgcl97aX0qSHAoS197aX0pICsgY197aX0gKiBJKSBtb2QgfGZyfAovLyBAcGFyYW0gbXNnIC0gVGhlIG1lc3NhZ2UgdG8gYmUgc2lnbmVkCi8vIEBwYXJhbSBub25jZSAtIFRoZSBub25jZSwgcGFydCBvZiB0aGUgcmluZyBzaWduYXR1cmUgaXRzZWxmLCBha2Egb25lIG9mIHRoZSBmYWtlIHNlY3JldCBrZXlzCi8vIEBwYXJhbSBjUHJldiAtIFRoZSBwcmV2aW91cyBjaGFsbGVuZ2UsIG9yIHRoZSBiYXNlIGNoYWxsZW5nZSBpZiB0aGlzIGlzIHRoZSBmaXJzdCBsaW5rIChpbiB3aGljaCBjYXNlIGl0IGlzIHBhcnQgb2YgdGhlIHJpbmcgc2lnKQovLyBAcGFyYW0gcGsgLSBUaGUgc3BlY2lmaWMgcHVibGljIGtleSBpbiB0aGUgcmluZyAoaW5kZXhlZCBmcm9tIHRoZSBhcnJheSBvZiBwdWJsaWMga2V5cykKLy8gQHBhcmFtIGtleUltYWdlIC0gVGhlIGtleSBpbWFnZSBvZiB0aGUgc2lnbmVyLCByZXF1aXJlZCBmb3IgbGlua2FiaWx0aXkgdG8gcHJldmVudCBkb3VibGUgc3BlbmRpbmcKLy8gQHJldHVybnMKYWJpX3JvdXRlX2NoYWxsZW5nZToKCWJ5dGUgMHg7IGR1cG4gOCAvLyBwdXNoIGVtcHR5IGJ5dGVzIHRvIGZpbGwgdGhlIHN0YWNrIGZyYW1lIGZvciB0aGlzIHN1YnJvdXRpbmUncyBsb2NhbCB2YXJpYWJsZXMKCgkvLyBrZXlJbWFnZTogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyA1CglleHRyYWN0IDIgMAoKCS8vIHBrOiBieXRlW10KCXR4bmEgQXBwbGljYXRpb25BcmdzIDQKCWV4dHJhY3QgMiAwCgoJLy8gY1ByZXY6IGJ5dGVbXQoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMwoJZXh0cmFjdCAyIDAKCgkvLyBub25jZTogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAyCglleHRyYWN0IDIgMAoKCS8vIG1zZzogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglleHRyYWN0IDIgMAoKCS8vIGV4ZWN1dGUgY2hhbGxlbmdlKGJ5dGVzLGJ5dGVzLGJ5dGVzLGJ5dGVzLGJ5dGVzKWJ5dGVbXQoJY2FsbHN1YiBjaGFsbGVuZ2UKCWludCAxCglyZXR1cm4KCmNoYWxsZW5nZToKCXByb3RvIDE0IDAKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MTI1CgkvLyBsZWZ0bGVmdCA9IGVjX3NjYWxhcl9tdWwoCgkvLyAgICAgICAiQk4yNTRnMSIsCgkvLyAgICAgICBoZXgoCgkvLyAgICAgICAgICIwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAxMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMiIKCS8vICAgICAgICksCgkvLyAgICAgICBub25jZQoJLy8gICAgICkKCWJ5dGUgMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAxMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMgoJZnJhbWVfZGlnIC0yIC8vIG5vbmNlOiBieXRlcwoJZWNfc2NhbGFyX211bCBCTjI1NGcxCglmcmFtZV9idXJ5IC02IC8vIGxlZnRsZWZ0OiBieXRlcwoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxMzQKCS8vIGxlZnRyaWdodCA9IGVjX3NjYWxhcl9tdWwoIkJOMjU0ZzEiLCBwaywgY1ByZXYpCglmcmFtZV9kaWcgLTQgLy8gcGs6IGJ5dGVzCglmcmFtZV9kaWcgLTMgLy8gY1ByZXY6IGJ5dGVzCgllY19zY2FsYXJfbXVsIEJOMjU0ZzEKCWZyYW1lX2J1cnkgLTcgLy8gbGVmdHJpZ2h0OiBieXRlcwoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxMzcKCS8vIGxlZnQgPSBlY19hZGQoIkJOMjU0ZzEiLCBsZWZ0bGVmdCwgbGVmdHJpZ2h0KQoJZnJhbWVfZGlnIC02IC8vIGxlZnRsZWZ0OiBieXRlcwoJZnJhbWVfZGlnIC03IC8vIGxlZnRyaWdodDogYnl0ZXMKCWVjX2FkZCBCTjI1NGcxCglmcmFtZV9idXJ5IC04IC8vIGxlZnQ6IGJ5dGVzCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjE0OQoJLy8gZnBFbGVtZW50ID0KCS8vICAgICAgIGJ0b2JpZ2ludChzaGEyNTYocGspKSAlIGJ0b2JpZ2ludChoZXgoIjMwNjQ0ZTcyZTEzMWEwMjliODUwNDViNjgxODE1ODVkOTc4MTZhOTE2ODcxY2E4ZDNjMjA4YzE2ZDg3Y2ZkNDciKSkKCWZyYW1lX2RpZyAtNCAvLyBwazogYnl0ZXMKCXNoYTI1NgoJYnl0ZSAweDMwNjQ0ZTcyZTEzMWEwMjliODUwNDViNjgxODE1ODVkOTc4MTZhOTE2ODcxY2E4ZDNjMjA4YzE2ZDg3Y2ZkNDcKCWIlCglmcmFtZV9idXJ5IC05IC8vIGZwRWxlbWVudDogYmlnaW50CgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjE1MgoJLy8gcmlnaHRsZWZ0cmlnaHQgPSBlY19tYXBfdG8oIkJOMjU0ZzEiLCBmcEVsZW1lbnQpCglmcmFtZV9kaWcgLTkgLy8gZnBFbGVtZW50OiBiaWdpbnQKCWVjX21hcF90byBCTjI1NGcxCglmcmFtZV9idXJ5IC0xMCAvLyByaWdodGxlZnRyaWdodDogYnl0ZXMKCgkvLyBFbmQgb2YgSGFzaFBvaW50VG9Qb2ludAoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjE1NgoJLy8gcmlnaHRsZWZ0ID0gZWNfc2NhbGFyX211bCgiQk4yNTRnMSIsIHJpZ2h0bGVmdHJpZ2h0LCBub25jZSkKCWZyYW1lX2RpZyAtMTAgLy8gcmlnaHRsZWZ0cmlnaHQ6IGJ5dGVzCglmcmFtZV9kaWcgLTIgLy8gbm9uY2U6IGJ5dGVzCgllY19zY2FsYXJfbXVsIEJOMjU0ZzEKCWZyYW1lX2J1cnkgLTExIC8vIHJpZ2h0bGVmdDogYnl0ZXMKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MTU5CgkvLyByaWdodHJpZ2h0ID0gZWNfc2NhbGFyX211bCgiQk4yNTRnMSIsIGtleUltYWdlLCBjUHJldikKCWZyYW1lX2RpZyAtNSAvLyBrZXlJbWFnZTogYnl0ZXMKCWZyYW1lX2RpZyAtMyAvLyBjUHJldjogYnl0ZXMKCWVjX3NjYWxhcl9tdWwgQk4yNTRnMQoJZnJhbWVfYnVyeSAtMTIgLy8gcmlnaHRyaWdodDogYnl0ZXMKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MTYyCgkvLyByaWdodCA9IGVjX2FkZCgiQk4yNTRnMSIsIHJpZ2h0bGVmdCwgcmlnaHRyaWdodCkKCWZyYW1lX2RpZyAtMTEgLy8gcmlnaHRsZWZ0OiBieXRlcwoJZnJhbWVfZGlnIC0xMiAvLyByaWdodHJpZ2h0OiBieXRlcwoJZWNfYWRkIEJOMjU0ZzEKCWZyYW1lX2J1cnkgLTEzIC8vIHJpZ2h0OiBieXRlcwoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxNjkKCS8vIGggPQoJLy8gICAgICAgYnRvYmlnaW50KHNoYTI1Nihjb25jYXQoY29uY2F0KG1zZywgbGVmdCksIHJpZ2h0KSkpICUKCS8vICAgICAgIGJ0b2JpZ2ludChoZXgoIjB4MzA2NDRlNzJlMTMxYTAyOWI4NTA0NWI2ODE4MTU4NWQyODMzZTg0ODc5Yjk3MDkxNDNlMWY1OTNmMDAwMDAwMSIpKQoJZnJhbWVfZGlnIC0xIC8vIG1zZzogYnl0ZXMKCWZyYW1lX2RpZyAtOCAvLyBsZWZ0OiBieXRlcwoJY29uY2F0CglmcmFtZV9kaWcgLTEzIC8vIHJpZ2h0OiBieXRlcwoJY29uY2F0CglzaGEyNTYKCWJ5dGUgMHgzMDY0NGU3MmUxMzFhMDI5Yjg1MDQ1YjY4MTgxNTg1ZDI4MzNlODQ4NzliOTcwOTE0M2UxZjU5M2YwMDAwMDAxCgliJQoJZnJhbWVfYnVyeSAtMTQgLy8gaDogYmlnaW50CgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjE3NAoJLy8gcmV0dXJuIGggYXMgYnl0ZXM7CglmcmFtZV9kaWcgLTE0IC8vIGg6IGJpZ2ludAoJZHVwCglsZW4KCWl0b2IKCWV4dHJhY3QgNiAyCglzd2FwCgljb25jYXQKCWJ5dGUgMHgxNTFmN2M3NQoJc3dhcAoJY29uY2F0Cglsb2cKCXJldHN1YgoKYWJpX3JvdXRlX2NyZWF0ZUFwcGxpY2F0aW9uOgoJaW50IDEKCXJldHVybgoKY3JlYXRlX05vT3A6CgltZXRob2QgImNyZWF0ZUFwcGxpY2F0aW9uKCl2b2lkIgoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMAoJbWF0Y2ggYWJpX3JvdXRlX2NyZWF0ZUFwcGxpY2F0aW9uCgllcnIKCmNhbGxfTm9PcDoKCW1ldGhvZCAiZHVtbXlPcFVwKHVpbnQ2NCl1aW50NjQiCgltZXRob2QgImNoYWxsZW5nZShieXRlW10sYnl0ZVtdLGJ5dGVbXSxieXRlW10sYnl0ZVtdKWJ5dGVbXSIKCXR4bmEgQXBwbGljYXRpb25BcmdzIDAKCW1hdGNoIGFiaV9yb3V0ZV9kdW1teU9wVXAgYWJpX3JvdXRlX2NoYWxsZW5nZQoJZXJy",
     "clear": "I3ByYWdtYSB2ZXJzaW9uIDEw"
   },
   "contract": {
@@ -114,88 +94,38 @@ export const APP_SPEC: AppSpec = {
         }
       },
       {
-        "name": "scalarMultBase",
+        "name": "challenge",
         "args": [
           {
-            "name": "scalar",
+            "name": "msg",
             "type": "byte[]",
-            "desc": ""
-          }
-        ],
-        "desc": "Scalar Mult BaseScalar multiplication of the base point@scalar- The scalar to multiply the basepoint by.",
-        "returns": {
-          "type": "byte[]",
-          "desc": "a point on the curve"
-        }
-      },
-      {
-        "name": "scalarMult",
-        "args": [
-          {
-            "name": "scalar",
-            "type": "byte[]",
-            "desc": ""
+            "desc": "The message to be signed"
           },
           {
-            "name": "point",
+            "name": "nonce",
             "type": "byte[]",
-            "desc": ""
-          }
-        ],
-        "desc": "Scalar MultScalar multiplication with a supplied point@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar",
-        "returns": {
-          "type": "byte[]",
-          "desc": "a point on the curve"
-        }
-      },
-      {
-        "name": "validPoint",
-        "args": [
-          {
-            "name": "point",
-            "type": "byte[]",
-            "desc": ""
-          }
-        ],
-        "desc": "validPointChecks if the point is valid (on curve)@point- The point to check",
-        "returns": {
-          "type": "bool",
-          "desc": "true if the point is valid, false otherwise"
-        }
-      },
-      {
-        "name": "pointAdd",
-        "args": [
-          {
-            "name": "pointA",
-            "type": "byte[]",
-            "desc": "The first point"
+            "desc": "The nonce, part of the ring signature itself, aka one of the fake secret keys"
           },
           {
-            "name": "pointB",
+            "name": "cPrev",
             "type": "byte[]",
-            "desc": "The second point"
-          }
-        ],
-        "desc": "Point addAdds two points on the curve",
-        "returns": {
-          "type": "byte[]",
-          "desc": "The result of the operation"
-        }
-      },
-      {
-        "name": "hashPointToPoint",
-        "args": [
+            "desc": "The previous challenge, or the base challenge if this is the first link (in which case it is part of the ring sig)"
+          },
           {
-            "name": "point",
+            "name": "pk",
             "type": "byte[]",
-            "desc": "The point to hash"
+            "desc": "The specific public key in the ring (indexed from the array of public keys)"
+          },
+          {
+            "name": "keyImage",
+            "type": "byte[]",
+            "desc": "The key image of the signer, required for linkabiltiy to prevent double spending"
           }
         ],
-        "desc": "hashPointToPointHashes a point to a point on the curveNOTE: ec_map_to maps fp_element to curve point. We use hash and then mod to map bytes to fp_element first.What is inside ec_map_to (accessed Dec 13th 2023):https://github.com/algorand/go-algorand/blob/master/data/transactions/logic/pairing.go#L862https://pkg.go.dev/github.com/consensys/gnark-crypto/ecc/bn254#MapToG1https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fp/element.go#L42",
+        "desc": "challengeProduce the challenge, i.e. an individual iteration in the ring sig verification.We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42c_{i+1}= Hs(m || r_{i}* G + c_{i}* K_{i}|| r_{i}*Hp(K_{i}) + c_{i}* I) mod |fr|",
         "returns": {
           "type": "byte[]",
-          "desc": "The result of the operation"
+          "desc": ""
         }
       },
       {
@@ -276,65 +206,30 @@ export type Mahber = {
        */
       returns: bigint
     }>
-    & Record<'scalarMultBase(byte[])byte[]' | 'scalarMultBase', {
-      argsObj: {
-        scalar: Uint8Array
-      }
-      argsTuple: [scalar: Uint8Array]
-      /**
-       * a point on the curve
-       */
-      returns: Uint8Array
-    }>
-    & Record<'scalarMult(byte[],byte[])byte[]' | 'scalarMult', {
-      argsObj: {
-        scalar: Uint8Array
-        point: Uint8Array
-      }
-      argsTuple: [scalar: Uint8Array, point: Uint8Array]
-      /**
-       * a point on the curve
-       */
-      returns: Uint8Array
-    }>
-    & Record<'validPoint(byte[])bool' | 'validPoint', {
-      argsObj: {
-        point: Uint8Array
-      }
-      argsTuple: [point: Uint8Array]
-      /**
-       * true if the point is valid, false otherwise
-       */
-      returns: boolean
-    }>
-    & Record<'pointAdd(byte[],byte[])byte[]' | 'pointAdd', {
+    & Record<'challenge(byte[],byte[],byte[],byte[],byte[])byte[]' | 'challenge', {
       argsObj: {
         /**
-         * The first point
+         * The message to be signed
          */
-        pointA: Uint8Array
+        msg: Uint8Array
         /**
-         * The second point
+         * The nonce, part of the ring signature itself, aka one of the fake secret keys
          */
-        pointB: Uint8Array
-      }
-      argsTuple: [pointA: Uint8Array, pointB: Uint8Array]
-      /**
-       * The result of the operation
-       */
-      returns: Uint8Array
-    }>
-    & Record<'hashPointToPoint(byte[])byte[]' | 'hashPointToPoint', {
-      argsObj: {
+        nonce: Uint8Array
         /**
-         * The point to hash
+         * The previous challenge, or the base challenge if this is the first link (in which case it is part of the ring sig)
          */
-        point: Uint8Array
+        cPrev: Uint8Array
+        /**
+         * The specific public key in the ring (indexed from the array of public keys)
+         */
+        pk: Uint8Array
+        /**
+         * The key image of the signer, required for linkabiltiy to prevent double spending
+         */
+        keyImage: Uint8Array
       }
-      argsTuple: [point: Uint8Array]
-      /**
-       * The result of the operation
-       */
+      argsTuple: [msg: Uint8Array, nonce: Uint8Array, cPrev: Uint8Array, pk: Uint8Array, keyImage: Uint8Array]
       returns: Uint8Array
     }>
     & Record<'createApplication()void' | 'createApplication', {
@@ -432,82 +327,18 @@ export abstract class MahberCallFactory {
     }
   }
   /**
-   * Constructs a no op call for the scalarMultBase(byte[])byte[] ABI method
+   * Constructs a no op call for the challenge(byte[],byte[],byte[],byte[],byte[])byte[] ABI method
    *
-   * Scalar Mult BaseScalar multiplication of the base point@scalar- The scalar to multiply the basepoint by.
-   *
-   * @param args Any args for the contract call
-   * @param params Any additional parameters for the call
-   * @returns A TypedCallParams object for the call
-   */
-  static scalarMultBase(args: MethodArgs<'scalarMultBase(byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
-    return {
-      method: 'scalarMultBase(byte[])byte[]' as const,
-      methodArgs: Array.isArray(args) ? args : [args.scalar],
-      ...params,
-    }
-  }
-  /**
-   * Constructs a no op call for the scalarMult(byte[],byte[])byte[] ABI method
-   *
-   * Scalar MultScalar multiplication with a supplied point@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar
+   * challengeProduce the challenge, i.e. an individual iteration in the ring sig verification.We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42c_{i+1}= Hs(m || r_{i}* G + c_{i}* K_{i}|| r_{i}*Hp(K_{i}) + c_{i}* I) mod |fr|
    *
    * @param args Any args for the contract call
    * @param params Any additional parameters for the call
    * @returns A TypedCallParams object for the call
    */
-  static scalarMult(args: MethodArgs<'scalarMult(byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
+  static challenge(args: MethodArgs<'challenge(byte[],byte[],byte[],byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
     return {
-      method: 'scalarMult(byte[],byte[])byte[]' as const,
-      methodArgs: Array.isArray(args) ? args : [args.scalar, args.point],
-      ...params,
-    }
-  }
-  /**
-   * Constructs a no op call for the validPoint(byte[])bool ABI method
-   *
-   * validPointChecks if the point is valid (on curve)@point- The point to check
-   *
-   * @param args Any args for the contract call
-   * @param params Any additional parameters for the call
-   * @returns A TypedCallParams object for the call
-   */
-  static validPoint(args: MethodArgs<'validPoint(byte[])bool'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
-    return {
-      method: 'validPoint(byte[])bool' as const,
-      methodArgs: Array.isArray(args) ? args : [args.point],
-      ...params,
-    }
-  }
-  /**
-   * Constructs a no op call for the pointAdd(byte[],byte[])byte[] ABI method
-   *
-   * Point addAdds two points on the curve
-   *
-   * @param args Any args for the contract call
-   * @param params Any additional parameters for the call
-   * @returns A TypedCallParams object for the call
-   */
-  static pointAdd(args: MethodArgs<'pointAdd(byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
-    return {
-      method: 'pointAdd(byte[],byte[])byte[]' as const,
-      methodArgs: Array.isArray(args) ? args : [args.pointA, args.pointB],
-      ...params,
-    }
-  }
-  /**
-   * Constructs a no op call for the hashPointToPoint(byte[])byte[] ABI method
-   *
-   * hashPointToPointHashes a point to a point on the curveNOTE: ec_map_to maps fp_element to curve point. We use hash and then mod to map bytes to fp_element first.What is inside ec_map_to (accessed Dec 13th 2023):https://github.com/algorand/go-algorand/blob/master/data/transactions/logic/pairing.go#L862https://pkg.go.dev/github.com/consensys/gnark-crypto/ecc/bn254#MapToG1https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fp/element.go#L42
-   *
-   * @param args Any args for the contract call
-   * @param params Any additional parameters for the call
-   * @returns A TypedCallParams object for the call
-   */
-  static hashPointToPoint(args: MethodArgs<'hashPointToPoint(byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
-    return {
-      method: 'hashPointToPoint(byte[])byte[]' as const,
-      methodArgs: Array.isArray(args) ? args : [args.point],
+      method: 'challenge(byte[],byte[],byte[],byte[],byte[])byte[]' as const,
+      methodArgs: Array.isArray(args) ? args : [args.msg, args.nonce, args.cPrev, args.pk, args.keyImage],
       ...params,
     }
   }
@@ -624,68 +455,16 @@ export class MahberClient {
   }
 
   /**
-   * Calls the scalarMultBase(byte[])byte[] ABI method.
+   * Calls the challenge(byte[],byte[],byte[],byte[],byte[])byte[] ABI method.
    *
-   * Scalar Mult BaseScalar multiplication of the base point@scalar- The scalar to multiply the basepoint by.
-   *
-   * @param args The arguments for the contract call
-   * @param params Any additional parameters for the call
-   * @returns The result of the call: a point on the curve
-   */
-  public scalarMultBase(args: MethodArgs<'scalarMultBase(byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
-    return this.call(MahberCallFactory.scalarMultBase(args, params))
-  }
-
-  /**
-   * Calls the scalarMult(byte[],byte[])byte[] ABI method.
-   *
-   * Scalar MultScalar multiplication with a supplied point@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar
+   * challengeProduce the challenge, i.e. an individual iteration in the ring sig verification.We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42c_{i+1}= Hs(m || r_{i}* G + c_{i}* K_{i}|| r_{i}*Hp(K_{i}) + c_{i}* I) mod |fr|
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
-   * @returns The result of the call: a point on the curve
+   * @returns The result of the call
    */
-  public scalarMult(args: MethodArgs<'scalarMult(byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
-    return this.call(MahberCallFactory.scalarMult(args, params))
-  }
-
-  /**
-   * Calls the validPoint(byte[])bool ABI method.
-   *
-   * validPointChecks if the point is valid (on curve)@point- The point to check
-   *
-   * @param args The arguments for the contract call
-   * @param params Any additional parameters for the call
-   * @returns The result of the call: true if the point is valid, false otherwise
-   */
-  public validPoint(args: MethodArgs<'validPoint(byte[])bool'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
-    return this.call(MahberCallFactory.validPoint(args, params))
-  }
-
-  /**
-   * Calls the pointAdd(byte[],byte[])byte[] ABI method.
-   *
-   * Point addAdds two points on the curve
-   *
-   * @param args The arguments for the contract call
-   * @param params Any additional parameters for the call
-   * @returns The result of the call: The result of the operation
-   */
-  public pointAdd(args: MethodArgs<'pointAdd(byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
-    return this.call(MahberCallFactory.pointAdd(args, params))
-  }
-
-  /**
-   * Calls the hashPointToPoint(byte[])byte[] ABI method.
-   *
-   * hashPointToPointHashes a point to a point on the curveNOTE: ec_map_to maps fp_element to curve point. We use hash and then mod to map bytes to fp_element first.What is inside ec_map_to (accessed Dec 13th 2023):https://github.com/algorand/go-algorand/blob/master/data/transactions/logic/pairing.go#L862https://pkg.go.dev/github.com/consensys/gnark-crypto/ecc/bn254#MapToG1https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fp/element.go#L42
-   *
-   * @param args The arguments for the contract call
-   * @param params Any additional parameters for the call
-   * @returns The result of the call: The result of the operation
-   */
-  public hashPointToPoint(args: MethodArgs<'hashPointToPoint(byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
-    return this.call(MahberCallFactory.hashPointToPoint(args, params))
+  public challenge(args: MethodArgs<'challenge(byte[],byte[],byte[],byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
+    return this.call(MahberCallFactory.challenge(args, params))
   }
 
   public compose(): MahberComposer {
@@ -699,28 +478,8 @@ export class MahberClient {
         resultMappers.push(undefined)
         return this
       },
-      scalarMultBase(args: MethodArgs<'scalarMultBase(byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
-        promiseChain = promiseChain.then(() => client.scalarMultBase(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
-        resultMappers.push(undefined)
-        return this
-      },
-      scalarMult(args: MethodArgs<'scalarMult(byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
-        promiseChain = promiseChain.then(() => client.scalarMult(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
-        resultMappers.push(undefined)
-        return this
-      },
-      validPoint(args: MethodArgs<'validPoint(byte[])bool'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
-        promiseChain = promiseChain.then(() => client.validPoint(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
-        resultMappers.push(undefined)
-        return this
-      },
-      pointAdd(args: MethodArgs<'pointAdd(byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
-        promiseChain = promiseChain.then(() => client.pointAdd(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
-        resultMappers.push(undefined)
-        return this
-      },
-      hashPointToPoint(args: MethodArgs<'hashPointToPoint(byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
-        promiseChain = promiseChain.then(() => client.hashPointToPoint(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
+      challenge(args: MethodArgs<'challenge(byte[],byte[],byte[],byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
+        promiseChain = promiseChain.then(() => client.challenge(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
         resultMappers.push(undefined)
         return this
       },
@@ -761,59 +520,15 @@ export type MahberComposer<TReturns extends [...any[]] = []> = {
   dummyOpUp(args: MethodArgs<'dummyOpUp(uint64)uint64'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'dummyOpUp(uint64)uint64'>]>
 
   /**
-   * Calls the scalarMultBase(byte[])byte[] ABI method.
+   * Calls the challenge(byte[],byte[],byte[],byte[],byte[])byte[] ABI method.
    *
-   * Scalar Mult BaseScalar multiplication of the base point@scalar- The scalar to multiply the basepoint by.
-   *
-   * @param args The arguments for the contract call
-   * @param params Any additional parameters for the call
-   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
-   */
-  scalarMultBase(args: MethodArgs<'scalarMultBase(byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'scalarMultBase(byte[])byte[]'>]>
-
-  /**
-   * Calls the scalarMult(byte[],byte[])byte[] ABI method.
-   *
-   * Scalar MultScalar multiplication with a supplied point@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar
+   * challengeProduce the challenge, i.e. an individual iteration in the ring sig verification.We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42c_{i+1}= Hs(m || r_{i}* G + c_{i}* K_{i}|| r_{i}*Hp(K_{i}) + c_{i}* I) mod |fr|
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
    * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
    */
-  scalarMult(args: MethodArgs<'scalarMult(byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'scalarMult(byte[],byte[])byte[]'>]>
-
-  /**
-   * Calls the validPoint(byte[])bool ABI method.
-   *
-   * validPointChecks if the point is valid (on curve)@point- The point to check
-   *
-   * @param args The arguments for the contract call
-   * @param params Any additional parameters for the call
-   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
-   */
-  validPoint(args: MethodArgs<'validPoint(byte[])bool'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'validPoint(byte[])bool'>]>
-
-  /**
-   * Calls the pointAdd(byte[],byte[])byte[] ABI method.
-   *
-   * Point addAdds two points on the curve
-   *
-   * @param args The arguments for the contract call
-   * @param params Any additional parameters for the call
-   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
-   */
-  pointAdd(args: MethodArgs<'pointAdd(byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'pointAdd(byte[],byte[])byte[]'>]>
-
-  /**
-   * Calls the hashPointToPoint(byte[])byte[] ABI method.
-   *
-   * hashPointToPointHashes a point to a point on the curveNOTE: ec_map_to maps fp_element to curve point. We use hash and then mod to map bytes to fp_element first.What is inside ec_map_to (accessed Dec 13th 2023):https://github.com/algorand/go-algorand/blob/master/data/transactions/logic/pairing.go#L862https://pkg.go.dev/github.com/consensys/gnark-crypto/ecc/bn254#MapToG1https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fp/element.go#L42
-   *
-   * @param args The arguments for the contract call
-   * @param params Any additional parameters for the call
-   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
-   */
-  hashPointToPoint(args: MethodArgs<'hashPointToPoint(byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'hashPointToPoint(byte[])byte[]'>]>
+  challenge(args: MethodArgs<'challenge(byte[],byte[],byte[],byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'challenge(byte[],byte[],byte[],byte[],byte[])byte[]'>]>
 
   /**
    * Makes a clear_state call to an existing instance of the Mahber smart contract.

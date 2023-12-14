@@ -18,88 +18,38 @@
       }
     },
     {
-      "name": "scalarMultBase",
+      "name": "challenge",
       "args": [
         {
-          "name": "scalar",
+          "name": "msg",
           "type": "byte[]",
-          "desc": ""
-        }
-      ],
-      "desc": "Scalar Mult BaseScalar multiplication of the base point@scalar- The scalar to multiply the basepoint by.",
-      "returns": {
-        "type": "byte[]",
-        "desc": "a point on the curve"
-      }
-    },
-    {
-      "name": "scalarMult",
-      "args": [
-        {
-          "name": "scalar",
-          "type": "byte[]",
-          "desc": ""
+          "desc": "The message to be signed"
         },
         {
-          "name": "point",
+          "name": "nonce",
           "type": "byte[]",
-          "desc": ""
-        }
-      ],
-      "desc": "Scalar MultScalar multiplication with a supplied point@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar",
-      "returns": {
-        "type": "byte[]",
-        "desc": "a point on the curve"
-      }
-    },
-    {
-      "name": "validPoint",
-      "args": [
-        {
-          "name": "point",
-          "type": "byte[]",
-          "desc": ""
-        }
-      ],
-      "desc": "validPointChecks if the point is valid (on curve)@point- The point to check",
-      "returns": {
-        "type": "bool",
-        "desc": "true if the point is valid, false otherwise"
-      }
-    },
-    {
-      "name": "pointAdd",
-      "args": [
-        {
-          "name": "pointA",
-          "type": "byte[]",
-          "desc": "The first point"
+          "desc": "The nonce, part of the ring signature itself, aka one of the fake secret keys"
         },
         {
-          "name": "pointB",
+          "name": "cPrev",
           "type": "byte[]",
-          "desc": "The second point"
-        }
-      ],
-      "desc": "Point addAdds two points on the curve",
-      "returns": {
-        "type": "byte[]",
-        "desc": "The result of the operation"
-      }
-    },
-    {
-      "name": "hashPointToPoint",
-      "args": [
+          "desc": "The previous challenge, or the base challenge if this is the first link (in which case it is part of the ring sig)"
+        },
         {
-          "name": "point",
+          "name": "pk",
           "type": "byte[]",
-          "desc": "The point to hash"
+          "desc": "The specific public key in the ring (indexed from the array of public keys)"
+        },
+        {
+          "name": "keyImage",
+          "type": "byte[]",
+          "desc": "The key image of the signer, required for linkabiltiy to prevent double spending"
         }
       ],
-      "desc": "hashPointToPointHashes a point to a point on the curveNOTE: ec_map_to maps fp_element to curve point. We use hash and then mod to map bytes to fp_element first.What is inside ec_map_to (accessed Dec 13th 2023):https://github.com/algorand/go-algorand/blob/master/data/transactions/logic/pairing.go#L862https://pkg.go.dev/github.com/consensys/gnark-crypto/ecc/bn254#MapToG1https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fp/element.go#L42",
+      "desc": "challengeProduce the challenge, i.e. an individual iteration in the ring sig verification.We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42c_{i+1}= Hs(m || r_{i}* G + c_{i}* K_{i}|| r_{i}*Hp(K_{i}) + c_{i}* I) mod |fr|",
       "returns": {
         "type": "byte[]",
-        "desc": "The result of the operation"
+        "desc": ""
       }
     },
     {
