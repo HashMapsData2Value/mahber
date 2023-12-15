@@ -119,7 +119,7 @@ class Mahber extends Contract {
   challenge(msg: bytes, nonce: bytes, cPrev: bytes, pk: bytes, keyImage: bytes): bytes {
     /* CALCULATE LEFT-HAND SIDE OF EQUATION (AFTER MSG BYTES)
      ** r_{i} * G + c_{i} * K_{i}
-     ** G = 0x00...01...02
+     ** G = 0x00...01...02 (basepoint)
      */
     // @ts-ignore
     const leftleft = ec_scalar_mul(
@@ -173,4 +173,14 @@ class Mahber extends Contract {
     // @ts-ignore
     return h as bytes;
   }
+
+  // TODO: "arming" function that will take in pre-computed challenges and store them in box.
+
+  // TODO: "triggering" function that is triggered individually per link in the ring signature, and will verify that the challenge is correct based off of the pre-computed challenges in the box. By allowing for verification in parallell, we can reduce the amount of time it takes to verify a ring signature.
+
+  // TODO: Loading function that will load cPrev and produced intermediary challenge values into a Box, allowing for verification in parallell
+
+  // TODO: verify function that will loop through all the intermediary challenge values and confirm that the relayer posted correct cPrevs based off of the calculations made...
+
+  // So long as the last value corresponds to the initailizer value (which we imply accepted from the verifier), it means that the ring has looped around
 }
