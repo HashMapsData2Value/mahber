@@ -51,10 +51,98 @@ dummyOpUp:
 	log
 	retsub
 
+scalarMultBase:
+	proto 2 1
+
+	// contracts/mahber.algo.ts:21
+	// result = ec_scalar_mul(
+	//       "BN254g1",
+	//       hex(
+	//         "00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002"
+	//       ),
+	//       scalar
+	//     )
+	byte 0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002
+	frame_dig -1 // scalar: bytes
+	ec_scalar_mul BN254g1
+	frame_bury -2 // result: bytes
+
+	// contracts/mahber.algo.ts:28
+	// return result;
+	frame_dig -2 // result: bytes
+	retsub
+
+scalarMult:
+	proto 3 1
+
+	// contracts/mahber.algo.ts:39
+	// result = ec_scalar_mul("BN254g1", point, scalar)
+	frame_dig -2 // point: bytes
+	frame_dig -1 // scalar: bytes
+	ec_scalar_mul BN254g1
+	frame_bury -3 // result: bytes
+
+	// contracts/mahber.algo.ts:40
+	// return result;
+	frame_dig -3 // result: bytes
+	retsub
+
+validPoint:
+	proto 1 1
+
+	// contracts/mahber.algo.ts:50
+	// return ec_subgroup_check("BN254g1", point);
+	frame_dig -1 // point: bytes
+	ec_subgroup_check BN254g1
+	retsub
+
+pointAdd:
+	proto 3 1
+
+	// contracts/mahber.algo.ts:61
+	// result = ec_add("BN254g1", pointA, pointB)
+	frame_dig -1 // pointA: bytes
+	frame_dig -2 // pointB: bytes
+	ec_add BN254g1
+	frame_bury -3 // result: bytes
+
+	// contracts/mahber.algo.ts:62
+	// return result;
+	frame_dig -3 // result: bytes
+	retsub
+
+hashPointToPoint:
+	proto 4 1
+
+	// contracts/mahber.algo.ts:77
+	// hash = sha256(point)
+	frame_dig -1 // point: bytes
+	sha256
+	frame_bury -2 // hash: byte[32]
+
+	// contracts/mahber.algo.ts:78
+	// fpElement =
+	//       btobigint(hash) % btobigint(hex("30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47"))
+	frame_dig -2 // hash: byte[32]
+	byte 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47
+	b%
+	frame_bury -3 // fpElement: bigint
+
+	// contracts/mahber.algo.ts:81
+	// result = ec_map_to("BN254g1", fpElement)
+	frame_dig -3 // fpElement: bigint
+	ec_map_to BN254g1
+	frame_bury -4 // result: bytes
+
+	// contracts/mahber.algo.ts:82
+	// return result;
+	frame_dig -4 // result: bytes
+	retsub
+
 // challenge(bytes,bytes,bytes,bytes,bytes)byte[]
 //
-// challenge
-// Produce the challenge, i.e. an individual iteration in the ring sig verification.
+// challenge2
+// Produce the challenge, i.e. an individual link in the ring sig verification.
 // We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42
 // c_{i+1} = Hs(m || r_{i} * G + c_{i} * K_{i} || r_{i}*Hp(K_{i}) + c_{i} * I) mod |fr|
 // @param msg - The message to be signed
@@ -64,7 +152,7 @@ dummyOpUp:
 // @param keyImage - The key image of the signer, required for linkabiltiy to prevent double spending
 // @returns
 abi_route_challenge:
-	byte 0x; dupn 8 // push empty bytes to fill the stack frame for this subroutine's local variables
+	byte 0x; dupn 2 // push empty bytes to fill the stack frame for this subroutine's local variables
 
 	// keyImage: byte[]
 	txna ApplicationArgs 5
@@ -92,89 +180,54 @@ abi_route_challenge:
 	return
 
 challenge:
-	proto 14 0
+	proto 8 0
 
-	// contracts/mahber.algo.ts:125
-	// leftleft = ec_scalar_mul(
-	//       "BN254g1",
-	//       hex(
-	//         "00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002"
-	//       ),
-	//       nonce
-	//     )
-	byte 0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002
-	frame_dig -2 // nonce: bytes
-	ec_scalar_mul BN254g1
-	frame_bury -6 // leftleft: bytes
-
-	// contracts/mahber.algo.ts:134
-	// leftright = ec_scalar_mul("BN254g1", pk, cPrev)
+	// contracts/mahber.algo.ts:101
+	// left = this.pointAdd(this.scalarMultBase(nonce), this.scalarMult(cPrev, pk))
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
 	frame_dig -4 // pk: bytes
 	frame_dig -3 // cPrev: bytes
-	ec_scalar_mul BN254g1
-	frame_bury -7 // leftright: bytes
-
-	// contracts/mahber.algo.ts:137
-	// left = ec_add("BN254g1", leftleft, leftright)
-	frame_dig -6 // leftleft: bytes
-	frame_dig -7 // leftright: bytes
-	ec_add BN254g1
-	frame_bury -8 // left: bytes
-
-	// contracts/mahber.algo.ts:149
-	// fpElement =
-	//       btobigint(sha256(pk)) % btobigint(hex("30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47"))
-	frame_dig -4 // pk: bytes
-	sha256
-	byte 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47
-	b%
-	frame_bury -9 // fpElement: bigint
-
-	// contracts/mahber.algo.ts:152
-	// rightleftright = ec_map_to("BN254g1", fpElement)
-	frame_dig -9 // fpElement: bigint
-	ec_map_to BN254g1
-	frame_bury -10 // rightleftright: bytes
-
-	// End of HashPointToPoint
-	// contracts/mahber.algo.ts:156
-	// rightleft = ec_scalar_mul("BN254g1", rightleftright, nonce)
-	frame_dig -10 // rightleftright: bytes
+	callsub scalarMult
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
 	frame_dig -2 // nonce: bytes
-	ec_scalar_mul BN254g1
-	frame_bury -11 // rightleft: bytes
+	callsub scalarMultBase
+	callsub pointAdd
+	frame_bury -6 // left: byte[]
 
-	// contracts/mahber.algo.ts:159
-	// rightright = ec_scalar_mul("BN254g1", keyImage, cPrev)
+	// contracts/mahber.algo.ts:107
+	// right = this.pointAdd(this.scalarMult(nonce, this.hashPointToPoint(pk)), this.scalarMult(cPrev, keyImage))
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
 	frame_dig -5 // keyImage: bytes
 	frame_dig -3 // cPrev: bytes
-	ec_scalar_mul BN254g1
-	frame_bury -12 // rightright: bytes
+	callsub scalarMult
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+	byte 0x; dupn 2 // push empty bytes to fill the stack frame for this subroutine's local variables
+	frame_dig -4 // pk: bytes
+	callsub hashPointToPoint
+	frame_dig -2 // nonce: bytes
+	callsub scalarMult
+	callsub pointAdd
+	frame_bury -7 // right: byte[]
 
-	// contracts/mahber.algo.ts:162
-	// right = ec_add("BN254g1", rightleft, rightright)
-	frame_dig -11 // rightleft: bytes
-	frame_dig -12 // rightright: bytes
-	ec_add BN254g1
-	frame_bury -13 // right: bytes
-
-	// contracts/mahber.algo.ts:169
+	// contracts/mahber.algo.ts:113
 	// h =
 	//       btobigint(sha256(concat(concat(msg, left), right))) %
 	//       btobigint(hex("0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001"))
 	frame_dig -1 // msg: bytes
-	frame_dig -8 // left: bytes
+	frame_dig -6 // left: byte[]
 	concat
-	frame_dig -13 // right: bytes
+	frame_dig -7 // right: byte[]
 	concat
 	sha256
 	byte 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001
 	b%
-	frame_bury -14 // h: bigint
+	frame_bury -8 // h: bigint
 
-	// contracts/mahber.algo.ts:174
+	// contracts/mahber.algo.ts:117
 	// return h as bytes;
-	frame_dig -14 // h: bigint
+	frame_dig -8 // h: bigint
 	dup
 	len
 	itob

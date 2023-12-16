@@ -133,7 +133,7 @@ describe("Mahber", () => {
   //   ]);
   // });
 
-  test.skip("challenge", async () => {
+  test("challenge", async () => {
     const nonce = new Uint8Array([
       46, 156, 236, 248, 53, 50, 159, 170, 109, 169, 33, 158, 103, 180, 57, 80, 45, 125, 194, 252, 175, 92, 76, 230, 42,
       18, 31, 135, 164, 88, 110, 100,

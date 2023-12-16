@@ -46,7 +46,7 @@
           "desc": "The key image of the signer, required for linkabiltiy to prevent double spending"
         }
       ],
-      "desc": "challengeProduce the challenge, i.e. an individual iteration in the ring sig verification.We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42c_{i+1}= Hs(m || r_{i}* G + c_{i}* K_{i}|| r_{i}*Hp(K_{i}) + c_{i}* I) mod |fr|",
+      "desc": "challenge2Produce the challenge, i.e. an individual link in the ring sig verification.We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42c_{i+1}= Hs(m || r_{i}* G + c_{i}* K_{i}|| r_{i}*Hp(K_{i}) + c_{i}* I) mod |fr|",
       "returns": {
         "type": "byte[]",
         "desc": ""
