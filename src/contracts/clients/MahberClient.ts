@@ -32,7 +32,37 @@ export const APP_SPEC: AppSpec = {
         "no_op": "CALL"
       }
     },
-    "challenge(byte[],byte[],byte[],byte[],byte[])byte[]": {
+    "publicScalarMultBase(byte[])byte[]": {
+      "call_config": {
+        "no_op": "CALL"
+      }
+    },
+    "publicScalarMult(byte[],byte[])byte[]": {
+      "call_config": {
+        "no_op": "CALL"
+      }
+    },
+    "publicValidPoint(byte[])bool": {
+      "call_config": {
+        "no_op": "CALL"
+      }
+    },
+    "publicPointAdd(byte[],byte[])byte[]": {
+      "call_config": {
+        "no_op": "CALL"
+      }
+    },
+    "publicHashPointToPoint(byte[])byte[]": {
+      "call_config": {
+        "no_op": "CALL"
+      }
+    },
+    "publicChallenge(byte[],byte[],byte[],byte[],byte[])byte[]": {
+      "call_config": {
+        "no_op": "CALL"
+      }
+    },
+    "deposit(byte[])uint64[]": {
       "call_config": {
         "no_op": "CALL"
       }
@@ -56,14 +86,23 @@ export const APP_SPEC: AppSpec = {
       "reserved": {}
     },
     "global": {
-      "declared": {},
+      "declared": {
+        "algoDenomination": {
+          "type": "uint64",
+          "key": "algoDenomination"
+        },
+        "pkIndex": {
+          "type": "uint64",
+          "key": "pkIndex"
+        }
+      },
       "reserved": {}
     }
   },
   "state": {
     "global": {
       "num_byte_slices": 0,
-      "num_uints": 0
+      "num_uints": 2
     },
     "local": {
       "num_byte_slices": 0,
@@ -71,7 +110,7 @@ export const APP_SPEC: AppSpec = {
     }
   },
   "source": {
-    "approval": "I3ByYWdtYSB2ZXJzaW9uIDEwCgovLyBUaGlzIFRFQUwgd2FzIGdlbmVyYXRlZCBieSBURUFMU2NyaXB0IHYwLjYzLjAKLy8gaHR0cHM6Ly9naXRodWIuY29tL2FsZ29yYW5kZm91bmRhdGlvbi9URUFMU2NyaXB0CgovLyBUaGlzIGNvbnRyYWN0IGlzIGNvbXBsaWFudCB3aXRoIGFuZC9vciBpbXBsZW1lbnRzIHRoZSBmb2xsb3dpbmcgQVJDczogWyBBUkM0IF0KCi8vIFRoZSBmb2xsb3dpbmcgdGVuIGxpbmVzIG9mIFRFQUwgaGFuZGxlIGluaXRpYWwgcHJvZ3JhbSBmbG93Ci8vIFRoaXMgcGF0dGVybiBpcyB1c2VkIHRvIG1ha2UgaXQgZWFzeSBmb3IgYW55b25lIHRvIHBhcnNlIHRoZSBzdGFydCBvZiB0aGUgcHJvZ3JhbSBhbmQgZGV0ZXJtaW5lIGlmIGEgc3BlY2lmaWMgYWN0aW9uIGlzIGFsbG93ZWQKLy8gSGVyZSwgYWN0aW9uIHJlZmVycyB0byB0aGUgT25Db21wbGV0ZSBpbiBjb21iaW5hdGlvbiB3aXRoIHdoZXRoZXIgdGhlIGFwcCBpcyBiZWluZyBjcmVhdGVkIG9yIGNhbGxlZAovLyBFdmVyeSBwb3NzaWJsZSBhY3Rpb24gZm9yIHRoaXMgY29udHJhY3QgaXMgcmVwcmVzZW50ZWQgaW4gdGhlIHN3aXRjaCBzdGF0ZW1lbnQKLy8gSWYgdGhlIGFjdGlvbiBpcyBub3QgaW1wbG1lbnRlZCBpbiB0aGUgY29udHJhY3QsIGl0cyByZXBzZWN0aXZlIGJyYW5jaCB3aWxsIGJlICJOT1RfSU1QTE1FTlRFRCIgd2hpY2gganVzdCBjb250YWlucyAiZXJyIgp0eG4gQXBwbGljYXRpb25JRAppbnQgMAo+CmludCA2CioKdHhuIE9uQ29tcGxldGlvbgorCnN3aXRjaCBjcmVhdGVfTm9PcCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIE5PVF9JTVBMRU1FTlRFRCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIGNhbGxfTm9PcAoKTk9UX0lNUExFTUVOVEVEOgoJZXJyCgovLyBkdW1teU9wVXAodWludDY0KXVpbnQ2NAovLwovLyBEdW1teSBPcCBVcAovLyBEdW1teSBvcGVyYXRpb24gdG8gZ2V0IG1vcmUgb3Bjb2RlIGJ1ZGdldAovLyBAaSAtIFRoZSBudW1iZXIgdG8gcmV0dXJuLCBuZWNzc2FyeSB0byBkZWR1cGxpY2F0ZSB0aGUgbmFtZQovLyBAcmV0dXJucyB0aGUgbnVtYmVyIChidXQgd2UgZG8gbm90aGluZyB3aXRoIGl0KQphYmlfcm91dGVfZHVtbXlPcFVwOgoJLy8gaTogdWludDY0Cgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglidG9pCgoJLy8gZXhlY3V0ZSBkdW1teU9wVXAodWludDY0KXVpbnQ2NAoJY2FsbHN1YiBkdW1teU9wVXAKCWludCAxCglyZXR1cm4KCmR1bW15T3BVcDoKCXByb3RvIDEgMAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxMQoJLy8gcmV0dXJuIGk7CglmcmFtZV9kaWcgLTEgLy8gaTogdWludDY0CglpdG9iCglieXRlIDB4MTUxZjdjNzUKCXN3YXAKCWNvbmNhdAoJbG9nCglyZXRzdWIKCnNjYWxhck11bHRCYXNlOgoJcHJvdG8gMiAxCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjIxCgkvLyByZXN1bHQgPSBlY19zY2FsYXJfbXVsKAoJLy8gICAgICAgIkJOMjU0ZzEiLAoJLy8gICAgICAgaGV4KAoJLy8gICAgICAgICAiMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMTAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDIiCgkvLyAgICAgICApLAoJLy8gICAgICAgc2NhbGFyCgkvLyAgICAgKQoJYnl0ZSAweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAyCglmcmFtZV9kaWcgLTEgLy8gc2NhbGFyOiBieXRlcwoJZWNfc2NhbGFyX211bCBCTjI1NGcxCglmcmFtZV9idXJ5IC0yIC8vIHJlc3VsdDogYnl0ZXMKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MjgKCS8vIHJldHVybiByZXN1bHQ7CglmcmFtZV9kaWcgLTIgLy8gcmVzdWx0OiBieXRlcwoJcmV0c3ViCgpzY2FsYXJNdWx0OgoJcHJvdG8gMyAxCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjM5CgkvLyByZXN1bHQgPSBlY19zY2FsYXJfbXVsKCJCTjI1NGcxIiwgcG9pbnQsIHNjYWxhcikKCWZyYW1lX2RpZyAtMiAvLyBwb2ludDogYnl0ZXMKCWZyYW1lX2RpZyAtMSAvLyBzY2FsYXI6IGJ5dGVzCgllY19zY2FsYXJfbXVsIEJOMjU0ZzEKCWZyYW1lX2J1cnkgLTMgLy8gcmVzdWx0OiBieXRlcwoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czo0MAoJLy8gcmV0dXJuIHJlc3VsdDsKCWZyYW1lX2RpZyAtMyAvLyByZXN1bHQ6IGJ5dGVzCglyZXRzdWIKCnZhbGlkUG9pbnQ6Cglwcm90byAxIDEKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6NTAKCS8vIHJldHVybiBlY19zdWJncm91cF9jaGVjaygiQk4yNTRnMSIsIHBvaW50KTsKCWZyYW1lX2RpZyAtMSAvLyBwb2ludDogYnl0ZXMKCWVjX3N1Ymdyb3VwX2NoZWNrIEJOMjU0ZzEKCXJldHN1YgoKcG9pbnRBZGQ6Cglwcm90byAzIDEKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6NjEKCS8vIHJlc3VsdCA9IGVjX2FkZCgiQk4yNTRnMSIsIHBvaW50QSwgcG9pbnRCKQoJZnJhbWVfZGlnIC0xIC8vIHBvaW50QTogYnl0ZXMKCWZyYW1lX2RpZyAtMiAvLyBwb2ludEI6IGJ5dGVzCgllY19hZGQgQk4yNTRnMQoJZnJhbWVfYnVyeSAtMyAvLyByZXN1bHQ6IGJ5dGVzCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjYyCgkvLyByZXR1cm4gcmVzdWx0OwoJZnJhbWVfZGlnIC0zIC8vIHJlc3VsdDogYnl0ZXMKCXJldHN1YgoKaGFzaFBvaW50VG9Qb2ludDoKCXByb3RvIDQgMQoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czo3NwoJLy8gaGFzaCA9IHNoYTI1Nihwb2ludCkKCWZyYW1lX2RpZyAtMSAvLyBwb2ludDogYnl0ZXMKCXNoYTI1NgoJZnJhbWVfYnVyeSAtMiAvLyBoYXNoOiBieXRlWzMyXQoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czo3OAoJLy8gZnBFbGVtZW50ID0KCS8vICAgICAgIGJ0b2JpZ2ludChoYXNoKSAlIGJ0b2JpZ2ludChoZXgoIjMwNjQ0ZTcyZTEzMWEwMjliODUwNDViNjgxODE1ODVkOTc4MTZhOTE2ODcxY2E4ZDNjMjA4YzE2ZDg3Y2ZkNDciKSkKCWZyYW1lX2RpZyAtMiAvLyBoYXNoOiBieXRlWzMyXQoJYnl0ZSAweDMwNjQ0ZTcyZTEzMWEwMjliODUwNDViNjgxODE1ODVkOTc4MTZhOTE2ODcxY2E4ZDNjMjA4YzE2ZDg3Y2ZkNDcKCWIlCglmcmFtZV9idXJ5IC0zIC8vIGZwRWxlbWVudDogYmlnaW50CgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjgxCgkvLyByZXN1bHQgPSBlY19tYXBfdG8oIkJOMjU0ZzEiLCBmcEVsZW1lbnQpCglmcmFtZV9kaWcgLTMgLy8gZnBFbGVtZW50OiBiaWdpbnQKCWVjX21hcF90byBCTjI1NGcxCglmcmFtZV9idXJ5IC00IC8vIHJlc3VsdDogYnl0ZXMKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6ODIKCS8vIHJldHVybiByZXN1bHQ7CglmcmFtZV9kaWcgLTQgLy8gcmVzdWx0OiBieXRlcwoJcmV0c3ViCgovLyBjaGFsbGVuZ2UoYnl0ZXMsYnl0ZXMsYnl0ZXMsYnl0ZXMsYnl0ZXMpYnl0ZVtdCi8vCi8vIGNoYWxsZW5nZTIKLy8gUHJvZHVjZSB0aGUgY2hhbGxlbmdlLCBpLmUuIGFuIGluZGl2aWR1YWwgbGluayBpbiB0aGUgcmluZyBzaWcgdmVyaWZpY2F0aW9uLgovLyBXZSBtb2QgYnkgb3JkZXIgb2YgZnIgaHR0cHM6Ly9naXRodWIuY29tL0NvbnNlbnN5cy9nbmFyay1jcnlwdG8vYmxvYi9tYXN0ZXIvZWNjL2JuMjU0L2ZyL2VsZW1lbnQuZ28jTDQyCi8vIGNfe2krMX0gPSBIcyhtIHx8IHJfe2l9ICogRyArIGNfe2l9ICogS197aX0gfHwgcl97aX0qSHAoS197aX0pICsgY197aX0gKiBJKSBtb2QgfGZyfAovLyBAcGFyYW0gbXNnIC0gVGhlIG1lc3NhZ2UgdG8gYmUgc2lnbmVkCi8vIEBwYXJhbSBub25jZSAtIFRoZSBub25jZSwgcGFydCBvZiB0aGUgcmluZyBzaWduYXR1cmUgaXRzZWxmLCBha2Egb25lIG9mIHRoZSBmYWtlIHNlY3JldCBrZXlzCi8vIEBwYXJhbSBjUHJldiAtIFRoZSBwcmV2aW91cyBjaGFsbGVuZ2UsIG9yIHRoZSBiYXNlIGNoYWxsZW5nZSBpZiB0aGlzIGlzIHRoZSBmaXJzdCBsaW5rIChpbiB3aGljaCBjYXNlIGl0IGlzIHBhcnQgb2YgdGhlIHJpbmcgc2lnKQovLyBAcGFyYW0gcGsgLSBUaGUgc3BlY2lmaWMgcHVibGljIGtleSBpbiB0aGUgcmluZyAoaW5kZXhlZCBmcm9tIHRoZSBhcnJheSBvZiBwdWJsaWMga2V5cykKLy8gQHBhcmFtIGtleUltYWdlIC0gVGhlIGtleSBpbWFnZSBvZiB0aGUgc2lnbmVyLCByZXF1aXJlZCBmb3IgbGlua2FiaWx0aXkgdG8gcHJldmVudCBkb3VibGUgc3BlbmRpbmcKLy8gQHJldHVybnMKYWJpX3JvdXRlX2NoYWxsZW5nZToKCWJ5dGUgMHg7IGR1cG4gMiAvLyBwdXNoIGVtcHR5IGJ5dGVzIHRvIGZpbGwgdGhlIHN0YWNrIGZyYW1lIGZvciB0aGlzIHN1YnJvdXRpbmUncyBsb2NhbCB2YXJpYWJsZXMKCgkvLyBrZXlJbWFnZTogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyA1CglleHRyYWN0IDIgMAoKCS8vIHBrOiBieXRlW10KCXR4bmEgQXBwbGljYXRpb25BcmdzIDQKCWV4dHJhY3QgMiAwCgoJLy8gY1ByZXY6IGJ5dGVbXQoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMwoJZXh0cmFjdCAyIDAKCgkvLyBub25jZTogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAyCglleHRyYWN0IDIgMAoKCS8vIG1zZzogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglleHRyYWN0IDIgMAoKCS8vIGV4ZWN1dGUgY2hhbGxlbmdlKGJ5dGVzLGJ5dGVzLGJ5dGVzLGJ5dGVzLGJ5dGVzKWJ5dGVbXQoJY2FsbHN1YiBjaGFsbGVuZ2UKCWludCAxCglyZXR1cm4KCmNoYWxsZW5nZToKCXByb3RvIDggMAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxMDEKCS8vIGxlZnQgPSB0aGlzLnBvaW50QWRkKHRoaXMuc2NhbGFyTXVsdEJhc2Uobm9uY2UpLCB0aGlzLnNjYWxhck11bHQoY1ByZXYsIHBrKSkKCWJ5dGUgMHggLy8gcHVzaCBlbXB0eSBieXRlcyB0byBmaWxsIHRoZSBzdGFjayBmcmFtZSBmb3IgdGhpcyBzdWJyb3V0aW5lJ3MgbG9jYWwgdmFyaWFibGVzCglieXRlIDB4IC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoJZnJhbWVfZGlnIC00IC8vIHBrOiBieXRlcwoJZnJhbWVfZGlnIC0zIC8vIGNQcmV2OiBieXRlcwoJY2FsbHN1YiBzY2FsYXJNdWx0CglieXRlIDB4IC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoJZnJhbWVfZGlnIC0yIC8vIG5vbmNlOiBieXRlcwoJY2FsbHN1YiBzY2FsYXJNdWx0QmFzZQoJY2FsbHN1YiBwb2ludEFkZAoJZnJhbWVfYnVyeSAtNiAvLyBsZWZ0OiBieXRlW10KCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MTA3CgkvLyByaWdodCA9IHRoaXMucG9pbnRBZGQodGhpcy5zY2FsYXJNdWx0KG5vbmNlLCB0aGlzLmhhc2hQb2ludFRvUG9pbnQocGspKSwgdGhpcy5zY2FsYXJNdWx0KGNQcmV2LCBrZXlJbWFnZSkpCglieXRlIDB4IC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoJYnl0ZSAweCAvLyBwdXNoIGVtcHR5IGJ5dGVzIHRvIGZpbGwgdGhlIHN0YWNrIGZyYW1lIGZvciB0aGlzIHN1YnJvdXRpbmUncyBsb2NhbCB2YXJpYWJsZXMKCWZyYW1lX2RpZyAtNSAvLyBrZXlJbWFnZTogYnl0ZXMKCWZyYW1lX2RpZyAtMyAvLyBjUHJldjogYnl0ZXMKCWNhbGxzdWIgc2NhbGFyTXVsdAoJYnl0ZSAweCAvLyBwdXNoIGVtcHR5IGJ5dGVzIHRvIGZpbGwgdGhlIHN0YWNrIGZyYW1lIGZvciB0aGlzIHN1YnJvdXRpbmUncyBsb2NhbCB2YXJpYWJsZXMKCWJ5dGUgMHg7IGR1cG4gMiAvLyBwdXNoIGVtcHR5IGJ5dGVzIHRvIGZpbGwgdGhlIHN0YWNrIGZyYW1lIGZvciB0aGlzIHN1YnJvdXRpbmUncyBsb2NhbCB2YXJpYWJsZXMKCWZyYW1lX2RpZyAtNCAvLyBwazogYnl0ZXMKCWNhbGxzdWIgaGFzaFBvaW50VG9Qb2ludAoJZnJhbWVfZGlnIC0yIC8vIG5vbmNlOiBieXRlcwoJY2FsbHN1YiBzY2FsYXJNdWx0CgljYWxsc3ViIHBvaW50QWRkCglmcmFtZV9idXJ5IC03IC8vIHJpZ2h0OiBieXRlW10KCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MTEzCgkvLyBoID0KCS8vICAgICAgIGJ0b2JpZ2ludChzaGEyNTYoY29uY2F0KGNvbmNhdChtc2csIGxlZnQpLCByaWdodCkpKSAlCgkvLyAgICAgICBidG9iaWdpbnQoaGV4KCIweDMwNjQ0ZTcyZTEzMWEwMjliODUwNDViNjgxODE1ODVkMjgzM2U4NDg3OWI5NzA5MTQzZTFmNTkzZjAwMDAwMDEiKSkKCWZyYW1lX2RpZyAtMSAvLyBtc2c6IGJ5dGVzCglmcmFtZV9kaWcgLTYgLy8gbGVmdDogYnl0ZVtdCgljb25jYXQKCWZyYW1lX2RpZyAtNyAvLyByaWdodDogYnl0ZVtdCgljb25jYXQKCXNoYTI1NgoJYnl0ZSAweDMwNjQ0ZTcyZTEzMWEwMjliODUwNDViNjgxODE1ODVkMjgzM2U4NDg3OWI5NzA5MTQzZTFmNTkzZjAwMDAwMDEKCWIlCglmcmFtZV9idXJ5IC04IC8vIGg6IGJpZ2ludAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxMTcKCS8vIHJldHVybiBoIGFzIGJ5dGVzOwoJZnJhbWVfZGlnIC04IC8vIGg6IGJpZ2ludAoJZHVwCglsZW4KCWl0b2IKCWV4dHJhY3QgNiAyCglzd2FwCgljb25jYXQKCWJ5dGUgMHgxNTFmN2M3NQoJc3dhcAoJY29uY2F0Cglsb2cKCXJldHN1YgoKYWJpX3JvdXRlX2NyZWF0ZUFwcGxpY2F0aW9uOgoJaW50IDEKCXJldHVybgoKY3JlYXRlX05vT3A6CgltZXRob2QgImNyZWF0ZUFwcGxpY2F0aW9uKCl2b2lkIgoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMAoJbWF0Y2ggYWJpX3JvdXRlX2NyZWF0ZUFwcGxpY2F0aW9uCgllcnIKCmNhbGxfTm9PcDoKCW1ldGhvZCAiZHVtbXlPcFVwKHVpbnQ2NCl1aW50NjQiCgltZXRob2QgImNoYWxsZW5nZShieXRlW10sYnl0ZVtdLGJ5dGVbXSxieXRlW10sYnl0ZVtdKWJ5dGVbXSIKCXR4bmEgQXBwbGljYXRpb25BcmdzIDAKCW1hdGNoIGFiaV9yb3V0ZV9kdW1teU9wVXAgYWJpX3JvdXRlX2NoYWxsZW5nZQoJZXJy",
+    "approval": "I3ByYWdtYSB2ZXJzaW9uIDEwCgovLyBUaGlzIFRFQUwgd2FzIGdlbmVyYXRlZCBieSBURUFMU2NyaXB0IHYwLjYzLjAKLy8gaHR0cHM6Ly9naXRodWIuY29tL2FsZ29yYW5kZm91bmRhdGlvbi9URUFMU2NyaXB0CgovLyBUaGlzIGNvbnRyYWN0IGlzIGNvbXBsaWFudCB3aXRoIGFuZC9vciBpbXBsZW1lbnRzIHRoZSBmb2xsb3dpbmcgQVJDczogWyBBUkM0IF0KCi8vIFRoZSBmb2xsb3dpbmcgdGVuIGxpbmVzIG9mIFRFQUwgaGFuZGxlIGluaXRpYWwgcHJvZ3JhbSBmbG93Ci8vIFRoaXMgcGF0dGVybiBpcyB1c2VkIHRvIG1ha2UgaXQgZWFzeSBmb3IgYW55b25lIHRvIHBhcnNlIHRoZSBzdGFydCBvZiB0aGUgcHJvZ3JhbSBhbmQgZGV0ZXJtaW5lIGlmIGEgc3BlY2lmaWMgYWN0aW9uIGlzIGFsbG93ZWQKLy8gSGVyZSwgYWN0aW9uIHJlZmVycyB0byB0aGUgT25Db21wbGV0ZSBpbiBjb21iaW5hdGlvbiB3aXRoIHdoZXRoZXIgdGhlIGFwcCBpcyBiZWluZyBjcmVhdGVkIG9yIGNhbGxlZAovLyBFdmVyeSBwb3NzaWJsZSBhY3Rpb24gZm9yIHRoaXMgY29udHJhY3QgaXMgcmVwcmVzZW50ZWQgaW4gdGhlIHN3aXRjaCBzdGF0ZW1lbnQKLy8gSWYgdGhlIGFjdGlvbiBpcyBub3QgaW1wbG1lbnRlZCBpbiB0aGUgY29udHJhY3QsIGl0cyByZXBzZWN0aXZlIGJyYW5jaCB3aWxsIGJlICJOT1RfSU1QTE1FTlRFRCIgd2hpY2gganVzdCBjb250YWlucyAiZXJyIgp0eG4gQXBwbGljYXRpb25JRAppbnQgMAo+CmludCA2CioKdHhuIE9uQ29tcGxldGlvbgorCnN3aXRjaCBjcmVhdGVfTm9PcCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIE5PVF9JTVBMRU1FTlRFRCBOT1RfSU1QTEVNRU5URUQgTk9UX0lNUExFTUVOVEVEIGNhbGxfTm9PcAoKTk9UX0lNUExFTUVOVEVEOgoJZXJyCgovLyBkdW1teU9wVXAodWludDY0KXVpbnQ2NAovLwovLyBEdW1teSBPcCBVcAovLyBEdW1teSBvcGVyYXRpb24gdG8gZ2V0IG1vcmUgb3Bjb2RlIGJ1ZGdldAovLyBAaSAtIFRoZSBudW1iZXIgdG8gcmV0dXJuLCBuZWNzc2FyeSB0byBkZWR1cGxpY2F0ZSB0aGUgbmFtZQovLyBAcmV0dXJucyB0aGUgbnVtYmVyIChidXQgd2UgZG8gbm90aGluZyB3aXRoIGl0KQphYmlfcm91dGVfZHVtbXlPcFVwOgoJLy8gaTogdWludDY0Cgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglidG9pCgoJLy8gZXhlY3V0ZSBkdW1teU9wVXAodWludDY0KXVpbnQ2NAoJY2FsbHN1YiBkdW1teU9wVXAKCWludCAxCglyZXR1cm4KCmR1bW15T3BVcDoKCXByb3RvIDEgMAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czozMQoJLy8gcmV0dXJuIGk7CglmcmFtZV9kaWcgLTEgLy8gaTogdWludDY0CglpdG9iCglieXRlIDB4MTUxZjdjNzUKCXN3YXAKCWNvbmNhdAoJbG9nCglyZXRzdWIKCnNjYWxhck11bHRCYXNlOgoJcHJvdG8gMiAxCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjQxCgkvLyByZXN1bHQgPSBlY19zY2FsYXJfbXVsKAoJLy8gICAgICAgIkJOMjU0ZzEiLAoJLy8gICAgICAgaGV4KAoJLy8gICAgICAgICAiMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMTAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDIiCgkvLyAgICAgICApLAoJLy8gICAgICAgc2NhbGFyCgkvLyAgICAgKQoJYnl0ZSAweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAyCglmcmFtZV9kaWcgLTEgLy8gc2NhbGFyOiBieXRlcwoJZWNfc2NhbGFyX211bCBCTjI1NGcxCglmcmFtZV9idXJ5IC0yIC8vIHJlc3VsdDogYnl0ZXMKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6NDgKCS8vIHJldHVybiByZXN1bHQ7CglmcmFtZV9kaWcgLTIgLy8gcmVzdWx0OiBieXRlcwoJcmV0c3ViCgovLyBwdWJsaWNTY2FsYXJNdWx0QmFzZShieXRlcylieXRlW10KLy8KLy8gcHVibGljU2NhbGFyTXVsdEJhc2UKLy8gUHVibGljIHdyYXBwZXIgYXJvdW5kIHRoZSBzY2FsYXJNdWx0QmFzZSBtZXRob2QsIGFsbG93aW5nIGl0IHRvIGJlIHRlc3RlZCBkaXJlY3RseS4KLy8gQHNjYWxhciAtIFRoZSBzY2FsYXIgdG8gbXVsdGlwbHkgdGhlIGJhc2Vwb2ludCBieS4KLy8gQHJldHVybnMgdGhlIGNvbnRlbnQgb2YgdGhlIHNjYWxhck11bHRCYXNlIGNhbGwKYWJpX3JvdXRlX3B1YmxpY1NjYWxhck11bHRCYXNlOgoJLy8gc2NhbGFyOiBieXRlW10KCXR4bmEgQXBwbGljYXRpb25BcmdzIDEKCWV4dHJhY3QgMiAwCgoJLy8gZXhlY3V0ZSBwdWJsaWNTY2FsYXJNdWx0QmFzZShieXRlcylieXRlW10KCWNhbGxzdWIgcHVibGljU2NhbGFyTXVsdEJhc2UKCWludCAxCglyZXR1cm4KCnB1YmxpY1NjYWxhck11bHRCYXNlOgoJcHJvdG8gMSAwCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjU3CgkvLyByZXR1cm4gdGhpcy5zY2FsYXJNdWx0QmFzZShzY2FsYXIpOwoJYnl0ZSAweCAvLyBwdXNoIGVtcHR5IGJ5dGVzIHRvIGZpbGwgdGhlIHN0YWNrIGZyYW1lIGZvciB0aGlzIHN1YnJvdXRpbmUncyBsb2NhbCB2YXJpYWJsZXMKCWZyYW1lX2RpZyAtMSAvLyBzY2FsYXI6IGJ5dGVzCgljYWxsc3ViIHNjYWxhck11bHRCYXNlCglkdXAKCWxlbgoJaXRvYgoJZXh0cmFjdCA2IDIKCXN3YXAKCWNvbmNhdAoJYnl0ZSAweDE1MWY3Yzc1Cglzd2FwCgljb25jYXQKCWxvZwoJcmV0c3ViCgpzY2FsYXJNdWx0OgoJcHJvdG8gMyAxCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjY4CgkvLyByZXN1bHQgPSBlY19zY2FsYXJfbXVsKCJCTjI1NGcxIiwgcG9pbnQsIHNjYWxhcikKCWZyYW1lX2RpZyAtMiAvLyBwb2ludDogYnl0ZXMKCWZyYW1lX2RpZyAtMSAvLyBzY2FsYXI6IGJ5dGVzCgllY19zY2FsYXJfbXVsIEJOMjU0ZzEKCWZyYW1lX2J1cnkgLTMgLy8gcmVzdWx0OiBieXRlcwoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czo2OQoJLy8gcmV0dXJuIHJlc3VsdDsKCWZyYW1lX2RpZyAtMyAvLyByZXN1bHQ6IGJ5dGVzCglyZXRzdWIKCi8vIHB1YmxpY1NjYWxhck11bHQoYnl0ZXMsYnl0ZXMpYnl0ZVtdCi8vCi8vIHB1YmxpY1NjYWxhck11bHQKLy8gUHVibGljIHdyYXBwZXIgYXJvdW5kIHRoZSBzY2FsYXJNdWx0IG1ldGhvZCwgYWxsb3dpbmcgaXQgdG8gYmUgdGVzdGVkIGRpcmVjdGx5LgovLyBAc2NhbGFyIC0gVGhlIHNjYWxhciB0byBtdWx0aXBseSB0aGUgcG9pbnQgd2l0aAovLyBAcG9pbnQgLSBUaGUgcG9pbnQgdGhhdCBpcyBtdWx0aXBsaWVkIHdpdGggdGhlIHNjYWxhcgovLyBAcmV0dXJucyB0aGUgY29udGVudCBvZiB0aGUgc2NhbGFyTXVsdCBjYWxsCmFiaV9yb3V0ZV9wdWJsaWNTY2FsYXJNdWx0OgoJLy8gcG9pbnQ6IGJ5dGVbXQoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMgoJZXh0cmFjdCAyIDAKCgkvLyBzY2FsYXI6IGJ5dGVbXQoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMQoJZXh0cmFjdCAyIDAKCgkvLyBleGVjdXRlIHB1YmxpY1NjYWxhck11bHQoYnl0ZXMsYnl0ZXMpYnl0ZVtdCgljYWxsc3ViIHB1YmxpY1NjYWxhck11bHQKCWludCAxCglyZXR1cm4KCnB1YmxpY1NjYWxhck11bHQ6Cglwcm90byAyIDAKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6NzkKCS8vIHJldHVybiB0aGlzLnNjYWxhck11bHQoc2NhbGFyLCBwb2ludCk7CglieXRlIDB4IC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoJZnJhbWVfZGlnIC0yIC8vIHBvaW50OiBieXRlcwoJZnJhbWVfZGlnIC0xIC8vIHNjYWxhcjogYnl0ZXMKCWNhbGxzdWIgc2NhbGFyTXVsdAoJZHVwCglsZW4KCWl0b2IKCWV4dHJhY3QgNiAyCglzd2FwCgljb25jYXQKCWJ5dGUgMHgxNTFmN2M3NQoJc3dhcAoJY29uY2F0Cglsb2cKCXJldHN1YgoKdmFsaWRQb2ludDoKCXByb3RvIDEgMQoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czo4OQoJLy8gcmV0dXJuIGVjX3N1Ymdyb3VwX2NoZWNrKCJCTjI1NGcxIiwgcG9pbnQpOwoJZnJhbWVfZGlnIC0xIC8vIHBvaW50OiBieXRlcwoJZWNfc3ViZ3JvdXBfY2hlY2sgQk4yNTRnMQoJcmV0c3ViCgovLyBwdWJsaWNWYWxpZFBvaW50KGJ5dGVzKWJvb2wKLy8KLy8gcHVibGljVmFsaWRQb2ludAovLyBQdWJsaWMgd3JhcHBlciBhcm91bmQgdGhlIHZhbGlkUG9pbnQgbWV0aG9kLCBhbGxvd2luZyBpdCB0byBiZSB0ZXN0ZWQgZGlyZWN0bHkuCi8vIEBwb2ludCAtIFRoZSBwb2ludCB0byBjaGVjawovLyBAcmV0dXJucyB0aGUgY29udGVudCBvZiB0aGUgdmFsaWRQb2ludCBjYWxsCmFiaV9yb3V0ZV9wdWJsaWNWYWxpZFBvaW50OgoJLy8gcG9pbnQ6IGJ5dGVbXQoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMQoJZXh0cmFjdCAyIDAKCgkvLyBleGVjdXRlIHB1YmxpY1ZhbGlkUG9pbnQoYnl0ZXMpYm9vbAoJY2FsbHN1YiBwdWJsaWNWYWxpZFBvaW50CglpbnQgMQoJcmV0dXJuCgpwdWJsaWNWYWxpZFBvaW50OgoJcHJvdG8gMSAwCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjk4CgkvLyByZXR1cm4gdGhpcy52YWxpZFBvaW50KHBvaW50KTsKCWZyYW1lX2RpZyAtMSAvLyBwb2ludDogYnl0ZXMKCWNhbGxzdWIgdmFsaWRQb2ludAoJYnl0ZSAweDAwCglpbnQgMAoJdW5jb3ZlciAyCglzZXRiaXQKCWJ5dGUgMHgxNTFmN2M3NQoJc3dhcAoJY29uY2F0Cglsb2cKCXJldHN1YgoKcG9pbnRBZGQ6Cglwcm90byAzIDEKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MTA5CgkvLyByZXN1bHQgPSBlY19hZGQoIkJOMjU0ZzEiLCBwb2ludEEsIHBvaW50QikKCWZyYW1lX2RpZyAtMSAvLyBwb2ludEE6IGJ5dGVzCglmcmFtZV9kaWcgLTIgLy8gcG9pbnRCOiBieXRlcwoJZWNfYWRkIEJOMjU0ZzEKCWZyYW1lX2J1cnkgLTMgLy8gcmVzdWx0OiBieXRlcwoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxMTAKCS8vIHJldHVybiByZXN1bHQ7CglmcmFtZV9kaWcgLTMgLy8gcmVzdWx0OiBieXRlcwoJcmV0c3ViCgovLyBwdWJsaWNQb2ludEFkZChieXRlcyxieXRlcylieXRlW10KLy8KLy8gcHVibGljUG9pbnRBZGQKLy8gUHVibGljIHdyYXBwZXIgYXJvdW5kIHRoZSBwb2ludEFkZCBtZXRob2QsIGFsbG93aW5nIGl0IHRvIGJlIHRlc3RlZCBkaXJlY3RseS4KLy8gQHBhcmFtIHBvaW50QSAtIFRoZSBmaXJzdCBwb2ludAovLyBAcGFyYW0gcG9pbnRCIC0gVGhlIHNlY29uZCBwb2ludAovLyBAcmV0dXJucyB0aGUgY29udGVudCBvZiB0aGUgcG9pbnRBZGQgY2FsbAphYmlfcm91dGVfcHVibGljUG9pbnRBZGQ6CgkvLyBwb2ludEI6IGJ5dGVbXQoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMgoJZXh0cmFjdCAyIDAKCgkvLyBwb2ludEE6IGJ5dGVbXQoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMQoJZXh0cmFjdCAyIDAKCgkvLyBleGVjdXRlIHB1YmxpY1BvaW50QWRkKGJ5dGVzLGJ5dGVzKWJ5dGVbXQoJY2FsbHN1YiBwdWJsaWNQb2ludEFkZAoJaW50IDEKCXJldHVybgoKcHVibGljUG9pbnRBZGQ6Cglwcm90byAyIDAKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MTIwCgkvLyByZXR1cm4gdGhpcy5wb2ludEFkZChwb2ludEEsIHBvaW50Qik7CglieXRlIDB4IC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoJZnJhbWVfZGlnIC0yIC8vIHBvaW50QjogYnl0ZXMKCWZyYW1lX2RpZyAtMSAvLyBwb2ludEE6IGJ5dGVzCgljYWxsc3ViIHBvaW50QWRkCglkdXAKCWxlbgoJaXRvYgoJZXh0cmFjdCA2IDIKCXN3YXAKCWNvbmNhdAoJYnl0ZSAweDE1MWY3Yzc1Cglzd2FwCgljb25jYXQKCWxvZwoJcmV0c3ViCgpoYXNoUG9pbnRUb1BvaW50OgoJcHJvdG8gNCAxCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjEzNAoJLy8gaGFzaCA9IHNoYTI1Nihwb2ludCkKCWZyYW1lX2RpZyAtMSAvLyBwb2ludDogYnl0ZXMKCXNoYTI1NgoJZnJhbWVfYnVyeSAtMiAvLyBoYXNoOiBieXRlWzMyXQoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxMzUKCS8vIGZwRWxlbWVudCA9CgkvLyAgICAgICBidG9iaWdpbnQoaGFzaCkgJSBidG9iaWdpbnQoaGV4KCIzMDY0NGU3MmUxMzFhMDI5Yjg1MDQ1YjY4MTgxNTg1ZDk3ODE2YTkxNjg3MWNhOGQzYzIwOGMxNmQ4N2NmZDQ3IikpCglmcmFtZV9kaWcgLTIgLy8gaGFzaDogYnl0ZVszMl0KCWJ5dGUgMHgzMDY0NGU3MmUxMzFhMDI5Yjg1MDQ1YjY4MTgxNTg1ZDk3ODE2YTkxNjg3MWNhOGQzYzIwOGMxNmQ4N2NmZDQ3CgliJQoJZnJhbWVfYnVyeSAtMyAvLyBmcEVsZW1lbnQ6IGJpZ2ludAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxMzgKCS8vIHJlc3VsdCA9IGVjX21hcF90bygiQk4yNTRnMSIsIGZwRWxlbWVudCkKCWZyYW1lX2RpZyAtMyAvLyBmcEVsZW1lbnQ6IGJpZ2ludAoJZWNfbWFwX3RvIEJOMjU0ZzEKCWZyYW1lX2J1cnkgLTQgLy8gcmVzdWx0OiBieXRlcwoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxMzkKCS8vIHJldHVybiByZXN1bHQ7CglmcmFtZV9kaWcgLTQgLy8gcmVzdWx0OiBieXRlcwoJcmV0c3ViCgovLyBwdWJsaWNIYXNoUG9pbnRUb1BvaW50KGJ5dGVzKWJ5dGVbXQovLwovLyBwdWJsaWNIYXNoUG9pbnRUb1BvaW50Ci8vIFB1YmxpYyB3cmFwcGVyIGFyb3VuZCB0aGUgaGFzaFBvaW50VG9Qb2ludCBtZXRob2QsIGFsbG93aW5nIGl0IHRvIGJlIHRlc3RlZCBkaXJlY3RseS4KLy8gQHBhcmFtIHBvaW50IC0gVGhlIHBvaW50IHRvIGhhc2gKLy8gQHJldHVybnMgdGhlIGNvbnRlbnQgb2YgdGhlIGhhc2hQb2ludFRvUG9pbnQgY2FsbAphYmlfcm91dGVfcHVibGljSGFzaFBvaW50VG9Qb2ludDoKCS8vIHBvaW50OiBieXRlW10KCXR4bmEgQXBwbGljYXRpb25BcmdzIDEKCWV4dHJhY3QgMiAwCgoJLy8gZXhlY3V0ZSBwdWJsaWNIYXNoUG9pbnRUb1BvaW50KGJ5dGVzKWJ5dGVbXQoJY2FsbHN1YiBwdWJsaWNIYXNoUG9pbnRUb1BvaW50CglpbnQgMQoJcmV0dXJuCgpwdWJsaWNIYXNoUG9pbnRUb1BvaW50OgoJcHJvdG8gMSAwCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjE0OAoJLy8gcmV0dXJuIHRoaXMuaGFzaFBvaW50VG9Qb2ludChwb2ludCk7CglieXRlIDB4OyBkdXBuIDIgLy8gcHVzaCBlbXB0eSBieXRlcyB0byBmaWxsIHRoZSBzdGFjayBmcmFtZSBmb3IgdGhpcyBzdWJyb3V0aW5lJ3MgbG9jYWwgdmFyaWFibGVzCglmcmFtZV9kaWcgLTEgLy8gcG9pbnQ6IGJ5dGVzCgljYWxsc3ViIGhhc2hQb2ludFRvUG9pbnQKCWR1cAoJbGVuCglpdG9iCglleHRyYWN0IDYgMgoJc3dhcAoJY29uY2F0CglieXRlIDB4MTUxZjdjNzUKCXN3YXAKCWNvbmNhdAoJbG9nCglyZXRzdWIKCmNoYWxsZW5nZToKCXByb3RvIDggMQoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxNjcKCS8vIGxlZnQgPSB0aGlzLnBvaW50QWRkKHRoaXMuc2NhbGFyTXVsdEJhc2Uobm9uY2UpLCB0aGlzLnNjYWxhck11bHQoY1ByZXYsIHBrKSkKCWJ5dGUgMHggLy8gcHVzaCBlbXB0eSBieXRlcyB0byBmaWxsIHRoZSBzdGFjayBmcmFtZSBmb3IgdGhpcyBzdWJyb3V0aW5lJ3MgbG9jYWwgdmFyaWFibGVzCglieXRlIDB4IC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoJZnJhbWVfZGlnIC00IC8vIHBrOiBieXRlcwoJZnJhbWVfZGlnIC0zIC8vIGNQcmV2OiBieXRlcwoJY2FsbHN1YiBzY2FsYXJNdWx0CglieXRlIDB4IC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoJZnJhbWVfZGlnIC0yIC8vIG5vbmNlOiBieXRlcwoJY2FsbHN1YiBzY2FsYXJNdWx0QmFzZQoJY2FsbHN1YiBwb2ludEFkZAoJZnJhbWVfYnVyeSAtNiAvLyBsZWZ0OiBieXRlW10KCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MTczCgkvLyByaWdodCA9IHRoaXMucG9pbnRBZGQodGhpcy5zY2FsYXJNdWx0KG5vbmNlLCB0aGlzLmhhc2hQb2ludFRvUG9pbnQocGspKSwgdGhpcy5zY2FsYXJNdWx0KGNQcmV2LCBrZXlJbWFnZSkpCglieXRlIDB4IC8vIHB1c2ggZW1wdHkgYnl0ZXMgdG8gZmlsbCB0aGUgc3RhY2sgZnJhbWUgZm9yIHRoaXMgc3Vicm91dGluZSdzIGxvY2FsIHZhcmlhYmxlcwoJYnl0ZSAweCAvLyBwdXNoIGVtcHR5IGJ5dGVzIHRvIGZpbGwgdGhlIHN0YWNrIGZyYW1lIGZvciB0aGlzIHN1YnJvdXRpbmUncyBsb2NhbCB2YXJpYWJsZXMKCWZyYW1lX2RpZyAtNSAvLyBrZXlJbWFnZTogYnl0ZXMKCWZyYW1lX2RpZyAtMyAvLyBjUHJldjogYnl0ZXMKCWNhbGxzdWIgc2NhbGFyTXVsdAoJYnl0ZSAweCAvLyBwdXNoIGVtcHR5IGJ5dGVzIHRvIGZpbGwgdGhlIHN0YWNrIGZyYW1lIGZvciB0aGlzIHN1YnJvdXRpbmUncyBsb2NhbCB2YXJpYWJsZXMKCWJ5dGUgMHg7IGR1cG4gMiAvLyBwdXNoIGVtcHR5IGJ5dGVzIHRvIGZpbGwgdGhlIHN0YWNrIGZyYW1lIGZvciB0aGlzIHN1YnJvdXRpbmUncyBsb2NhbCB2YXJpYWJsZXMKCWZyYW1lX2RpZyAtNCAvLyBwazogYnl0ZXMKCWNhbGxzdWIgaGFzaFBvaW50VG9Qb2ludAoJZnJhbWVfZGlnIC0yIC8vIG5vbmNlOiBieXRlcwoJY2FsbHN1YiBzY2FsYXJNdWx0CgljYWxsc3ViIHBvaW50QWRkCglmcmFtZV9idXJ5IC03IC8vIHJpZ2h0OiBieXRlW10KCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MTc5CgkvLyBoID0KCS8vICAgICAgIGJ0b2JpZ2ludChzaGEyNTYoY29uY2F0KGNvbmNhdChtc2csIGxlZnQpLCByaWdodCkpKSAlCgkvLyAgICAgICBidG9iaWdpbnQoaGV4KCIweDMwNjQ0ZTcyZTEzMWEwMjliODUwNDViNjgxODE1ODVkMjgzM2U4NDg3OWI5NzA5MTQzZTFmNTkzZjAwMDAwMDEiKSkKCWZyYW1lX2RpZyAtMSAvLyBtc2c6IGJ5dGVzCglmcmFtZV9kaWcgLTYgLy8gbGVmdDogYnl0ZVtdCgljb25jYXQKCWZyYW1lX2RpZyAtNyAvLyByaWdodDogYnl0ZVtdCgljb25jYXQKCXNoYTI1NgoJYnl0ZSAweDMwNjQ0ZTcyZTEzMWEwMjliODUwNDViNjgxODE1ODVkMjgzM2U4NDg3OWI5NzA5MTQzZTFmNTkzZjAwMDAwMDEKCWIlCglmcmFtZV9idXJ5IC04IC8vIGg6IGJpZ2ludAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoxODMKCS8vIHJldHVybiBoIGFzIGJ5dGVzOwoJZnJhbWVfZGlnIC04IC8vIGg6IGJpZ2ludAoJcmV0c3ViCgovLyBwdWJsaWNDaGFsbGVuZ2UoYnl0ZXMsYnl0ZXMsYnl0ZXMsYnl0ZXMsYnl0ZXMpYnl0ZVtdCi8vCi8vIHB1YmxpY0NoYWxsZW5nZQovLyBQdWJsaWMgd3JhcHBlciBhcm91bmQgdGhlIGNoYWxsZW5nZSBtZXRob2QsIGFsbG93aW5nIGl0IHRvIGJlIHRlc3RlZCBkaXJlY3RseS4KLy8gQHBhcmFtIG1zZyAtIFRoZSBtZXNzYWdlIHRvIGJlIHNpZ25lZAovLyBAcGFyYW0gbm9uY2UgLSBUaGUgbm9uY2UsIHBhcnQgb2YgdGhlIHJpbmcgc2lnbmF0dXJlIGl0c2VsZiwgYWthIG9uZSBvZiB0aGUgZmFrZSBzZWNyZXQga2V5cwovLyBAcGFyYW0gY1ByZXYgLSBUaGUgcHJldmlvdXMgY2hhbGxlbmdlLCBvciB0aGUgYmFzZSBjaGFsbGVuZ2UgaWYgdGhpcyBpcyB0aGUgZmlyc3QgbGluayAoaW4gd2hpY2ggY2FzZSBpdCBpcyBwYXJ0IG9mIHRoZSByaW5nIHNpZykKLy8gQHBhcmFtIHBrIC0gVGhlIHNwZWNpZmljIHB1YmxpYyBrZXkgaW4gdGhlIHJpbmcgKGluZGV4ZWQgZnJvbSB0aGUgYXJyYXkgb2YgcHVibGljIGtleXMpCi8vIEBwYXJhbSBrZXlJbWFnZSAtIFRoZSBrZXkgaW1hZ2Ugb2YgdGhlIHNpZ25lciwgcmVxdWlyZWQgZm9yIGxpbmthYmlsdGl5IHRvIHByZXZlbnQgZG91YmxlIHNwZW5kaW5nCi8vIEByZXR1cm5zIC0gdGhlIGNvbnRlbnQgb2YgdGhlIHByaXZhdGVDaGFsbGVuZ2UgY2FsbAphYmlfcm91dGVfcHVibGljQ2hhbGxlbmdlOgoJLy8ga2V5SW1hZ2U6IGJ5dGVbXQoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgNQoJZXh0cmFjdCAyIDAKCgkvLyBwazogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyA0CglleHRyYWN0IDIgMAoKCS8vIGNQcmV2OiBieXRlW10KCXR4bmEgQXBwbGljYXRpb25BcmdzIDMKCWV4dHJhY3QgMiAwCgoJLy8gbm9uY2U6IGJ5dGVbXQoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMgoJZXh0cmFjdCAyIDAKCgkvLyBtc2c6IGJ5dGVbXQoJdHhuYSBBcHBsaWNhdGlvbkFyZ3MgMQoJZXh0cmFjdCAyIDAKCgkvLyBleGVjdXRlIHB1YmxpY0NoYWxsZW5nZShieXRlcyxieXRlcyxieXRlcyxieXRlcyxieXRlcylieXRlW10KCWNhbGxzdWIgcHVibGljQ2hhbGxlbmdlCglpbnQgMQoJcmV0dXJuCgpwdWJsaWNDaGFsbGVuZ2U6Cglwcm90byA1IDAKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MTk2CgkvLyByZXR1cm4gdGhpcy5jaGFsbGVuZ2UobXNnLCBub25jZSwgY1ByZXYsIHBrLCBrZXlJbWFnZSk7CglieXRlIDB4OyBkdXBuIDIgLy8gcHVzaCBlbXB0eSBieXRlcyB0byBmaWxsIHRoZSBzdGFjayBmcmFtZSBmb3IgdGhpcyBzdWJyb3V0aW5lJ3MgbG9jYWwgdmFyaWFibGVzCglmcmFtZV9kaWcgLTUgLy8ga2V5SW1hZ2U6IGJ5dGVzCglmcmFtZV9kaWcgLTQgLy8gcGs6IGJ5dGVzCglmcmFtZV9kaWcgLTMgLy8gY1ByZXY6IGJ5dGVzCglmcmFtZV9kaWcgLTIgLy8gbm9uY2U6IGJ5dGVzCglmcmFtZV9kaWcgLTEgLy8gbXNnOiBieXRlcwoJY2FsbHN1YiBjaGFsbGVuZ2UKCWR1cAoJbGVuCglpdG9iCglleHRyYWN0IDYgMgoJc3dhcAoJY29uY2F0CglieXRlIDB4MTUxZjdjNzUKCXN3YXAKCWNvbmNhdAoJbG9nCglyZXRzdWIKCi8vIGRlcG9zaXQoYnl0ZXMpdWludDY0W10KLy8KLy8gZGVwb3NpdAovLyBEZXBvc2l0IGZ1bmRzICsgcHVibGljIGtleSBpbnRvIHRoZSBjb250cmFjdAovLyBAcGFyYW0gcGsgLSBUaGUgcHVibGljIGtleSB0byBkZXBvc2l0Ci8vIFRPRE86IEFkZCBjdXN0b20gRWREU0EgdG8gY2hlY2sgdGhhdCB0aGUgZGVwb3NpdG9yIGtub3dzIHRoZSBzZWNyZXQga2V5LiBVc2VmdWwgdG8gcHJldmVudCByb2d1ZSBrZXkgYXR0YWNrLCBhZGRpbmcgdGhlIG5lZ2F0aXZlIG9mIGFub3RoZXIgcGsuCi8vIEByZXR1cm5zIC0gdGhlIG51bWJlciBpZCBvZiB0aGUgcHVibGljIGtleSwgaWYgc3VjY2Vzc2Z1bC4gZmFpbHMgaWYgdW5zdWNjZXNzZnVsLgphYmlfcm91dGVfZGVwb3NpdDoKCWJ5dGUgMHg7IGR1cCAvLyBwdXNoIGVtcHR5IGJ5dGVzIHRvIGZpbGwgdGhlIHN0YWNrIGZyYW1lIGZvciB0aGlzIHN1YnJvdXRpbmUncyBsb2NhbCB2YXJpYWJsZXMKCgkvLyBwazogYnl0ZVtdCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAxCglleHRyYWN0IDIgMAoKCS8vIGV4ZWN1dGUgZGVwb3NpdChieXRlcyl1aW50NjRbXQoJY2FsbHN1YiBkZXBvc2l0CglpbnQgMQoJcmV0dXJuCgpkZXBvc2l0OgoJcHJvdG8gMyAwCgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjIwNwoJLy8gYXNzZXJ0KHRoaXMudmFsaWRQb2ludChwaykpCglmcmFtZV9kaWcgLTEgLy8gcGs6IGJ5dGVzCgljYWxsc3ViIHZhbGlkUG9pbnQKCWFzc2VydAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoyMDgKCS8vIGFzc2VydCghdGhpcy5oYXNoRmlsdGVyKHBrKS5leGlzdHMpCglmcmFtZV9kaWcgLTEgLy8gcGs6IGJ5dGVzCglib3hfbGVuCglzd2FwCglwb3AKCSEKCWFzc2VydAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoyMTMKCS8vIGJveElkID0gdGhpcy5wa0luZGV4LnZhbHVlIC8gTUFYX0JPWF9QS19OVU1CRVIKCWJ5dGUgMHg3MDZiNDk2ZTY0NjU3OCAvLyAicGtJbmRleCIKCWFwcF9nbG9iYWxfZ2V0CglpbnQgNTEyCgkvCglmcmFtZV9idXJ5IC0yIC8vIGJveElkOiB1aW50NjQKCgkvLyBpZjBfY29uZGl0aW9uCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MjE2CgkvLyAhdGhpcy5xdWlja0FjY2Vzc1BLQm94ZXMoYm94SWQpLmV4aXN0cwoJZnJhbWVfZGlnIC0yIC8vIGJveElkOiB1aW50NjQKCWl0b2IKCWJveF9sZW4KCXN3YXAKCXBvcAoJIQoJYnogaWYwX2VuZAoKCS8vIGlmMF9jb25zZXF1ZW50CgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MjE3CgkvLyB0aGlzLnF1aWNrQWNjZXNzUEtCb3hlcyhib3hJZCkuY3JlYXRlKE1BWF9CT1hfU0laRSkKCWZyYW1lX2RpZyAtMiAvLyBib3hJZDogdWludDY0CglpdG9iCglpbnQgMzI3NjgKCWJveF9jcmVhdGUKCmlmMF9lbmQ6CgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MjIxCgkvLyB0aGlzLnF1aWNrQWNjZXNzUEtCb3hlcyhib3hJZCkucmVwbGFjZSgodGhpcy5wa0luZGV4LnZhbHVlICUgTUFYX0JPWF9QS19OVU1CRVIpICogQ1VSVkVfUE9JTlRfU0laRSwgcGspCglmcmFtZV9kaWcgLTIgLy8gYm94SWQ6IHVpbnQ2NAoJaXRvYgoJYnl0ZSAweDcwNmI0OTZlNjQ2NTc4IC8vICJwa0luZGV4IgoJYXBwX2dsb2JhbF9nZXQKCWludCA1MTIKCSUKCWludCA2NAoJKgoJZnJhbWVfZGlnIC0xIC8vIHBrOiBieXRlcwoJYm94X3JlcGxhY2UKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MjI0CgkvLyB0aGlzLmhhc2hGaWx0ZXIocGspLmNyZWF0ZSgxKQoJZnJhbWVfZGlnIC0xIC8vIHBrOiBieXRlcwoJaW50IDEKCWJveF9jcmVhdGUKCgkvLyBjb250cmFjdHMvbWFoYmVyLmFsZ28udHM6MjI2CgkvLyBpZHggPSB0aGlzLnBrSW5kZXgudmFsdWUKCWJ5dGUgMHg3MDZiNDk2ZTY0NjU3OCAvLyAicGtJbmRleCIKCWFwcF9nbG9iYWxfZ2V0CglmcmFtZV9idXJ5IC0zIC8vIGlkeDogdWludDY0CgoJLy8gY29udHJhY3RzL21haGJlci5hbGdvLnRzOjIyOQoJLy8gdGhpcy5wa0luZGV4LnZhbHVlID0gdGhpcy5wa0luZGV4LnZhbHVlICsgMQoJYnl0ZSAweDcwNmI0OTZlNjQ2NTc4IC8vICJwa0luZGV4IgoJYnl0ZSAweDcwNmI0OTZlNjQ2NTc4IC8vICJwa0luZGV4IgoJYXBwX2dsb2JhbF9nZXQKCWludCAxCgkrCglhcHBfZ2xvYmFsX3B1dAoKCS8vIGNvbnRyYWN0cy9tYWhiZXIuYWxnby50czoyMzEKCS8vIHJldHVybiBbaWR4LCBib3hJZF07CglmcmFtZV9kaWcgLTMgLy8gaWR4OiB1aW50NjQKCWl0b2IKCWZyYW1lX2RpZyAtMiAvLyBib3hJZDogdWludDY0CglpdG9iCgljb25jYXQKCWR1cAoJbGVuCglpbnQgOAoJLwoJaXRvYgoJZXh0cmFjdCA2IDIKCXN3YXAKCWNvbmNhdAoJYnl0ZSAweDE1MWY3Yzc1Cglzd2FwCgljb25jYXQKCWxvZwoJcmV0c3ViCgphYmlfcm91dGVfY3JlYXRlQXBwbGljYXRpb246CglpbnQgMQoJcmV0dXJuCgpjcmVhdGVfTm9PcDoKCW1ldGhvZCAiY3JlYXRlQXBwbGljYXRpb24oKXZvaWQiCgl0eG5hIEFwcGxpY2F0aW9uQXJncyAwCgltYXRjaCBhYmlfcm91dGVfY3JlYXRlQXBwbGljYXRpb24KCWVycgoKY2FsbF9Ob09wOgoJbWV0aG9kICJkdW1teU9wVXAodWludDY0KXVpbnQ2NCIKCW1ldGhvZCAicHVibGljU2NhbGFyTXVsdEJhc2UoYnl0ZVtdKWJ5dGVbXSIKCW1ldGhvZCAicHVibGljU2NhbGFyTXVsdChieXRlW10sYnl0ZVtdKWJ5dGVbXSIKCW1ldGhvZCAicHVibGljVmFsaWRQb2ludChieXRlW10pYm9vbCIKCW1ldGhvZCAicHVibGljUG9pbnRBZGQoYnl0ZVtdLGJ5dGVbXSlieXRlW10iCgltZXRob2QgInB1YmxpY0hhc2hQb2ludFRvUG9pbnQoYnl0ZVtdKWJ5dGVbXSIKCW1ldGhvZCAicHVibGljQ2hhbGxlbmdlKGJ5dGVbXSxieXRlW10sYnl0ZVtdLGJ5dGVbXSxieXRlW10pYnl0ZVtdIgoJbWV0aG9kICJkZXBvc2l0KGJ5dGVbXSl1aW50NjRbXSIKCXR4bmEgQXBwbGljYXRpb25BcmdzIDAKCW1hdGNoIGFiaV9yb3V0ZV9kdW1teU9wVXAgYWJpX3JvdXRlX3B1YmxpY1NjYWxhck11bHRCYXNlIGFiaV9yb3V0ZV9wdWJsaWNTY2FsYXJNdWx0IGFiaV9yb3V0ZV9wdWJsaWNWYWxpZFBvaW50IGFiaV9yb3V0ZV9wdWJsaWNQb2ludEFkZCBhYmlfcm91dGVfcHVibGljSGFzaFBvaW50VG9Qb2ludCBhYmlfcm91dGVfcHVibGljQ2hhbGxlbmdlIGFiaV9yb3V0ZV9kZXBvc2l0CgllcnI=",
     "clear": "I3ByYWdtYSB2ZXJzaW9uIDEw"
   },
   "contract": {
@@ -94,7 +133,92 @@ export const APP_SPEC: AppSpec = {
         }
       },
       {
-        "name": "challenge",
+        "name": "publicScalarMultBase",
+        "args": [
+          {
+            "name": "scalar",
+            "type": "byte[]",
+            "desc": ""
+          }
+        ],
+        "desc": "publicScalarMultBasePublic wrapper around the scalarMultBase method, allowing it to be tested directly.@scalar- The scalar to multiply the basepoint by.",
+        "returns": {
+          "type": "byte[]",
+          "desc": "the content of the scalarMultBase call"
+        }
+      },
+      {
+        "name": "publicScalarMult",
+        "args": [
+          {
+            "name": "scalar",
+            "type": "byte[]",
+            "desc": ""
+          },
+          {
+            "name": "point",
+            "type": "byte[]",
+            "desc": ""
+          }
+        ],
+        "desc": "publicScalarMultPublic wrapper around the scalarMult method, allowing it to be tested directly.@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar",
+        "returns": {
+          "type": "byte[]",
+          "desc": "the content of the scalarMult call"
+        }
+      },
+      {
+        "name": "publicValidPoint",
+        "args": [
+          {
+            "name": "point",
+            "type": "byte[]",
+            "desc": ""
+          }
+        ],
+        "desc": "publicValidPointPublic wrapper around the validPoint method, allowing it to be tested directly.@point- The point to check",
+        "returns": {
+          "type": "bool",
+          "desc": "the content of the validPoint call"
+        }
+      },
+      {
+        "name": "publicPointAdd",
+        "args": [
+          {
+            "name": "pointA",
+            "type": "byte[]",
+            "desc": "The first point"
+          },
+          {
+            "name": "pointB",
+            "type": "byte[]",
+            "desc": "The second point"
+          }
+        ],
+        "desc": "publicPointAddPublic wrapper around the pointAdd method, allowing it to be tested directly.",
+        "returns": {
+          "type": "byte[]",
+          "desc": "the content of the pointAdd call"
+        }
+      },
+      {
+        "name": "publicHashPointToPoint",
+        "args": [
+          {
+            "name": "point",
+            "type": "byte[]",
+            "desc": "The point to hash"
+          }
+        ],
+        "desc": "publicHashPointToPointPublic wrapper around the hashPointToPoint method, allowing it to be tested directly.",
+        "returns": {
+          "type": "byte[]",
+          "desc": "the content of the hashPointToPoint call"
+        }
+      },
+      {
+        "name": "publicChallenge",
         "args": [
           {
             "name": "msg",
@@ -122,10 +246,25 @@ export const APP_SPEC: AppSpec = {
             "desc": "The key image of the signer, required for linkabiltiy to prevent double spending"
           }
         ],
-        "desc": "challenge2Produce the challenge, i.e. an individual link in the ring sig verification.We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42c_{i+1}= Hs(m || r_{i}* G + c_{i}* K_{i}|| r_{i}*Hp(K_{i}) + c_{i}* I) mod |fr|",
+        "desc": "publicChallengePublic wrapper around the challenge method, allowing it to be tested directly.",
         "returns": {
           "type": "byte[]",
-          "desc": ""
+          "desc": "- the content of the privateChallenge call"
+        }
+      },
+      {
+        "name": "deposit",
+        "args": [
+          {
+            "name": "pk",
+            "type": "byte[]",
+            "desc": "The public key to depositTODO: Add custom EdDSA to check that the depositor knows the secret key. Useful to prevent rogue key attack, adding the negative of another pk."
+          }
+        ],
+        "desc": "depositDeposit funds + public key into the contract",
+        "returns": {
+          "type": "uint64[]",
+          "desc": "- the number id of the public key, if successful. fails if unsuccessful."
         }
       },
       {
@@ -206,7 +345,68 @@ export type Mahber = {
        */
       returns: bigint
     }>
-    & Record<'challenge(byte[],byte[],byte[],byte[],byte[])byte[]' | 'challenge', {
+    & Record<'publicScalarMultBase(byte[])byte[]' | 'publicScalarMultBase', {
+      argsObj: {
+        scalar: Uint8Array
+      }
+      argsTuple: [scalar: Uint8Array]
+      /**
+       * the content of the scalarMultBase call
+       */
+      returns: Uint8Array
+    }>
+    & Record<'publicScalarMult(byte[],byte[])byte[]' | 'publicScalarMult', {
+      argsObj: {
+        scalar: Uint8Array
+        point: Uint8Array
+      }
+      argsTuple: [scalar: Uint8Array, point: Uint8Array]
+      /**
+       * the content of the scalarMult call
+       */
+      returns: Uint8Array
+    }>
+    & Record<'publicValidPoint(byte[])bool' | 'publicValidPoint', {
+      argsObj: {
+        point: Uint8Array
+      }
+      argsTuple: [point: Uint8Array]
+      /**
+       * the content of the validPoint call
+       */
+      returns: boolean
+    }>
+    & Record<'publicPointAdd(byte[],byte[])byte[]' | 'publicPointAdd', {
+      argsObj: {
+        /**
+         * The first point
+         */
+        pointA: Uint8Array
+        /**
+         * The second point
+         */
+        pointB: Uint8Array
+      }
+      argsTuple: [pointA: Uint8Array, pointB: Uint8Array]
+      /**
+       * the content of the pointAdd call
+       */
+      returns: Uint8Array
+    }>
+    & Record<'publicHashPointToPoint(byte[])byte[]' | 'publicHashPointToPoint', {
+      argsObj: {
+        /**
+         * The point to hash
+         */
+        point: Uint8Array
+      }
+      argsTuple: [point: Uint8Array]
+      /**
+       * the content of the hashPointToPoint call
+       */
+      returns: Uint8Array
+    }>
+    & Record<'publicChallenge(byte[],byte[],byte[],byte[],byte[])byte[]' | 'publicChallenge', {
       argsObj: {
         /**
          * The message to be signed
@@ -230,7 +430,23 @@ export type Mahber = {
         keyImage: Uint8Array
       }
       argsTuple: [msg: Uint8Array, nonce: Uint8Array, cPrev: Uint8Array, pk: Uint8Array, keyImage: Uint8Array]
+      /**
+       * - the content of the privateChallenge call
+       */
       returns: Uint8Array
+    }>
+    & Record<'deposit(byte[])uint64[]' | 'deposit', {
+      argsObj: {
+        /**
+         * The public key to depositTODO: Add custom EdDSA to check that the depositor knows the secret key. Useful to prevent rogue key attack, adding the negative of another pk.
+         */
+        pk: Uint8Array
+      }
+      argsTuple: [pk: Uint8Array]
+      /**
+       * - the number id of the public key, if successful. fails if unsuccessful.
+       */
+      returns: bigint[]
     }>
     & Record<'createApplication()void' | 'createApplication', {
       argsObj: {
@@ -238,6 +454,15 @@ export type Mahber = {
       argsTuple: []
       returns: void
     }>
+  /**
+   * Defines the shape of the global and local state of the application.
+   */
+  state: {
+    global: {
+      'algoDenomination'?: IntegerState
+      'pkIndex'?: IntegerState
+    }
+  }
 }
 /**
  * Defines the possible abi call signatures
@@ -327,18 +552,114 @@ export abstract class MahberCallFactory {
     }
   }
   /**
-   * Constructs a no op call for the challenge(byte[],byte[],byte[],byte[],byte[])byte[] ABI method
+   * Constructs a no op call for the publicScalarMultBase(byte[])byte[] ABI method
    *
-   * challenge2Produce the challenge, i.e. an individual link in the ring sig verification.We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42c_{i+1}= Hs(m || r_{i}* G + c_{i}* K_{i}|| r_{i}*Hp(K_{i}) + c_{i}* I) mod |fr|
+   * publicScalarMultBasePublic wrapper around the scalarMultBase method, allowing it to be tested directly.@scalar- The scalar to multiply the basepoint by.
    *
    * @param args Any args for the contract call
    * @param params Any additional parameters for the call
    * @returns A TypedCallParams object for the call
    */
-  static challenge(args: MethodArgs<'challenge(byte[],byte[],byte[],byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
+  static publicScalarMultBase(args: MethodArgs<'publicScalarMultBase(byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
     return {
-      method: 'challenge(byte[],byte[],byte[],byte[],byte[])byte[]' as const,
+      method: 'publicScalarMultBase(byte[])byte[]' as const,
+      methodArgs: Array.isArray(args) ? args : [args.scalar],
+      ...params,
+    }
+  }
+  /**
+   * Constructs a no op call for the publicScalarMult(byte[],byte[])byte[] ABI method
+   *
+   * publicScalarMultPublic wrapper around the scalarMult method, allowing it to be tested directly.@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar
+   *
+   * @param args Any args for the contract call
+   * @param params Any additional parameters for the call
+   * @returns A TypedCallParams object for the call
+   */
+  static publicScalarMult(args: MethodArgs<'publicScalarMult(byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
+    return {
+      method: 'publicScalarMult(byte[],byte[])byte[]' as const,
+      methodArgs: Array.isArray(args) ? args : [args.scalar, args.point],
+      ...params,
+    }
+  }
+  /**
+   * Constructs a no op call for the publicValidPoint(byte[])bool ABI method
+   *
+   * publicValidPointPublic wrapper around the validPoint method, allowing it to be tested directly.@point- The point to check
+   *
+   * @param args Any args for the contract call
+   * @param params Any additional parameters for the call
+   * @returns A TypedCallParams object for the call
+   */
+  static publicValidPoint(args: MethodArgs<'publicValidPoint(byte[])bool'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
+    return {
+      method: 'publicValidPoint(byte[])bool' as const,
+      methodArgs: Array.isArray(args) ? args : [args.point],
+      ...params,
+    }
+  }
+  /**
+   * Constructs a no op call for the publicPointAdd(byte[],byte[])byte[] ABI method
+   *
+   * publicPointAddPublic wrapper around the pointAdd method, allowing it to be tested directly.
+   *
+   * @param args Any args for the contract call
+   * @param params Any additional parameters for the call
+   * @returns A TypedCallParams object for the call
+   */
+  static publicPointAdd(args: MethodArgs<'publicPointAdd(byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
+    return {
+      method: 'publicPointAdd(byte[],byte[])byte[]' as const,
+      methodArgs: Array.isArray(args) ? args : [args.pointA, args.pointB],
+      ...params,
+    }
+  }
+  /**
+   * Constructs a no op call for the publicHashPointToPoint(byte[])byte[] ABI method
+   *
+   * publicHashPointToPointPublic wrapper around the hashPointToPoint method, allowing it to be tested directly.
+   *
+   * @param args Any args for the contract call
+   * @param params Any additional parameters for the call
+   * @returns A TypedCallParams object for the call
+   */
+  static publicHashPointToPoint(args: MethodArgs<'publicHashPointToPoint(byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
+    return {
+      method: 'publicHashPointToPoint(byte[])byte[]' as const,
+      methodArgs: Array.isArray(args) ? args : [args.point],
+      ...params,
+    }
+  }
+  /**
+   * Constructs a no op call for the publicChallenge(byte[],byte[],byte[],byte[],byte[])byte[] ABI method
+   *
+   * publicChallengePublic wrapper around the challenge method, allowing it to be tested directly.
+   *
+   * @param args Any args for the contract call
+   * @param params Any additional parameters for the call
+   * @returns A TypedCallParams object for the call
+   */
+  static publicChallenge(args: MethodArgs<'publicChallenge(byte[],byte[],byte[],byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
+    return {
+      method: 'publicChallenge(byte[],byte[],byte[],byte[],byte[])byte[]' as const,
       methodArgs: Array.isArray(args) ? args : [args.msg, args.nonce, args.cPrev, args.pk, args.keyImage],
+      ...params,
+    }
+  }
+  /**
+   * Constructs a no op call for the deposit(byte[])uint64[] ABI method
+   *
+   * depositDeposit funds + public key into the contract
+   *
+   * @param args Any args for the contract call
+   * @param params Any additional parameters for the call
+   * @returns A TypedCallParams object for the call
+   */
+  static deposit(args: MethodArgs<'deposit(byte[])uint64[]'>, params: AppClientCallCoreParams & CoreAppCallArgs) {
+    return {
+      method: 'deposit(byte[])uint64[]' as const,
+      methodArgs: Array.isArray(args) ? args : [args.pk],
       ...params,
     }
   }
@@ -455,16 +776,153 @@ export class MahberClient {
   }
 
   /**
-   * Calls the challenge(byte[],byte[],byte[],byte[],byte[])byte[] ABI method.
+   * Calls the publicScalarMultBase(byte[])byte[] ABI method.
    *
-   * challenge2Produce the challenge, i.e. an individual link in the ring sig verification.We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42c_{i+1}= Hs(m || r_{i}* G + c_{i}* K_{i}|| r_{i}*Hp(K_{i}) + c_{i}* I) mod |fr|
+   * publicScalarMultBasePublic wrapper around the scalarMultBase method, allowing it to be tested directly.@scalar- The scalar to multiply the basepoint by.
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
-   * @returns The result of the call
+   * @returns The result of the call: the content of the scalarMultBase call
    */
-  public challenge(args: MethodArgs<'challenge(byte[],byte[],byte[],byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
-    return this.call(MahberCallFactory.challenge(args, params))
+  public publicScalarMultBase(args: MethodArgs<'publicScalarMultBase(byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
+    return this.call(MahberCallFactory.publicScalarMultBase(args, params))
+  }
+
+  /**
+   * Calls the publicScalarMult(byte[],byte[])byte[] ABI method.
+   *
+   * publicScalarMultPublic wrapper around the scalarMult method, allowing it to be tested directly.@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The result of the call: the content of the scalarMult call
+   */
+  public publicScalarMult(args: MethodArgs<'publicScalarMult(byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
+    return this.call(MahberCallFactory.publicScalarMult(args, params))
+  }
+
+  /**
+   * Calls the publicValidPoint(byte[])bool ABI method.
+   *
+   * publicValidPointPublic wrapper around the validPoint method, allowing it to be tested directly.@point- The point to check
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The result of the call: the content of the validPoint call
+   */
+  public publicValidPoint(args: MethodArgs<'publicValidPoint(byte[])bool'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
+    return this.call(MahberCallFactory.publicValidPoint(args, params))
+  }
+
+  /**
+   * Calls the publicPointAdd(byte[],byte[])byte[] ABI method.
+   *
+   * publicPointAddPublic wrapper around the pointAdd method, allowing it to be tested directly.
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The result of the call: the content of the pointAdd call
+   */
+  public publicPointAdd(args: MethodArgs<'publicPointAdd(byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
+    return this.call(MahberCallFactory.publicPointAdd(args, params))
+  }
+
+  /**
+   * Calls the publicHashPointToPoint(byte[])byte[] ABI method.
+   *
+   * publicHashPointToPointPublic wrapper around the hashPointToPoint method, allowing it to be tested directly.
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The result of the call: the content of the hashPointToPoint call
+   */
+  public publicHashPointToPoint(args: MethodArgs<'publicHashPointToPoint(byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
+    return this.call(MahberCallFactory.publicHashPointToPoint(args, params))
+  }
+
+  /**
+   * Calls the publicChallenge(byte[],byte[],byte[],byte[],byte[])byte[] ABI method.
+   *
+   * publicChallengePublic wrapper around the challenge method, allowing it to be tested directly.
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The result of the call: - the content of the privateChallenge call
+   */
+  public publicChallenge(args: MethodArgs<'publicChallenge(byte[],byte[],byte[],byte[],byte[])byte[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
+    return this.call(MahberCallFactory.publicChallenge(args, params))
+  }
+
+  /**
+   * Calls the deposit(byte[])uint64[] ABI method.
+   *
+   * depositDeposit funds + public key into the contract
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The result of the call: - the number id of the public key, if successful. fails if unsuccessful.
+   */
+  public deposit(args: MethodArgs<'deposit(byte[])uint64[]'>, params: AppClientCallCoreParams & CoreAppCallArgs = {}) {
+    return this.call(MahberCallFactory.deposit(args, params))
+  }
+
+  /**
+   * Extracts a binary state value out of an AppState dictionary
+   *
+   * @param state The state dictionary containing the state value
+   * @param key The key of the state value
+   * @returns A BinaryState instance containing the state value, or undefined if the key was not found
+   */
+  private static getBinaryState(state: AppState, key: string): BinaryState | undefined {
+    const value = state[key]
+    if (!value) return undefined
+    if (!('valueRaw' in value))
+      throw new Error(`Failed to parse state value for ${key}; received an int when expected a byte array`)
+    return {
+      asString(): string {
+        return value.value
+      },
+      asByteArray(): Uint8Array {
+        return value.valueRaw
+      }
+    }
+  }
+
+  /**
+   * Extracts a integer state value out of an AppState dictionary
+   *
+   * @param state The state dictionary containing the state value
+   * @param key The key of the state value
+   * @returns An IntegerState instance containing the state value, or undefined if the key was not found
+   */
+  private static getIntegerState(state: AppState, key: string): IntegerState | undefined {
+    const value = state[key]
+    if (!value) return undefined
+    if ('valueRaw' in value)
+      throw new Error(`Failed to parse state value for ${key}; received a byte array when expected a number`)
+    return {
+      asBigInt() {
+        return typeof value.value === 'bigint' ? value.value : BigInt(value.value)
+      },
+      asNumber(): number {
+        return typeof value.value === 'bigint' ? Number(value.value) : value.value
+      },
+    }
+  }
+
+  /**
+   * Returns the smart contract's global state wrapped in a strongly typed accessor with options to format the stored value
+   */
+  public async getGlobalState(): Promise<Mahber['state']['global']> {
+    const state = await this.appClient.getGlobalState()
+    return {
+      get algoDenomination() {
+        return MahberClient.getIntegerState(state, 'algoDenomination')
+      },
+      get pkIndex() {
+        return MahberClient.getIntegerState(state, 'pkIndex')
+      },
+    }
   }
 
   public compose(): MahberComposer {
@@ -478,8 +936,38 @@ export class MahberClient {
         resultMappers.push(undefined)
         return this
       },
-      challenge(args: MethodArgs<'challenge(byte[],byte[],byte[],byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
-        promiseChain = promiseChain.then(() => client.challenge(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
+      publicScalarMultBase(args: MethodArgs<'publicScalarMultBase(byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
+        promiseChain = promiseChain.then(() => client.publicScalarMultBase(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
+        resultMappers.push(undefined)
+        return this
+      },
+      publicScalarMult(args: MethodArgs<'publicScalarMult(byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
+        promiseChain = promiseChain.then(() => client.publicScalarMult(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
+        resultMappers.push(undefined)
+        return this
+      },
+      publicValidPoint(args: MethodArgs<'publicValidPoint(byte[])bool'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
+        promiseChain = promiseChain.then(() => client.publicValidPoint(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
+        resultMappers.push(undefined)
+        return this
+      },
+      publicPointAdd(args: MethodArgs<'publicPointAdd(byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
+        promiseChain = promiseChain.then(() => client.publicPointAdd(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
+        resultMappers.push(undefined)
+        return this
+      },
+      publicHashPointToPoint(args: MethodArgs<'publicHashPointToPoint(byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
+        promiseChain = promiseChain.then(() => client.publicHashPointToPoint(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
+        resultMappers.push(undefined)
+        return this
+      },
+      publicChallenge(args: MethodArgs<'publicChallenge(byte[],byte[],byte[],byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
+        promiseChain = promiseChain.then(() => client.publicChallenge(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
+        resultMappers.push(undefined)
+        return this
+      },
+      deposit(args: MethodArgs<'deposit(byte[])uint64[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs) {
+        promiseChain = promiseChain.then(() => client.deposit(args, {...params, sendParams: {...params?.sendParams, skipSending: true, atc}}))
         resultMappers.push(undefined)
         return this
       },
@@ -520,15 +1008,81 @@ export type MahberComposer<TReturns extends [...any[]] = []> = {
   dummyOpUp(args: MethodArgs<'dummyOpUp(uint64)uint64'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'dummyOpUp(uint64)uint64'>]>
 
   /**
-   * Calls the challenge(byte[],byte[],byte[],byte[],byte[])byte[] ABI method.
+   * Calls the publicScalarMultBase(byte[])byte[] ABI method.
    *
-   * challenge2Produce the challenge, i.e. an individual link in the ring sig verification.We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42c_{i+1}= Hs(m || r_{i}* G + c_{i}* K_{i}|| r_{i}*Hp(K_{i}) + c_{i}* I) mod |fr|
+   * publicScalarMultBasePublic wrapper around the scalarMultBase method, allowing it to be tested directly.@scalar- The scalar to multiply the basepoint by.
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
    * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
    */
-  challenge(args: MethodArgs<'challenge(byte[],byte[],byte[],byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'challenge(byte[],byte[],byte[],byte[],byte[])byte[]'>]>
+  publicScalarMultBase(args: MethodArgs<'publicScalarMultBase(byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'publicScalarMultBase(byte[])byte[]'>]>
+
+  /**
+   * Calls the publicScalarMult(byte[],byte[])byte[] ABI method.
+   *
+   * publicScalarMultPublic wrapper around the scalarMult method, allowing it to be tested directly.@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  publicScalarMult(args: MethodArgs<'publicScalarMult(byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'publicScalarMult(byte[],byte[])byte[]'>]>
+
+  /**
+   * Calls the publicValidPoint(byte[])bool ABI method.
+   *
+   * publicValidPointPublic wrapper around the validPoint method, allowing it to be tested directly.@point- The point to check
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  publicValidPoint(args: MethodArgs<'publicValidPoint(byte[])bool'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'publicValidPoint(byte[])bool'>]>
+
+  /**
+   * Calls the publicPointAdd(byte[],byte[])byte[] ABI method.
+   *
+   * publicPointAddPublic wrapper around the pointAdd method, allowing it to be tested directly.
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  publicPointAdd(args: MethodArgs<'publicPointAdd(byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'publicPointAdd(byte[],byte[])byte[]'>]>
+
+  /**
+   * Calls the publicHashPointToPoint(byte[])byte[] ABI method.
+   *
+   * publicHashPointToPointPublic wrapper around the hashPointToPoint method, allowing it to be tested directly.
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  publicHashPointToPoint(args: MethodArgs<'publicHashPointToPoint(byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'publicHashPointToPoint(byte[])byte[]'>]>
+
+  /**
+   * Calls the publicChallenge(byte[],byte[],byte[],byte[],byte[])byte[] ABI method.
+   *
+   * publicChallengePublic wrapper around the challenge method, allowing it to be tested directly.
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  publicChallenge(args: MethodArgs<'publicChallenge(byte[],byte[],byte[],byte[],byte[])byte[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'publicChallenge(byte[],byte[],byte[],byte[],byte[])byte[]'>]>
+
+  /**
+   * Calls the deposit(byte[])uint64[] ABI method.
+   *
+   * depositDeposit funds + public key into the contract
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  deposit(args: MethodArgs<'deposit(byte[])uint64[]'>, params?: AppClientCallCoreParams & CoreAppCallArgs): MahberComposer<[...TReturns, MethodReturn<'deposit(byte[])uint64[]'>]>
 
   /**
    * Makes a clear_state call to an existing instance of the Mahber smart contract.

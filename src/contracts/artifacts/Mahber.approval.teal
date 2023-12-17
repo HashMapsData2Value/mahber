@@ -41,7 +41,7 @@ abi_route_dummyOpUp:
 dummyOpUp:
 	proto 1 0
 
-	// contracts/mahber.algo.ts:11
+	// contracts/mahber.algo.ts:31
 	// return i;
 	frame_dig -1 // i: uint64
 	itob
@@ -54,7 +54,7 @@ dummyOpUp:
 scalarMultBase:
 	proto 2 1
 
-	// contracts/mahber.algo.ts:21
+	// contracts/mahber.algo.ts:41
 	// result = ec_scalar_mul(
 	//       "BN254g1",
 	//       hex(
@@ -67,60 +67,213 @@ scalarMultBase:
 	ec_scalar_mul BN254g1
 	frame_bury -2 // result: bytes
 
-	// contracts/mahber.algo.ts:28
+	// contracts/mahber.algo.ts:48
 	// return result;
 	frame_dig -2 // result: bytes
+	retsub
+
+// publicScalarMultBase(bytes)byte[]
+//
+// publicScalarMultBase
+// Public wrapper around the scalarMultBase method, allowing it to be tested directly.
+// @scalar - The scalar to multiply the basepoint by.
+// @returns the content of the scalarMultBase call
+abi_route_publicScalarMultBase:
+	// scalar: byte[]
+	txna ApplicationArgs 1
+	extract 2 0
+
+	// execute publicScalarMultBase(bytes)byte[]
+	callsub publicScalarMultBase
+	int 1
+	return
+
+publicScalarMultBase:
+	proto 1 0
+
+	// contracts/mahber.algo.ts:57
+	// return this.scalarMultBase(scalar);
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+	frame_dig -1 // scalar: bytes
+	callsub scalarMultBase
+	dup
+	len
+	itob
+	extract 6 2
+	swap
+	concat
+	byte 0x151f7c75
+	swap
+	concat
+	log
 	retsub
 
 scalarMult:
 	proto 3 1
 
-	// contracts/mahber.algo.ts:39
+	// contracts/mahber.algo.ts:68
 	// result = ec_scalar_mul("BN254g1", point, scalar)
 	frame_dig -2 // point: bytes
 	frame_dig -1 // scalar: bytes
 	ec_scalar_mul BN254g1
 	frame_bury -3 // result: bytes
 
-	// contracts/mahber.algo.ts:40
+	// contracts/mahber.algo.ts:69
 	// return result;
 	frame_dig -3 // result: bytes
+	retsub
+
+// publicScalarMult(bytes,bytes)byte[]
+//
+// publicScalarMult
+// Public wrapper around the scalarMult method, allowing it to be tested directly.
+// @scalar - The scalar to multiply the point with
+// @point - The point that is multiplied with the scalar
+// @returns the content of the scalarMult call
+abi_route_publicScalarMult:
+	// point: byte[]
+	txna ApplicationArgs 2
+	extract 2 0
+
+	// scalar: byte[]
+	txna ApplicationArgs 1
+	extract 2 0
+
+	// execute publicScalarMult(bytes,bytes)byte[]
+	callsub publicScalarMult
+	int 1
+	return
+
+publicScalarMult:
+	proto 2 0
+
+	// contracts/mahber.algo.ts:79
+	// return this.scalarMult(scalar, point);
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+	frame_dig -2 // point: bytes
+	frame_dig -1 // scalar: bytes
+	callsub scalarMult
+	dup
+	len
+	itob
+	extract 6 2
+	swap
+	concat
+	byte 0x151f7c75
+	swap
+	concat
+	log
 	retsub
 
 validPoint:
 	proto 1 1
 
-	// contracts/mahber.algo.ts:50
+	// contracts/mahber.algo.ts:89
 	// return ec_subgroup_check("BN254g1", point);
 	frame_dig -1 // point: bytes
 	ec_subgroup_check BN254g1
 	retsub
 
+// publicValidPoint(bytes)bool
+//
+// publicValidPoint
+// Public wrapper around the validPoint method, allowing it to be tested directly.
+// @point - The point to check
+// @returns the content of the validPoint call
+abi_route_publicValidPoint:
+	// point: byte[]
+	txna ApplicationArgs 1
+	extract 2 0
+
+	// execute publicValidPoint(bytes)bool
+	callsub publicValidPoint
+	int 1
+	return
+
+publicValidPoint:
+	proto 1 0
+
+	// contracts/mahber.algo.ts:98
+	// return this.validPoint(point);
+	frame_dig -1 // point: bytes
+	callsub validPoint
+	byte 0x00
+	int 0
+	uncover 2
+	setbit
+	byte 0x151f7c75
+	swap
+	concat
+	log
+	retsub
+
 pointAdd:
 	proto 3 1
 
-	// contracts/mahber.algo.ts:61
+	// contracts/mahber.algo.ts:109
 	// result = ec_add("BN254g1", pointA, pointB)
 	frame_dig -1 // pointA: bytes
 	frame_dig -2 // pointB: bytes
 	ec_add BN254g1
 	frame_bury -3 // result: bytes
 
-	// contracts/mahber.algo.ts:62
+	// contracts/mahber.algo.ts:110
 	// return result;
 	frame_dig -3 // result: bytes
+	retsub
+
+// publicPointAdd(bytes,bytes)byte[]
+//
+// publicPointAdd
+// Public wrapper around the pointAdd method, allowing it to be tested directly.
+// @param pointA - The first point
+// @param pointB - The second point
+// @returns the content of the pointAdd call
+abi_route_publicPointAdd:
+	// pointB: byte[]
+	txna ApplicationArgs 2
+	extract 2 0
+
+	// pointA: byte[]
+	txna ApplicationArgs 1
+	extract 2 0
+
+	// execute publicPointAdd(bytes,bytes)byte[]
+	callsub publicPointAdd
+	int 1
+	return
+
+publicPointAdd:
+	proto 2 0
+
+	// contracts/mahber.algo.ts:120
+	// return this.pointAdd(pointA, pointB);
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+	frame_dig -2 // pointB: bytes
+	frame_dig -1 // pointA: bytes
+	callsub pointAdd
+	dup
+	len
+	itob
+	extract 6 2
+	swap
+	concat
+	byte 0x151f7c75
+	swap
+	concat
+	log
 	retsub
 
 hashPointToPoint:
 	proto 4 1
 
-	// contracts/mahber.algo.ts:77
+	// contracts/mahber.algo.ts:134
 	// hash = sha256(point)
 	frame_dig -1 // point: bytes
 	sha256
 	frame_bury -2 // hash: byte[32]
 
-	// contracts/mahber.algo.ts:78
+	// contracts/mahber.algo.ts:135
 	// fpElement =
 	//       btobigint(hash) % btobigint(hex("30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47"))
 	frame_dig -2 // hash: byte[32]
@@ -128,32 +281,115 @@ hashPointToPoint:
 	b%
 	frame_bury -3 // fpElement: bigint
 
-	// contracts/mahber.algo.ts:81
+	// contracts/mahber.algo.ts:138
 	// result = ec_map_to("BN254g1", fpElement)
 	frame_dig -3 // fpElement: bigint
 	ec_map_to BN254g1
 	frame_bury -4 // result: bytes
 
-	// contracts/mahber.algo.ts:82
+	// contracts/mahber.algo.ts:139
 	// return result;
 	frame_dig -4 // result: bytes
 	retsub
 
-// challenge(bytes,bytes,bytes,bytes,bytes)byte[]
+// publicHashPointToPoint(bytes)byte[]
 //
-// challenge2
-// Produce the challenge, i.e. an individual link in the ring sig verification.
-// We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42
-// c_{i+1} = Hs(m || r_{i} * G + c_{i} * K_{i} || r_{i}*Hp(K_{i}) + c_{i} * I) mod |fr|
+// publicHashPointToPoint
+// Public wrapper around the hashPointToPoint method, allowing it to be tested directly.
+// @param point - The point to hash
+// @returns the content of the hashPointToPoint call
+abi_route_publicHashPointToPoint:
+	// point: byte[]
+	txna ApplicationArgs 1
+	extract 2 0
+
+	// execute publicHashPointToPoint(bytes)byte[]
+	callsub publicHashPointToPoint
+	int 1
+	return
+
+publicHashPointToPoint:
+	proto 1 0
+
+	// contracts/mahber.algo.ts:148
+	// return this.hashPointToPoint(point);
+	byte 0x; dupn 2 // push empty bytes to fill the stack frame for this subroutine's local variables
+	frame_dig -1 // point: bytes
+	callsub hashPointToPoint
+	dup
+	len
+	itob
+	extract 6 2
+	swap
+	concat
+	byte 0x151f7c75
+	swap
+	concat
+	log
+	retsub
+
+challenge:
+	proto 8 1
+
+	// contracts/mahber.algo.ts:167
+	// left = this.pointAdd(this.scalarMultBase(nonce), this.scalarMult(cPrev, pk))
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+	frame_dig -4 // pk: bytes
+	frame_dig -3 // cPrev: bytes
+	callsub scalarMult
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+	frame_dig -2 // nonce: bytes
+	callsub scalarMultBase
+	callsub pointAdd
+	frame_bury -6 // left: byte[]
+
+	// contracts/mahber.algo.ts:173
+	// right = this.pointAdd(this.scalarMult(nonce, this.hashPointToPoint(pk)), this.scalarMult(cPrev, keyImage))
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+	frame_dig -5 // keyImage: bytes
+	frame_dig -3 // cPrev: bytes
+	callsub scalarMult
+	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+	byte 0x; dupn 2 // push empty bytes to fill the stack frame for this subroutine's local variables
+	frame_dig -4 // pk: bytes
+	callsub hashPointToPoint
+	frame_dig -2 // nonce: bytes
+	callsub scalarMult
+	callsub pointAdd
+	frame_bury -7 // right: byte[]
+
+	// contracts/mahber.algo.ts:179
+	// h =
+	//       btobigint(sha256(concat(concat(msg, left), right))) %
+	//       btobigint(hex("0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001"))
+	frame_dig -1 // msg: bytes
+	frame_dig -6 // left: byte[]
+	concat
+	frame_dig -7 // right: byte[]
+	concat
+	sha256
+	byte 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001
+	b%
+	frame_bury -8 // h: bigint
+
+	// contracts/mahber.algo.ts:183
+	// return h as bytes;
+	frame_dig -8 // h: bigint
+	retsub
+
+// publicChallenge(bytes,bytes,bytes,bytes,bytes)byte[]
+//
+// publicChallenge
+// Public wrapper around the challenge method, allowing it to be tested directly.
 // @param msg - The message to be signed
 // @param nonce - The nonce, part of the ring signature itself, aka one of the fake secret keys
 // @param cPrev - The previous challenge, or the base challenge if this is the first link (in which case it is part of the ring sig)
 // @param pk - The specific public key in the ring (indexed from the array of public keys)
 // @param keyImage - The key image of the signer, required for linkabiltiy to prevent double spending
-// @returns
-abi_route_challenge:
-	byte 0x; dupn 2 // push empty bytes to fill the stack frame for this subroutine's local variables
-
+// @returns - the content of the privateChallenge call
+abi_route_publicChallenge:
 	// keyImage: byte[]
 	txna ApplicationArgs 5
 	extract 2 0
@@ -174,62 +410,145 @@ abi_route_challenge:
 	txna ApplicationArgs 1
 	extract 2 0
 
-	// execute challenge(bytes,bytes,bytes,bytes,bytes)byte[]
-	callsub challenge
+	// execute publicChallenge(bytes,bytes,bytes,bytes,bytes)byte[]
+	callsub publicChallenge
 	int 1
 	return
 
-challenge:
-	proto 8 0
+publicChallenge:
+	proto 5 0
 
-	// contracts/mahber.algo.ts:101
-	// left = this.pointAdd(this.scalarMultBase(nonce), this.scalarMult(cPrev, pk))
-	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
-	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
-	frame_dig -4 // pk: bytes
-	frame_dig -3 // cPrev: bytes
-	callsub scalarMult
-	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
-	frame_dig -2 // nonce: bytes
-	callsub scalarMultBase
-	callsub pointAdd
-	frame_bury -6 // left: byte[]
-
-	// contracts/mahber.algo.ts:107
-	// right = this.pointAdd(this.scalarMult(nonce, this.hashPointToPoint(pk)), this.scalarMult(cPrev, keyImage))
-	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
-	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
-	frame_dig -5 // keyImage: bytes
-	frame_dig -3 // cPrev: bytes
-	callsub scalarMult
-	byte 0x // push empty bytes to fill the stack frame for this subroutine's local variables
+	// contracts/mahber.algo.ts:196
+	// return this.challenge(msg, nonce, cPrev, pk, keyImage);
 	byte 0x; dupn 2 // push empty bytes to fill the stack frame for this subroutine's local variables
+	frame_dig -5 // keyImage: bytes
 	frame_dig -4 // pk: bytes
-	callsub hashPointToPoint
+	frame_dig -3 // cPrev: bytes
 	frame_dig -2 // nonce: bytes
-	callsub scalarMult
-	callsub pointAdd
-	frame_bury -7 // right: byte[]
-
-	// contracts/mahber.algo.ts:113
-	// h =
-	//       btobigint(sha256(concat(concat(msg, left), right))) %
-	//       btobigint(hex("0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001"))
 	frame_dig -1 // msg: bytes
-	frame_dig -6 // left: byte[]
-	concat
-	frame_dig -7 // right: byte[]
-	concat
-	sha256
-	byte 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001
-	b%
-	frame_bury -8 // h: bigint
-
-	// contracts/mahber.algo.ts:117
-	// return h as bytes;
-	frame_dig -8 // h: bigint
+	callsub challenge
 	dup
 	len
+	itob
+	extract 6 2
+	swap
+	concat
+	byte 0x151f7c75
+	swap
+	concat
+	log
+	retsub
+
+// deposit(bytes)uint64[]
+//
+// deposit
+// Deposit funds + public key into the contract
+// @param pk - The public key to deposit
+// TODO: Add custom EdDSA to check that the depositor knows the secret key. Useful to prevent rogue key attack, adding the negative of another pk.
+// @returns - the number id of the public key, if successful. fails if unsuccessful.
+abi_route_deposit:
+	byte 0x; dup // push empty bytes to fill the stack frame for this subroutine's local variables
+
+	// pk: byte[]
+	txna ApplicationArgs 1
+	extract 2 0
+
+	// execute deposit(bytes)uint64[]
+	callsub deposit
+	int 1
+	return
+
+deposit:
+	proto 3 0
+
+	// contracts/mahber.algo.ts:207
+	// assert(this.validPoint(pk))
+	frame_dig -1 // pk: bytes
+	callsub validPoint
+	assert
+
+	// contracts/mahber.algo.ts:208
+	// assert(!this.hashFilter(pk).exists)
+	frame_dig -1 // pk: bytes
+	box_len
+	swap
+	pop
+	!
+	assert
+
+	// contracts/mahber.algo.ts:213
+	// boxId = this.pkIndex.value / MAX_BOX_PK_NUMBER
+	byte 0x706b496e646578 // "pkIndex"
+	app_global_get
+	int 512
+	/
+	frame_bury -2 // boxId: uint64
+
+	// if0_condition
+	// contracts/mahber.algo.ts:216
+	// !this.quickAccessPKBoxes(boxId).exists
+	frame_dig -2 // boxId: uint64
+	itob
+	box_len
+	swap
+	pop
+	!
+	bz if0_end
+
+	// if0_consequent
+	// contracts/mahber.algo.ts:217
+	// this.quickAccessPKBoxes(boxId).create(MAX_BOX_SIZE)
+	frame_dig -2 // boxId: uint64
+	itob
+	int 32768
+	box_create
+
+if0_end:
+	// contracts/mahber.algo.ts:221
+	// this.quickAccessPKBoxes(boxId).replace((this.pkIndex.value % MAX_BOX_PK_NUMBER) * CURVE_POINT_SIZE, pk)
+	frame_dig -2 // boxId: uint64
+	itob
+	byte 0x706b496e646578 // "pkIndex"
+	app_global_get
+	int 512
+	%
+	int 64
+	*
+	frame_dig -1 // pk: bytes
+	box_replace
+
+	// contracts/mahber.algo.ts:224
+	// this.hashFilter(pk).create(1)
+	frame_dig -1 // pk: bytes
+	int 1
+	box_create
+
+	// contracts/mahber.algo.ts:226
+	// idx = this.pkIndex.value
+	byte 0x706b496e646578 // "pkIndex"
+	app_global_get
+	frame_bury -3 // idx: uint64
+
+	// contracts/mahber.algo.ts:229
+	// this.pkIndex.value = this.pkIndex.value + 1
+	byte 0x706b496e646578 // "pkIndex"
+	byte 0x706b496e646578 // "pkIndex"
+	app_global_get
+	int 1
+	+
+	app_global_put
+
+	// contracts/mahber.algo.ts:231
+	// return [idx, boxId];
+	frame_dig -3 // idx: uint64
+	itob
+	frame_dig -2 // boxId: uint64
+	itob
+	concat
+	dup
+	len
+	int 8
+	/
 	itob
 	extract 6 2
 	swap
@@ -252,7 +571,13 @@ create_NoOp:
 
 call_NoOp:
 	method "dummyOpUp(uint64)uint64"
-	method "challenge(byte[],byte[],byte[],byte[],byte[])byte[]"
+	method "publicScalarMultBase(byte[])byte[]"
+	method "publicScalarMult(byte[],byte[])byte[]"
+	method "publicValidPoint(byte[])bool"
+	method "publicPointAdd(byte[],byte[])byte[]"
+	method "publicHashPointToPoint(byte[])byte[]"
+	method "publicChallenge(byte[],byte[],byte[],byte[],byte[])byte[]"
+	method "deposit(byte[])uint64[]"
 	txna ApplicationArgs 0
-	match abi_route_dummyOpUp abi_route_challenge
+	match abi_route_dummyOpUp abi_route_publicScalarMultBase abi_route_publicScalarMult abi_route_publicValidPoint abi_route_publicPointAdd abi_route_publicHashPointToPoint abi_route_publicChallenge abi_route_deposit
 	err

@@ -18,7 +18,92 @@
       }
     },
     {
-      "name": "challenge",
+      "name": "publicScalarMultBase",
+      "args": [
+        {
+          "name": "scalar",
+          "type": "byte[]",
+          "desc": ""
+        }
+      ],
+      "desc": "publicScalarMultBasePublic wrapper around the scalarMultBase method, allowing it to be tested directly.@scalar- The scalar to multiply the basepoint by.",
+      "returns": {
+        "type": "byte[]",
+        "desc": "the content of the scalarMultBase call"
+      }
+    },
+    {
+      "name": "publicScalarMult",
+      "args": [
+        {
+          "name": "scalar",
+          "type": "byte[]",
+          "desc": ""
+        },
+        {
+          "name": "point",
+          "type": "byte[]",
+          "desc": ""
+        }
+      ],
+      "desc": "publicScalarMultPublic wrapper around the scalarMult method, allowing it to be tested directly.@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar",
+      "returns": {
+        "type": "byte[]",
+        "desc": "the content of the scalarMult call"
+      }
+    },
+    {
+      "name": "publicValidPoint",
+      "args": [
+        {
+          "name": "point",
+          "type": "byte[]",
+          "desc": ""
+        }
+      ],
+      "desc": "publicValidPointPublic wrapper around the validPoint method, allowing it to be tested directly.@point- The point to check",
+      "returns": {
+        "type": "bool",
+        "desc": "the content of the validPoint call"
+      }
+    },
+    {
+      "name": "publicPointAdd",
+      "args": [
+        {
+          "name": "pointA",
+          "type": "byte[]",
+          "desc": "The first point"
+        },
+        {
+          "name": "pointB",
+          "type": "byte[]",
+          "desc": "The second point"
+        }
+      ],
+      "desc": "publicPointAddPublic wrapper around the pointAdd method, allowing it to be tested directly.",
+      "returns": {
+        "type": "byte[]",
+        "desc": "the content of the pointAdd call"
+      }
+    },
+    {
+      "name": "publicHashPointToPoint",
+      "args": [
+        {
+          "name": "point",
+          "type": "byte[]",
+          "desc": "The point to hash"
+        }
+      ],
+      "desc": "publicHashPointToPointPublic wrapper around the hashPointToPoint method, allowing it to be tested directly.",
+      "returns": {
+        "type": "byte[]",
+        "desc": "the content of the hashPointToPoint call"
+      }
+    },
+    {
+      "name": "publicChallenge",
       "args": [
         {
           "name": "msg",
@@ -46,10 +131,25 @@
           "desc": "The key image of the signer, required for linkabiltiy to prevent double spending"
         }
       ],
-      "desc": "challenge2Produce the challenge, i.e. an individual link in the ring sig verification.We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42c_{i+1}= Hs(m || r_{i}* G + c_{i}* K_{i}|| r_{i}*Hp(K_{i}) + c_{i}* I) mod |fr|",
+      "desc": "publicChallengePublic wrapper around the challenge method, allowing it to be tested directly.",
       "returns": {
         "type": "byte[]",
-        "desc": ""
+        "desc": "- the content of the privateChallenge call"
+      }
+    },
+    {
+      "name": "deposit",
+      "args": [
+        {
+          "name": "pk",
+          "type": "byte[]",
+          "desc": "The public key to depositTODO: Add custom EdDSA to check that the depositor knows the secret key. Useful to prevent rogue key attack, adding the negative of another pk."
+        }
+      ],
+      "desc": "depositDeposit funds + public key into the contract",
+      "returns": {
+        "type": "uint64[]",
+        "desc": "- the number id of the public key, if successful. fails if unsuccessful."
       }
     },
     {

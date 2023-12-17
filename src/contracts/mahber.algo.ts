@@ -1,7 +1,27 @@
 import { Contract } from "@algorandfoundation/tealscript";
 
+const CURVE_POINT_SIZE = 64; // 64 bytes for BN254 curve points (point.X || point.Y)
+const MAX_BOX_SIZE = 32768; // 32 KB
+const MAX_BOX_PK_NUMBER = MAX_BOX_SIZE / CURVE_POINT_SIZE;
+
 // eslint-disable-next-line no-unused-vars
 class Mahber extends Contract {
+  // GLOBAL STATE
+
+  algoDenomination = GlobalStateKey<uint64>(); // the "denomination" in Algos of the SC, the Algo chunk sum that is deposited and withdrawn(minus fees).
+
+  pkIndex = GlobalStateKey<uint64>(); // How many public keys (PKs) are in the contract
+
+  // PK BOXES
+  // We want to store the PKs in a way that allows for easy access for when they are included in a ring signature.
+  quickAccessPKBoxes = BoxMap<uint64, bytes>(); // Boxes containing PK bytes, accessible by [boxId][offsetIndex].
+
+  // HashFilter BOXES
+  // We want a simple way to ensure that a PK or a key image (KI) are not submitted twice. The latter is to prevent double spending.
+  // For the former, if someone submits the same public key multiple times their funds will be trapped and be unable to be withdrawn.
+  // Because we have 1 KI per withdrawal and 1 PK per KI, we can only withdraw 1 once per PK.
+  hashFilter = BoxMap<bytes, bytes>(); // HashFilter with box titles = Hash(public key) or Hash/(key image)
+
   /** Dummy Op Up
    * Dummy operation to get more opcode budget
    * @i - The number to return, necssary to deduplicate the name
@@ -13,7 +33,7 @@ class Mahber extends Contract {
 
   /** Scalar Mult Base
    * Scalar multiplication of the base point
-   * @scalar - The scalar to multiply the basepoint by.
+   * @scalar - The scalar to multiply the base point by.
    * @returns a point on the curve
    */
   private scalarMultBase(scalar: bytes): bytes {
@@ -28,6 +48,15 @@ class Mahber extends Contract {
     return result;
   }
 
+  /** publicScalarMultBase
+   * Public wrapper around the scalarMultBase method, allowing it to be tested directly.
+   * @scalar - The scalar to multiply the basepoint by.
+   * @returns the content of the scalarMultBase call
+   */
+  publicScalarMultBase(scalar: bytes): bytes {
+    return this.scalarMultBase(scalar);
+  }
+
   /** Scalar Mult
    * Scalar multiplication with a supplied point
    * @scalar - The scalar to multiply the point with
@@ -40,6 +69,16 @@ class Mahber extends Contract {
     return result;
   }
 
+  /** publicScalarMult
+   * Public wrapper around the scalarMult method, allowing it to be tested directly.
+   * @scalar - The scalar to multiply the point with
+   * @point - The point that is multiplied with the scalar
+   * @returns the content of the scalarMult call
+   */
+  publicScalarMult(scalar: bytes, point: bytes): bytes {
+    return this.scalarMult(scalar, point);
+  }
+
   /** validPoint
    * Checks if the point is valid (on curve)
    * @point - The point to check
@@ -48,6 +87,15 @@ class Mahber extends Contract {
   private validPoint(point: bytes): boolean {
     // @ts-ignore
     return ec_subgroup_check("BN254g1", point);
+  }
+
+  /** publicValidPoint
+   * Public wrapper around the validPoint method, allowing it to be tested directly.
+   * @point - The point to check
+   * @returns the content of the validPoint call
+   */
+  publicValidPoint(point: bytes): boolean {
+    return this.validPoint(point);
   }
 
   /** Point add
@@ -62,10 +110,19 @@ class Mahber extends Contract {
     return result;
   }
 
+  /** publicPointAdd
+   * Public wrapper around the pointAdd method, allowing it to be tested directly.
+   * @param pointA - The first point
+   * @param pointB - The second point
+   * @returns the content of the pointAdd call
+   */
+  publicPointAdd(pointA: bytes, pointB: bytes): bytes {
+    return this.pointAdd(pointA, pointB);
+  }
+
   /** hashPointToPoint
-   *  Hashes a point to a point on the curve
-   * NOTE: ec_map_to maps fp_element to curve point. We use hash and then mod to
-   * map the point's X and Y bytes to fp_element first.
+   * Hashes a point to a point on the curve
+   * NOTE: ec_map_to maps fp_element to curve point. We use hash and then mod to map the point's X and Y bytes to fp_element first.
    * What is inside ec_map_to (accessed Dec 13th 2023):
    *    https://github.com/algorand/go-algorand/blob/master/data/transactions/logic/pairing.go#L862
    *    https://pkg.go.dev/github.com/consensys/gnark-crypto/ecc/bn254#MapToG1
@@ -82,6 +139,15 @@ class Mahber extends Contract {
     return result;
   }
 
+  /** publicHashPointToPoint
+   * Public wrapper around the hashPointToPoint method, allowing it to be tested directly.
+   * @param point - The point to hash
+   * @returns the content of the hashPointToPoint call
+   */
+  publicHashPointToPoint(point: bytes): bytes {
+    return this.hashPointToPoint(point);
+  }
+
   /** challenge
    * Produce the challenge, i.e. an individual link in the ring sig verification.
    * We mod by order of fr https://github.com/Consensys/gnark-crypto/blob/master/ecc/bn254/fr/element.go#L42
@@ -91,9 +157,9 @@ class Mahber extends Contract {
    * @param cPrev - The previous challenge, or the base challenge if this is the first link (in which case it is part of the ring sig)
    * @param pk - The specific public key in the ring (indexed from the array of public keys)
    * @param keyImage - The key image of the signer, required for linkabiltiy to prevent double spending
-   * @returns
+   * @returns - the challenge
    */
-  challenge(msg: bytes, nonce: bytes, cPrev: bytes, pk: bytes, keyImage: bytes): bytes {
+  private challenge(msg: bytes, nonce: bytes, cPrev: bytes, pk: bytes, keyImage: bytes): bytes {
     /* CALCULATE LEFT-HAND SIDE OF EQUATION (AFTER MSG BYTES)
      ** r_{i} * G + c_{i} * K_{i}
      ** G = 0x00...0100.git..02 (basepoint)
@@ -116,4 +182,61 @@ class Mahber extends Contract {
     // @ts-ignore
     return h as bytes;
   }
+
+  /** publicChallenge
+   * Public wrapper around the challenge method, allowing it to be tested directly.
+   * @param msg - The message to be signed
+   * @param nonce - The nonce, part of the ring signature itself, aka one of the fake secret keys
+   * @param cPrev - The previous challenge, or the base challenge if this is the first link (in which case it is part of the ring sig)
+   * @param pk - The specific public key in the ring (indexed from the array of public keys)
+   * @param keyImage - The key image of the signer, required for linkabiltiy to prevent double spending
+   * @returns - the content of the privateChallenge call
+   */
+  publicChallenge(msg: bytes, nonce: bytes, cPrev: bytes, pk: bytes, keyImage: bytes): bytes {
+    return this.challenge(msg, nonce, cPrev, pk, keyImage);
+  }
+
+  /** deposit
+   * Deposit funds + public key into the contract
+   * @param pk - The public key to deposit
+   * TODO: Add custom EdDSA to check that the depositor knows the secret key. Useful to prevent rogue key attack, adding the negative of another pk.
+   * @returns - the number id of the public key, if successful. fails if unsuccessful.
+   */
+  deposit(pk: bytes): uint64[] {
+    // Ensure the public key is valid.
+    assert(this.validPoint(pk)); // Filter out invalid points
+    assert(!this.hashFilter(pk).exists); // Filter out duplicate public keys by checking if the hash of the public key is already in the filter
+    // TODO: assert(this.eddsaVerify(pk, msg, sig)); // Filter out rogue key attack by proving that the depositor knows the secret key
+    // TODO: assert(... == this.denomination); // Ensure the depositor is funding the right amount
+
+    // Calculate the box id to slot the PK into based off of the number of PKs already in the contract.
+    const boxId = this.pkIndex.value / MAX_BOX_PK_NUMBER;
+
+    // Check if the quick access box exists, otherwise create it.
+    if (!this.quickAccessPKBoxes(boxId).exists) {
+      this.quickAccessPKBoxes(boxId).create(MAX_BOX_SIZE);
+    }
+
+    // Add the PK at the right offset.
+    this.quickAccessPKBoxes(boxId).replace((this.pkIndex.value % MAX_BOX_PK_NUMBER) * CURVE_POINT_SIZE, pk);
+
+    // Add the PK to the hash filter.
+    this.hashFilter(pk).create(1);
+
+    const idx = this.pkIndex.value;
+
+    // Increment the number of PKs in the contract.
+    this.pkIndex.value = this.pkIndex.value + 1;
+
+    return [idx, boxId];
+  }
+  // TODO: "arming" function that will take in pre-computed challenges and store them in box.
+
+  // TODO: "triggering" function that is triggered individually per link in the ring signature, and will verify that the challenge is correct based off of the pre-computed challenges in the box. By allowing for verification in parallell, we can reduce the amount of time it takes to verify a ring signature.
+
+  // TODO: Loading function that will load cPrev and produced intermediary challenge values into a Box, allowing for verification in parallell
+
+  // TODO: verify function that will loop through all the intermediary challenge values and confirm that the relayer posted correct cPrevs based off of the calculations made...
+
+  // So long as the last value corresponds to the initailizer value (which we imply accepted from the verifier), it means that the ring has looped around
 }
