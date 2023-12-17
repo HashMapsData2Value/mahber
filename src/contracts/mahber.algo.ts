@@ -162,7 +162,7 @@ class Mahber extends Contract {
   private challenge(msg: bytes, nonce: bytes, cPrev: bytes, pk: bytes, keyImage: bytes): bytes {
     /* CALCULATE LEFT-HAND SIDE OF EQUATION (AFTER MSG BYTES)
      ** r_{i} * G + c_{i} * K_{i}
-     ** G = 0x00...0100.git..02 (basepoint)
+     ** G = 0x00...0100...02 (basepoint)
      */
     const left = this.pointAdd(this.scalarMultBase(nonce), this.scalarMult(cPrev, pk));
 
@@ -203,7 +203,7 @@ class Mahber extends Contract {
    * @returns - the number id of the public key, if successful. fails if unsuccessful.
    */
   deposit(pk: bytes): uint64[] {
-    // Ensure the public key is valid.
+    // Ensure the public key is OK.
     assert(this.validPoint(pk)); // Filter out invalid points
     assert(!this.hashFilter(pk).exists); // Filter out duplicate public keys by checking if the hash of the public key is already in the filter
     // TODO: assert(this.eddsaVerify(pk, msg, sig)); // Filter out rogue key attack by proving that the depositor knows the secret key
