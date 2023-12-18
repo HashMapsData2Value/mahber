@@ -3,6 +3,9 @@
 /* eslint-disable no-plusplus */
 import { describe, test, expect, beforeAll, beforeEach } from "@jest/globals";
 import { algorandFixture } from "@algorandfoundation/algokit-utils/testing";
+import algosdk from "algosdk";
+import * as algokit from "@algorandfoundation/algokit-utils";
+
 import { MahberClient } from "../contracts/clients/MahberClient";
 
 const fixture = algorandFixture();
@@ -38,11 +41,19 @@ describe("Mahber - Functionality Tests", () => {
       152, 91, 35, 51, 213, 130, 134, 113, 172, 108, 77, 224, 158, 148,
     ]);
 
-    const msg = new Uint8Array([104, 101, 108, 108, 111]); // hello
+    const { algod, testAccount } = fixture.context;
+    const { appAddress } = await appClient.appClient.getAppReference();
+
+    const depositTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+      from: testAccount.addr,
+      to: appAddress,
+      amount: 10000 * 1000000,
+      suggestedParams: await algokit.getTransactionParams(undefined, algod),
+    });
 
     const res = await appClient
       .compose()
-      .deposit({ pk })
+      .deposit({ pk, depositTxn })
       .dummyOpUp({ i: 1 })
       .dummyOpUp({ i: 2 })
       .dummyOpUp({ i: 3 })

@@ -3,6 +3,15 @@
   "desc": "",
   "methods": [
     {
+      "name": "createApplication",
+      "args": [],
+      "desc": "",
+      "returns": {
+        "type": "void",
+        "desc": ""
+      }
+    },
+    {
       "name": "dummyOpUp",
       "args": [
         {
@@ -141,6 +150,11 @@
       "name": "deposit",
       "args": [
         {
+          "name": "depositTxn",
+          "type": "pay",
+          "desc": ""
+        },
+        {
           "name": "pk",
           "type": "byte[]",
           "desc": "The public key to depositTODO: Add custom EdDSA to check that the depositor knows the secret key. Useful to prevent rogue key attack, adding the negative of another pk."
@@ -151,15 +165,6 @@
         "type": "uint64[]",
         "desc": "- the number id of the public key, if successful. fails if unsuccessful."
       }
-    },
-    {
-      "name": "createApplication",
-      "desc": "",
-      "returns": {
-        "type": "void",
-        "desc": ""
-      },
-      "args": []
     }
   ]
 }

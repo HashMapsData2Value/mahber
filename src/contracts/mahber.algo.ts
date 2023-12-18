@@ -8,7 +8,8 @@ const MAX_BOX_PK_NUMBER = MAX_BOX_SIZE / CURVE_POINT_SIZE;
 class Mahber extends Contract {
   // GLOBAL STATE
 
-  algoDenomination = GlobalStateKey<uint64>(); // the "denomination" in Algos of the SC, the Algo chunk sum that is deposited and withdrawn(minus fees).
+  // For fungibility all deposits need to be the same amount of Algo chunk sum/"denomination".
+  algoDenomination = GlobalStateKey<uint64>(); // Includes MBBR.
 
   pkIndex = GlobalStateKey<uint64>(); // How many public keys (PKs) are in the contract
 
@@ -21,6 +22,12 @@ class Mahber extends Contract {
   // For the former, if someone submits the same public key multiple times their funds will be trapped and be unable to be withdrawn.
   // Because we have 1 KI per withdrawal and 1 PK per KI, we can only withdraw 1 once per PK.
   hashFilter = BoxMap<bytes, bytes>(); // HashFilter with box titles = Hash(public key) or Hash/(key image)
+
+  createApplication(): void {
+    // Initialize global state
+    this.algoDenomination.value = 10000 * 1000000; // Algo
+    this.pkIndex.value = 0;
+  }
 
   /** Dummy Op Up
    * Dummy operation to get more opcode budget
@@ -202,12 +209,16 @@ class Mahber extends Contract {
    * TODO: Add custom EdDSA to check that the depositor knows the secret key. Useful to prevent rogue key attack, adding the negative of another pk.
    * @returns - the number id of the public key, if successful. fails if unsuccessful.
    */
-  deposit(pk: bytes): uint64[] {
+  deposit(depositTxn: PayTxn, pk: bytes): uint64[] {
     // Ensure the public key is OK.
     assert(this.validPoint(pk)); // Filter out invalid points
     assert(!this.hashFilter(pk).exists); // Filter out duplicate public keys by checking if the hash of the public key is already in the filter
     // TODO: assert(this.eddsaVerify(pk, msg, sig)); // Filter out rogue key attack by proving that the depositor knows the secret key
-    // TODO: assert(... == this.denomination); // Ensure the depositor is funding the right amount
+    verifyTxn(depositTxn, {
+      // Ensure the depositor is funding the right amount
+      receiver: this.app.address,
+      amount: this.algoDenomination.value,
+    });
 
     // Calculate the box id to slot the PK into based off of the number of PKs already in the contract.
     const boxId = this.pkIndex.value / MAX_BOX_PK_NUMBER;
