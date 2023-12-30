@@ -1,7 +1,7 @@
 import { Contract } from "@algorandfoundation/tealscript";
 
 const CURVE_POINT_SIZE = 64; // 64 bytes for BN254 curve points (point.X || point.Y)
-const MAX_BOX_SIZE = 32768; // 32 KB
+const MAX_BOX_SIZE = 32768 - 1024; // 32 KB - 1KB (If we want write budget to be able to create new PK box AND add PK to hashfilter we can't have the PK BOX be 32KB as it would exceed write budget...
 const MAX_BOX_PK_NUMBER = MAX_BOX_SIZE / CURVE_POINT_SIZE;
 
 // eslint-disable-next-line no-unused-vars
@@ -232,6 +232,7 @@ class Mahber extends Contract {
     //   const boxlength = this.quickAccessPKBoxes(boxId).length();
     //   this.quickAccessPKBoxes(boxId).resize(boxlength + CURVE_POINT_SIZE);
     // }
+    // It would also allow us to set MAX_BOX_SIZE to 32KB instead of 31KB, which would allow us to store 512 PKs per box instead of 496.
 
     if (!this.quickAccessPKBoxes(boxId).exists) {
       this.quickAccessPKBoxes(boxId).create(MAX_BOX_SIZE);
@@ -241,7 +242,7 @@ class Mahber extends Contract {
     this.quickAccessPKBoxes(boxId).replace((this.pkIndex.value % MAX_BOX_PK_NUMBER) * CURVE_POINT_SIZE, pk);
 
     // Add the PK to the hash filter.
-    // this.hashFilter(pk).create(1);
+    this.hashFilter(pk).create(1);
 
     const idx = this.pkIndex.value;
 

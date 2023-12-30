@@ -113,7 +113,7 @@ describe("Mahber - Unit Tests", () => {
     ]);
     try {
       await appClient.compose().publicValidPoint({ point: bPointFalse }).dummyOpUp({ i: 11 }).execute();
-      expect(true).toStrictEqual(false); // dirty trick to get the test to fail if the error is not thrown
+      expect(false).toStrictEqual(true); // dirty trick to get the test to fail if the error is not thrown
     } catch (e) {
       expect(true).toStrictEqual(true); // dirty trick to get the test to pass if the error is thrown
     }

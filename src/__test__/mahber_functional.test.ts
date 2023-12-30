@@ -13,6 +13,10 @@ const fixture = algorandFixture();
 let appClient: MahberClient;
 let permanentTestAccount: algosdk.Account;
 
+const CURVE_POINT_SIZE = 64; // 64 bytes for BN254 curve points (point.X || point.Y)
+const MAX_BOX_SIZE = 32768 - 1024; // 32 KB - 1KB (If we want write budget to be able to create new PK box AND add PK to hashfilter we can't have the PK BOX be 32KB as it would exceed write budget...
+const MAX_BOX_PK_NUMBER = MAX_BOX_SIZE / CURVE_POINT_SIZE;
+
 describe("Mahber - Functionality Tests", () => {
   beforeEach(fixture.beforeEach);
 
@@ -137,7 +141,7 @@ describe("Mahber - Functionality Tests", () => {
       } else {
         throw new Error("No pkIndex");
       }
-      return Math.floor(pkIndex / 512);
+      return Math.floor(pkIndex / MAX_BOX_PK_NUMBER);
     };
 
     await depositFunc(
@@ -163,8 +167,41 @@ describe("Mahber - Functionality Tests", () => {
       { appIndex: 0, name: algosdk.encodeUint64(await getBoxIndex()) },
       { appIndex: 0, name: pk2 }
     );
-    const a = res[0];
-    expect(a[0]).toEqual(1n);
+    expect(res[0][0]).toEqual(1n);
+
+    try {
+      await depositFunc(
+        algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+          from: permanentTestAccount.addr,
+          to: appAddress,
+          amount: 1000 * 1000000,
+          suggestedParams: await algod.getTransactionParams().do(),
+        }),
+        pk2,
+        { appIndex: 0, name: algosdk.encodeUint64(await getBoxIndex()) },
+        { appIndex: 0, name: pk1 }
+      );
+      expect(false).toStrictEqual(true); // Should not be able to deposit with the same pk twice!
+    } catch (e) {
+      expect(true).toStrictEqual(true);
+    }
+
+    try {
+      await depositFunc(
+        algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+          from: permanentTestAccount.addr,
+          to: appAddress,
+          amount: 1000 * 1000000,
+          suggestedParams: await algod.getTransactionParams().do(),
+        }),
+        pk2,
+        { appIndex: 0, name: algosdk.encodeUint64(await getBoxIndex()) },
+        { appIndex: 0, name: pk2 }
+      );
+      expect(false).toStrictEqual(true); // Should not be able to deposit with the same pk twice!
+    } catch (e) {
+      expect(true).toStrictEqual(true);
+    }
   });
 
   test("verify ring of 2", async () => {
