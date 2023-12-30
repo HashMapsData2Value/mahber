@@ -11,63 +11,163 @@ import { MahberClient } from "../contracts/clients/MahberClient";
 const fixture = algorandFixture();
 
 let appClient: MahberClient;
+let permanentTestAccount: algosdk.Account;
 
 describe("Mahber - Functionality Tests", () => {
   beforeEach(fixture.beforeEach);
 
   beforeAll(async () => {
     await fixture.beforeEach();
-    const { algod, testAccount } = fixture.context;
+    const { algod, kmd } = fixture.context;
+
+    permanentTestAccount = await algokit.getDispenserAccount(algod, kmd);
 
     appClient = new MahberClient(
       {
-        sender: testAccount,
+        sender: permanentTestAccount,
         resolveBy: "id",
         id: 0,
       },
       algod
     );
-
     await appClient.create.createApplication({});
   });
 
-  test("deposit", async () => {
-    // Test depositing funds and storing a public key
-    // initializer, nonces, keyImage
+  test("deposit twice", async () => {
+    // Test depositing funds and storing two public keys
 
-    const pk = new Uint8Array([
+    const pk1 = new Uint8Array([
       11, 48, 4, 239, 146, 88, 81, 181, 255, 165, 13, 48, 49, 236, 186, 215, 45, 128, 73, 145, 33, 162, 247, 59, 111,
       204, 3, 250, 109, 60, 186, 154, 17, 236, 107, 153, 192, 187, 48, 92, 143, 116, 33, 82, 156, 186, 75, 116, 152, 83,
       152, 91, 35, 51, 213, 130, 134, 113, 172, 108, 77, 224, 158, 148,
     ]);
 
-    const { algod, testAccount } = fixture.context;
+    const pk2 = new Uint8Array([
+      9, 248, 102, 55, 220, 25, 60, 89, 46, 208, 84, 173, 48, 230, 88, 102, 32, 224, 91, 169, 142, 249, 223, 222, 61,
+      232, 97, 146, 42, 74, 99, 44, 33, 17, 116, 95, 48, 43, 184, 201, 193, 43, 213, 130, 27, 208, 47, 43, 35, 254, 22,
+      155, 150, 40, 132, 181, 229, 12, 225, 61, 204, 38, 70, 69,
+    ]);
+
+    const { algod } = fixture.context;
     const { appAddress } = await appClient.appClient.getAppReference();
 
-    const depositTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-      from: testAccount.addr,
-      to: appAddress,
-      amount: 10000 * 1000000,
-      suggestedParams: await algokit.getTransactionParams(undefined, algod),
-    });
+    const depositFunc = async (
+      depositTxn: algosdk.Transaction,
+      pk: Uint8Array,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      quickAccessPKBoxRef: any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      hashFilterBoxRef: any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ): Promise<any> => {
+      const res = await appClient
+        .compose()
+        .deposit(
+          { depositTxn, pk },
+          {
+            boxes: [
+              quickAccessPKBoxRef,
+              hashFilterBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef, // Hash filter reference
+            ],
+          }
+        )
+        .dummyOpUp(
+          { i: 1 },
+          {
+            boxes: [
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+            ],
+          }
+        )
+        .dummyOpUp(
+          { i: 2 },
+          {
+            boxes: [
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+            ],
+          }
+        )
+        .dummyOpUp(
+          { i: 3 },
+          {
+            boxes: [
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+              quickAccessPKBoxRef,
+            ],
+          }
+        )
+        .dummyOpUp({ i: 4 })
+        .execute();
+      const a = res.returns?.valueOf();
 
-    const res = await appClient
-      .compose()
-      .deposit({ pk, depositTxn })
-      .dummyOpUp({ i: 1 })
-      .dummyOpUp({ i: 2 })
-      .dummyOpUp({ i: 3 })
-      .dummyOpUp({ i: 4 })
-      .execute();
-    const a = res.returns?.valueOf() as Array<bigint | Array<number>>;
+      return a;
+    };
 
-    console.log(a);
-    console.log(a[0]);
-    // Ring Sig verified if we were able to reconstruct the initializer using the nonces, ring and keyImage
-    // expect(a[0][0]).toBeGreaterThan(0);
+    const getBoxIndex = async () => {
+      const gs = await appClient.getGlobalState();
+      let pkIndex;
+      if (gs.pkIndex?.asNumber() !== undefined) {
+        pkIndex = gs.pkIndex.asNumber();
+      } else {
+        throw new Error("No pkIndex");
+      }
+      return Math.floor(pkIndex / 512);
+    };
+
+    await depositFunc(
+      algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+        from: permanentTestAccount.addr,
+        to: appAddress,
+        amount: 1000 * 1000000,
+        suggestedParams: await algod.getTransactionParams().do(),
+      }),
+      pk1,
+      { appIndex: 0, name: algosdk.encodeUint64(await getBoxIndex()) },
+      { appIndex: 0, name: pk1 }
+    );
+
+    const res = await depositFunc(
+      algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+        from: permanentTestAccount.addr,
+        to: appAddress,
+        amount: 1000 * 1000000,
+        suggestedParams: await algod.getTransactionParams().do(),
+      }),
+      pk2,
+      { appIndex: 0, name: algosdk.encodeUint64(await getBoxIndex()) },
+      { appIndex: 0, name: pk2 }
+    );
+    const a = res[0];
+    expect(a[0]).toEqual(1n);
   });
 
-  test.skip("verify ring of 2", async () => {
+  test("verify ring of 2", async () => {
     // ringSig ---- {c0, r0, ..., rn, I}
     // initializer, nonces, keyImage
 

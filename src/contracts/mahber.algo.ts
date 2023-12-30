@@ -25,7 +25,7 @@ class Mahber extends Contract {
 
   createApplication(): void {
     // Initialize global state
-    this.algoDenomination.value = 10000 * 1000000; // Algo
+    this.algoDenomination.value = 1000 * 1000000; // Algo
     this.pkIndex.value = 0;
   }
 
@@ -221,9 +221,18 @@ class Mahber extends Contract {
     });
 
     // Calculate the box id to slot the PK into based off of the number of PKs already in the contract.
-    const boxId = this.pkIndex.value / MAX_BOX_PK_NUMBER;
+    const boxId = this.pkIndex.value / MAX_BOX_PK_NUMBER; // Integer division, e.g. 2000/512 ->x 3
 
     // Check if the quick access box exists, otherwise create it.
+
+    // Once we've gotten box_resize integrated which will allow us to resize boxes, we can use this instead:
+    // if (!this.quickAccessPKBoxes(boxId).exists) {
+    //   this.quickAccessPKBoxes(boxId).create(CURVE_POINT_SIZE);
+    // } else {
+    //   const boxlength = this.quickAccessPKBoxes(boxId).length();
+    //   this.quickAccessPKBoxes(boxId).resize(boxlength + CURVE_POINT_SIZE);
+    // }
+
     if (!this.quickAccessPKBoxes(boxId).exists) {
       this.quickAccessPKBoxes(boxId).create(MAX_BOX_SIZE);
     }
@@ -232,7 +241,7 @@ class Mahber extends Contract {
     this.quickAccessPKBoxes(boxId).replace((this.pkIndex.value % MAX_BOX_PK_NUMBER) * CURVE_POINT_SIZE, pk);
 
     // Add the PK to the hash filter.
-    this.hashFilter(pk).create(1);
+    // this.hashFilter(pk).create(1);
 
     const idx = this.pkIndex.value;
 

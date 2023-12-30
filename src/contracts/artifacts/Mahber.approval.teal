@@ -33,9 +33,9 @@ createApplication:
 	proto 0 0
 
 	// contracts/mahber.algo.ts:28
-	// this.algoDenomination.value = 10000 * 1000000
+	// this.algoDenomination.value = 1000 * 1000000
 	byte 0x616c676f44656e6f6d696e6174696f6e // "algoDenomination"
-	int 10000000000
+	int 1000000000
 	app_global_put
 
 	// contracts/mahber.algo.ts:29
@@ -539,7 +539,7 @@ deposit:
 	frame_bury -3 // boxId: uint64
 
 	// if0_condition
-	// contracts/mahber.algo.ts:227
+	// contracts/mahber.algo.ts:236
 	// !this.quickAccessPKBoxes(boxId).exists
 	frame_dig -3 // boxId: uint64
 	itob
@@ -550,7 +550,7 @@ deposit:
 	bz if0_end
 
 	// if0_consequent
-	// contracts/mahber.algo.ts:228
+	// contracts/mahber.algo.ts:237
 	// this.quickAccessPKBoxes(boxId).create(MAX_BOX_SIZE)
 	frame_dig -3 // boxId: uint64
 	itob
@@ -558,7 +558,7 @@ deposit:
 	box_create
 
 if0_end:
-	// contracts/mahber.algo.ts:232
+	// contracts/mahber.algo.ts:241
 	// this.quickAccessPKBoxes(boxId).replace((this.pkIndex.value % MAX_BOX_PK_NUMBER) * CURVE_POINT_SIZE, pk)
 	frame_dig -3 // boxId: uint64
 	itob
@@ -571,19 +571,13 @@ if0_end:
 	frame_dig -2 // pk: bytes
 	box_replace
 
-	// contracts/mahber.algo.ts:235
-	// this.hashFilter(pk).create(1)
-	frame_dig -2 // pk: bytes
-	int 1
-	box_create
-
-	// contracts/mahber.algo.ts:237
+	// contracts/mahber.algo.ts:246
 	// idx = this.pkIndex.value
 	byte 0x706b496e646578 // "pkIndex"
 	app_global_get
 	frame_bury -4 // idx: uint64
 
-	// contracts/mahber.algo.ts:240
+	// contracts/mahber.algo.ts:249
 	// this.pkIndex.value = this.pkIndex.value + 1
 	byte 0x706b496e646578 // "pkIndex"
 	byte 0x706b496e646578 // "pkIndex"
@@ -592,7 +586,7 @@ if0_end:
 	+
 	app_global_put
 
-	// contracts/mahber.algo.ts:242
+	// contracts/mahber.algo.ts:251
 	// return [idx, boxId];
 	frame_dig -4 // idx: uint64
 	itob
