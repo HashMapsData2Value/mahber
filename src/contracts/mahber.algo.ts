@@ -251,6 +251,7 @@ class Mahber extends Contract {
 
     return [idx, boxId];
   }
+
   // TODO: "arming" function that will take in pre-computed challenges and store them in box.
 
   // TODO: "triggering" function that is triggered individually per link in the ring signature, and will verify that the challenge is correct based off of the pre-computed challenges in the box. By allowing for verification in parallell, we can reduce the amount of time it takes to verify a ring signature.
@@ -258,6 +259,10 @@ class Mahber extends Contract {
   // TODO: Loading function that will load cPrev and produced intermediary challenge values into a Box, allowing for verification in parallell
 
   // TODO: verify function that will loop through all the intermediary challenge values and confirm that the relayer posted correct cPrevs based off of the calculations made...
+  // - Should only be possible if the key image has NOT been added yet
+  // - Do we need to consider the case where relayers submit the withdrawal in the same block?
+  //   Or should all transactions in a block be considered sequentially, such that despite being
+  //   in the same block one tx will win over the other, preventing the other from withdrawing?
 
   // So long as the last value corresponds to the initailizer value (which we imply accepted from the verifier), it means that the ring has looped around
 }
