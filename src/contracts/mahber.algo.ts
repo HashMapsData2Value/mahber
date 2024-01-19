@@ -1,15 +1,20 @@
 import { Contract } from "@algorandfoundation/tealscript";
 
+const MAX_BOX_BYTES = 32768; // 32 KB
 const CURVE_POINT_SIZE = 64; // 64 bytes for BN254 curve points (point.X || point.Y)
-const MAX_BOX_SIZE = 32768 - 1024; // 32 KB - 1KB (If we want write budget to be able to create new PK box AND add PK to hashfilter we can't have the PK BOX be 32KB as it would exceed write budget...
-const MAX_BOX_PK_NUMBER = MAX_BOX_SIZE / CURVE_POINT_SIZE;
+const MAX_PK_BOX_SIZE = MAX_BOX_BYTES - 1024; // 32 KB - 1KB (If we want write budget to be able to create new PK box AND add PK to hashfilter we can't have the PK BOX be 32KB as it would exceed write budget...
+const MAX_PK_BOX_PK_NUMBER = MAX_PK_BOX_SIZE / CURVE_POINT_SIZE;
+
+const CHALLENGE_SIZE = 32; // 32 bytes since we use SHA256 when calculating challenge
 
 // eslint-disable-next-line no-unused-vars
 class Mahber extends Contract {
   // GLOBAL STATE
 
   // For fungibility all deposits need to be the same amount of Algo chunk sum/"denomination".
-  algoDenomination = GlobalStateKey<uint64>(); // Includes MBBR.
+  denomination = GlobalStateKey<uint64>(); // Includes MBBR.
+
+  asaId = GlobalStateKey<uint64>(); // Includes MBBR.
 
   pkIndex = GlobalStateKey<uint64>(); // How many public keys (PKs) are in the contract
 
@@ -23,9 +28,22 @@ class Mahber extends Contract {
   // Because we have 1 KI per withdrawal and 1 PK per KI, we can only withdraw 1 once per PK.
   hashFilter = BoxMap<bytes, bytes>(); // HashFilter with box titles = Hash(public key) or Hash/(key image)
 
+  /// WITHDRAWAL BOXES
+
+  // Session BOXES
+  // Each withdrawal attempt has a session box, which contains certain information.
+  sessionsBoxes = BoxMap<bytes, bytes>();
+
+  // Precomputed Challenges Boxes
+  precomputedChallengesBoxes = BoxMap<bytes, bytes>();
+
+  // Intermediate Challenges Boxes
+  intermediateChallengesBoxes = BoxMap<bytes, bytes>();
+
   createApplication(): void {
     // Initialize global state
-    this.algoDenomination.value = 1000 * 1000000; // Algo
+    this.denomination.value = 1000 * 1000000;
+    this.asaId = 0; // Algo, the "default" ASA
     this.pkIndex.value = 0;
   }
 
@@ -217,11 +235,11 @@ class Mahber extends Contract {
     verifyTxn(depositTxn, {
       // Ensure the depositor is funding the right amount
       receiver: this.app.address,
-      amount: this.algoDenomination.value,
+      amount: this.denomination.value,
     });
 
     // Calculate the box id to slot the PK into based off of the number of PKs already in the contract.
-    const boxId = this.pkIndex.value / MAX_BOX_PK_NUMBER; // Integer division, e.g. 2000/512 ->x 3
+    const boxId = this.pkIndex.value / MAX_PK_BOX_PK_NUMBER; // Integer division, e.g. 2000/512 ->x 3
 
     // Check if the quick access box exists, otherwise create it.
 
@@ -232,17 +250,17 @@ class Mahber extends Contract {
     //   const boxlength = this.quickAccessPKBoxes(boxId).length();
     //   this.quickAccessPKBoxes(boxId).resize(boxlength + CURVE_POINT_SIZE);
     // }
-    // It would also allow us to set MAX_BOX_SIZE to 32KB instead of 31KB, which would allow us to store 512 PKs per box instead of 496.
+    // It would also allow us to set MAX_PK_BOX_SIZE to 32KB instead of 31KB, which would allow us to store 512 PKs per box instead of 496.
 
     if (!this.quickAccessPKBoxes(boxId).exists) {
-      this.quickAccessPKBoxes(boxId).create(MAX_BOX_SIZE);
+      this.quickAccessPKBoxes(boxId).create(MAX_PK_BOX_SIZE);
     }
 
     // Add the PK at the right offset.
-    this.quickAccessPKBoxes(boxId).replace((this.pkIndex.value % MAX_BOX_PK_NUMBER) * CURVE_POINT_SIZE, pk);
+    this.quickAccessPKBoxes(boxId).replace((this.pkIndex.value % MAX_PK_BOX_PK_NUMBER) * CURVE_POINT_SIZE, pk);
 
-    // Add the PK to the hash filter.
-    this.hashFilter(pk).create(1);
+    // Add the PK to the hash filter - a box whose title is the PK
+    this.hashFilter(pk).create(0);
 
     const idx = this.pkIndex.value;
 
@@ -252,15 +270,171 @@ class Mahber extends Contract {
     return [idx, boxId];
   }
 
-  // TODO: "arming" function that will take in pre-computed challenges and store them in box.
+  /** initWithdrawal
+   * Creates a box representing a "withdrawal session".
+   * Of key importance is the signed message string, which must contain the following:
+   * Ring Size - Chosen number of PKs, i.e. size of anonymity set
+   * Key Image - The keyimage, the one thing that is unique for a withdrawal
+   * App Id - The id of the smart contract app
+   * Nominal amount - The denomination of the contract, what was deposited originally
+   * ASA ID - Clarifies the ASA ID. (Plain Algo has ID 0, "the default" asset of Algorand)
+   * Withdrawal Address - Address of the final recipient of the funds
+   * Relayer Address - Address of the relayer, facilitating the withdrawal (could be same as withdrawal address)
+   * Relayer Fee - The fee the relayer charges for facilitating the withdrawal (could be 0)
+   * The hash of the message becomes the id of the withdrawal session's box.
+   * @param mbbrDepositTxn - The transaction that deposited the MBBR
+   * @param msg - Signed message
+   * @param initialChallenge - The initial challenge, which needs to be re-created to verify the ring signature
+   * @returns - the id of the withdrawal session box
+   */
+  initWithdrawalSession(mbbrDepositTxn: PayTxn, msg: bytes, initialChallenge: bytes): bytes {
+    // TODO: verify relayer address is session creator, to prevent relayers screwing each other over
+    // TODO: verify mbbr is enough to cover the box creation fee
+    // TODO: verify message characer length is correct
+    const id = sha256(msg);
+    this.sessionsBoxes(id).create(len(msg) + 2 * len(initialChallenge)); // Size neeeds cover message size, initial challenge size and the last calculated challenge from the last verified box of loaded values
+    // initialChallenge size and the last calculated challenge from the last verified box of loaded values?
 
-  // TODO: "triggering" function that is triggered individually per link in the ring signature, and will verify that the challenge is correct based off of the pre-computed challenges in the box. By allowing for verification in parallell, we can reduce the amount of time it takes to verify a ring signature.
+    // TODO: add a locking/unlock state? Once locked the session can't be modified anymore, and the relayer can either withdraw or destroy the session.
+    // TODO: add space for keeping track of box verifications... increment box verified number from 0, to 1, to 2, etc until final box, as determined by the ring size
+    // TODO: Keep track of the last challenge as well, which at some point will equal the initial challenge.
+    return id;
+  }
 
-  // TODO: Loading function that will load cPrev and produced intermediary challenge values into a Box, allowing for verification in parallell
+  /** TODO: destroyWithdrawalSession, IF SESSION LOCKED */
+
+  /** createUploadPrecomputedChallengesBox
+   * Creates a box that will be used to upload precomputed challenges into.
+   * @param msg - Msg, functioning as the id for the withdrawal session
+   * @param boxIndex - The index of the precomputed challenge box, incrementing with each chunk of date.
+   * @param boxSize - The size of the precomputed challenge box
+   * @returns - the id of the precomputed challenge box
+   */
+  createUploadPrecomputedChallengesBox(mbbrDepositTxn: PayTxn, msg: bytes, boxIndex: uint64, boxSize: uint64): bytes {
+    // TODO: verify relayer address is session creator, to prevent relayers screwing with each other
+    // TODO: verify relayer has enough MBBR to cover the box creation fee
+    // TODO: CHECK IF SESSION IS LOCKED, IN WHICH CASE NO CHANGE CAN BE MADE FOR THIS ID!
+    const boxId = sha256(concat(concat(sha256(msg), "precomputedChallenges"), itob(boxIndex)));
+    this.precomputedChallengesBoxes(boxId).create(boxSize);
+    return boxId;
+  }
+
+  /** uploadPrecomputedChallenges
+   * Creates a box and uploads the precomputed challenges into it.
+   * @param msg - Msg, functioning as the id for the withdrawal session
+   * @param index - The index of the precomputed challenge box, incrementing with each chunk of date.
+   * @param precomputedChallenges - The precomputed challenges
+   * @returns - the id of the precomputed challenge box
+   */
+  uploadPrecomputedChallenges(msg: bytes, boxIndex: uint64, precomputedChallenges: bytes): bytes {
+    // TODO: verify relayer address is session creator, to prevent others overwriting the precomputed challenges
+    // TODO: CHECK IF SESSION IS LOCKED, IN WHICH CASE NO CHANGE CAN BE MADE FOR THIS ID!
+    const boxId = sha256(concat(concat(sha256(msg), "precomputedChallenges"), itob(boxIndex)));
+    this.precomputedChallengesBoxes(boxId).replace(0, precomputedChallenges);
+    return boxId;
+  }
+
+  /** createIntermediateChallengesBox
+   * Creates a box that will be used to contain intermediateChallengesBox.
+   * Should eventually be a mirror image of the corresponding uploadPrecomputedChallengesBox.
+   * @param msg - Msg, functioning as the id for the withdrawal session
+   * @param boxIndex - The index of the precomputed challenge box, incrementing with each chunk of date.
+   * @param boxSize - The size of the precomputed challenge box
+   * @returns - the id of the precomputed challenge box
+   */
+  createIntermediateChallengesBox(mbbrDepositTxn: PayTxn, msg: bytes, boxIndex: uint64, boxSize: uint64): bytes {
+    // TODO: verify relayer address is session creator, to prevent relayers screwing with each other
+    // TODO: verify relayer has enough MBBR to cover the box creation fee
+    // TODO: CHECK IF SESSION IS LOCKED, IN WHICH CASE NO CHANGE CAN BE MADE FOR THIS ID!
+    const boxId = sha256(concat(concat(sha256(msg), "intermediateChallenges"), itob(boxIndex)));
+    this.precomputedChallengesBoxes(boxId).create(boxSize);
+    return boxId;
+  }
+
+  // TODO: COMBINE challenge boxes into one function, to save on code space
+
+  /** computeIndividualChallenge
+   * Computes an individual challenge.
+   * Note that the previous challenge is loaded specifically from the precomputed challenges box.
+   * While the calculated challenge is loaded into the intermediate challenges box.
+   * At the end we will compare if the two boxes are the same, and of course that the last challenge is the same as the initial challenge.
+   * By loading specifically from the precomputed challenges box we can verify in parallell.
+   * The odds of being able to arrive at the same initial challenge in the last challenge is astronomically low UNLESS it is a valid ring signature.
+   * Public keys are of course loaded from the contract storage.
+   * @param msg - The message to be signed
+   * @param nonce - The nonce, part of the ring signature itself, aka one of the fake secret keys
+   * @param pkIndex- The index number of the public key in the smart contract storage
+   * @param keyImage - The key image of the signer, required for linkabiltiy to prevent double spending
+   * @param cPrevIndex - The index of the previous challenge, allowing it to be loaded from the loaded precomputed challenges box
+   * @returns - ...
+   */
+  computeIndividualChallenge(
+    msg: bytes,
+    nonce: bytes,
+    pkIndex: uint64,
+    keyImage: bytes,
+    cPrevBoxIndex: uint64,
+    cPrevOffset: uint64
+  ): [bytes, uint64] {
+    // TODO: extract PK from storage using index
+    // TODO: extract cPrev from precomputed storage using index
+
+    const pkBoxId = pkIndex / MAX_PK_BOX_PK_NUMBER; // Box of the PK in question
+    const pkOffset = (pkIndex % MAX_PK_BOX_PK_NUMBER) * CURVE_POINT_SIZE; // Offset of the PK in question inside the box
+    const pk = this.quickAccessPKBoxes(pkBoxId).extract(pkOffset, pkOffset + CURVE_POINT_SIZE); // PK in question
+
+    const cPrevBoxId = sha256(concat(concat(sha256(msg), "precomputedChallenges"), itob(cPrevBoxIndex)));
+    const cPrev = this.precomputedChallengesBoxes(cPrevBoxId).extract(cPrevOffset, cPrevOffset + CHALLENGE_SIZE); // cPrev in question
+
+    const computedChallenge = this.challenge(msg, nonce, cPrev, pk, keyImage);
+
+    let intermediateChallengesBoxIndex = cPrevBoxIndex;
+    let intermediateChallengesBoxOffset = cPrevOffset + CHALLENGE_SIZE;
+    if (intermediateChallengesBoxOffset === MAX_BOX_BYTES) {
+      // If we are at the end of the precomputed challenges box, we need to upload to the next box at the 0th offset
+      intermediateChallengesBoxIndex = intermediateChallengesBoxIndex + 1;
+      intermediateChallengesBoxOffset = 0;
+    }
+
+    // TODO: Consider adding a check here already comparing the smart contract computed challenge with the pre-computed (cPrev + 1) compute challenge?
+    // Would provide an additional check but require loading another box...
+
+    // TODO: check if session is locked, in which case no change can be made!
+
+    const intermediateChallengesBoxId = sha256(
+      concat(concat(sha256(msg), "precomputedChallenges"), itob(intermediateChallengesBoxIndex))
+    );
+    this.intermediateChallengesBoxes(intermediateChallengesBoxId).replace(
+      intermediateChallengesBoxOffset,
+      computedChallenge
+    );
+    return [intermediateChallengesBoxId, intermediateChallengesBoxOffset];
+  }
+
+  // TODO:
+  /** lockSessions
+   * Locks session to either delete all boxes or allow withdrawal. After a lock has been made no changes can be made.
+   */
+
+  /** verifyChallengesEqual
+   * Verifies that precomputated and intermediated challenges are equal.
+   * If they are equal, the last challenge is stored in the withdrawalSession.
+   * As the last boxIndex is checked, if the ring sig is valid, the last challenge will be equal to the initial challenge.
+   * Since
+   * @param msg - the msg, which acts as id for the withdrawal session
+   */
+  verifyChallengesEqualIncrement(msg: bytes, boxIndex: uint64, half: uint64): bytes {
+    // check if "lock" has been set! If not nothing can be done
+  }
+
+  // TODO:
+  /** finalPayOutCheck
+   * Checks if the lock has been set, if the correct number of boxes of computations have been verified, etc
+   */
 
   // TODO: verify function that will loop through all the intermediary challenge values and confirm that the relayer posted correct cPrevs based off of the calculations made...
   // - Should only be possible if the key image has NOT been added yet
-  // - Do we need to consider the case where relayers submit the withdrawal in the same block?
+  // - Do we need to consider the case where relayers submit the withdrawal in the same block?†
   //   Or should all transactions in a block be considered sequentially, such that despite being
   //   in the same block one tx will win over the other, preventing the other from withdrawing?
 
