@@ -85,7 +85,7 @@ export class MahberChallengeLsig extends LogicSig {
         3: rawBytes(cPrev),
         4: rawBytes(pk),
         5: rawBytes(keyImage),
-        6: rawBytes(h),
+        // 6: rawBytes(h),
       },
     });
   }
