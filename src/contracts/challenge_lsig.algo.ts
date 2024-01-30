@@ -1,12 +1,5 @@
 import { LogicSig } from "@algorandfoundation/tealscript";
 
-const MAX_BOX_BYTES = 32768; // 32 KB
-const CURVE_POINT_SIZE = 64; // 64 bytes for BN254 curve points (point.X || point.Y)
-const MAX_PK_BOX_SIZE = MAX_BOX_BYTES - 1024; // 32 KB - 1KB (If we want write budget to be able to create new PK box AND add PK to hashfilter we can't have the PK BOX be 32KB as it would exceed write budget...
-const MAX_PK_BOX_PK_NUMBER = MAX_PK_BOX_SIZE / CURVE_POINT_SIZE;
-
-const CHALLENGE_SIZE = 32; // 32 bytes since we use SHA256 when calculating challenge
-
 export class MahberChallengeLsig extends LogicSig {
   /** hashPointToPoint
    * Hashes a point to a point on the curve
