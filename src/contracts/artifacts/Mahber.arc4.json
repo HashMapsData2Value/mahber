@@ -161,7 +161,7 @@
         {
           "name": "pk",
           "type": "byte[]",
-          "desc": "The specific public key in the ring (indexed from the array of public keys)"
+          "desc": "The specific public key in the ƒring (indexed from the array of public keys)"
         },
         {
           "name": "keyImage",
@@ -171,10 +171,14 @@
         {
           "name": "lsigTxn",
           "type": "pay"
+        },
+        {
+          "name": "output",
+          "type": "byte[]"
         }
       ],
       "returns": {
-        "type": "byte[]",
+        "type": "void",
         "desc": "- the content of the privateChallenge call"
       }
     },
