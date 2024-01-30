@@ -238,7 +238,7 @@ describe("Mahber - Unit Tests", () => {
         cPrev,
         pk,
         keyImage,
-        // output,
+        output,
         lsigTxn: {
           transaction: lsigPayTxn,
           signer: lsig,

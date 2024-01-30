@@ -171,6 +171,10 @@
         {
           "name": "lsigTxn",
           "type": "pay"
+        },
+        {
+          "name": "output",
+          "type": "byte[]"
         }
       ],
       "returns": {

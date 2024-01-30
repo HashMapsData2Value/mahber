@@ -225,7 +225,15 @@ class Mahber extends Contract {
    * @param keyImage - The key image of the signer, required for linkabiltiy to prevent double spending
    * @returns - the content of the privateChallenge call
    */
-  publicChallengeLsig(msg: bytes, nonce: bytes, cPrev: bytes, pk: bytes, keyImage: bytes, lsigTxn: PayTxn): void {
+  publicChallengeLsig(
+    msg: bytes,
+    nonce: bytes,
+    cPrev: bytes,
+    pk: bytes,
+    keyImage: bytes,
+    lsigTxn: PayTxn,
+    output: bytes
+  ): void {
     verifyTxn(lsigTxn, { sender: Address.fromBytes(MahberChallengeLsig.address()) });
   }
 

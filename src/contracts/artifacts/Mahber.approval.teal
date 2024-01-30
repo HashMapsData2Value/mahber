@@ -557,8 +557,12 @@ publicChallenge:
 	callsub challenge
 	retsub
 
-// publicChallengeLsig(byte[],byte[],byte[],byte[],byte[],pay)void
+// publicChallengeLsig(byte[],byte[],byte[],byte[],byte[],pay,byte[])void
 abi_route_publicChallengeLsig:
+	// output: byte[]
+	txna ApplicationArgs 6
+	extract 2 0
+
 	// lsigTxn: pay
 	txn GroupIndex
 	int 1
@@ -589,12 +593,12 @@ abi_route_publicChallengeLsig:
 	txna ApplicationArgs 1
 	extract 2 0
 
-	// execute publicChallengeLsig(byte[],byte[],byte[],byte[],byte[],pay)void
+	// execute publicChallengeLsig(byte[],byte[],byte[],byte[],byte[],pay,byte[])void
 	callsub publicChallengeLsig
 	int 1
 	return
 
-// publicChallengeLsig(msg: bytes, nonce: bytes, cPrev: bytes, pk: bytes, keyImage: bytes, lsigTxn: PayTxn): void
+// publicChallengeLsig(msg: bytes, nonce: bytes, cPrev: bytes, pk: bytes, keyImage: bytes, lsigTxn: PayTxn, output: bytes): void
 //
 // publicChallenge
 // Public wrapper around the challenge method, allowing it to be tested directly.
@@ -605,14 +609,14 @@ abi_route_publicChallengeLsig:
 // @param keyImage - The key image of the signer, required for linkabiltiy to prevent double spending
 // @returns - the content of the privateChallenge call
 publicChallengeLsig:
-	proto 6 0
+	proto 7 0
 
-	// contracts/mahber.algo.ts:229
+	// contracts/mahber.algo.ts:237
 	// verifyTxn(lsigTxn, { sender: Address.fromBytes(MahberChallengeLsig.address()) })
 	// verify sender
 	frame_dig -6 // lsigTxn: PayTxn
 	gtxns Sender
-	addr GZYOCK77JHJ7A5NMRAFJZFDLASC347BDLQ3USDWLRAYG6REOIXT7AM7UTM
+	addr RXYWVNCICXJ776PFHRBH5LACRLP4NCQVBK55AITZKTOI5LJUGTQ6YUJR3U
 	==
 	assert
 	retsub
@@ -665,13 +669,13 @@ deposit:
 	byte 0x
 	dup
 
-	// contracts/mahber.algo.ts:240
+	// contracts/mahber.algo.ts:248
 	// assert(this.validPoint(pk))
 	frame_dig -2 // pk: bytes
 	callsub validPoint
 	assert
 
-	// contracts/mahber.algo.ts:241
+	// contracts/mahber.algo.ts:249
 	// assert(!this.hashFilter(pk).exists)
 	frame_dig -2 // pk: bytes
 	box_len
@@ -680,7 +684,7 @@ deposit:
 	!
 	assert
 
-	// contracts/mahber.algo.ts:243
+	// contracts/mahber.algo.ts:251
 	// verifyTxn(depositTxn, {
 	//       // Ensure the depositor is funding the right amount
 	//       receiver: this.app.address,
@@ -701,7 +705,7 @@ deposit:
 	==
 	assert
 
-	// contracts/mahber.algo.ts:250
+	// contracts/mahber.algo.ts:258
 	// boxId = this.pkIndex.value / MAX_PK_BOX_PK_NUMBER
 	byte 0x706b496e646578 // "pkIndex"
 	app_global_get
@@ -710,7 +714,7 @@ deposit:
 	frame_bury 0 // boxId: uint64
 
 	// if0_condition
-	// contracts/mahber.algo.ts:263
+	// contracts/mahber.algo.ts:271
 	// !this.quickAccessPKBoxes(boxId).exists
 	frame_dig 0 // boxId: uint64
 	itob
@@ -721,7 +725,7 @@ deposit:
 	bz if0_end
 
 	// if0_consequent
-	// contracts/mahber.algo.ts:264
+	// contracts/mahber.algo.ts:272
 	// this.quickAccessPKBoxes(boxId).create(MAX_PK_BOX_SIZE)
 	frame_dig 0 // boxId: uint64
 	itob
@@ -730,7 +734,7 @@ deposit:
 	pop
 
 if0_end:
-	// contracts/mahber.algo.ts:268
+	// contracts/mahber.algo.ts:276
 	// this.quickAccessPKBoxes(boxId).replace((this.pkIndex.value % MAX_PK_BOX_PK_NUMBER) * CURVE_POINT_SIZE, pk)
 	frame_dig 0 // boxId: uint64
 	itob
@@ -743,20 +747,20 @@ if0_end:
 	frame_dig -2 // pk: bytes
 	box_replace
 
-	// contracts/mahber.algo.ts:271
+	// contracts/mahber.algo.ts:279
 	// this.hashFilter(pk).create(0)
 	frame_dig -2 // pk: bytes
 	int 0
 	box_create
 	pop
 
-	// contracts/mahber.algo.ts:273
+	// contracts/mahber.algo.ts:281
 	// idx = this.pkIndex.value
 	byte 0x706b496e646578 // "pkIndex"
 	app_global_get
 	frame_bury 1 // idx: uint64
 
-	// contracts/mahber.algo.ts:276
+	// contracts/mahber.algo.ts:284
 	// this.pkIndex.value = this.pkIndex.value + 1
 	byte 0x706b496e646578 // "pkIndex"
 	dup
@@ -765,7 +769,7 @@ if0_end:
 	+
 	app_global_put
 
-	// contracts/mahber.algo.ts:278
+	// contracts/mahber.algo.ts:286
 	// return [idx, boxId];
 	frame_dig 1 // idx: uint64
 	itob
@@ -834,13 +838,13 @@ initWithdrawalSession:
 	// Push empty bytes after the frame pointer to reserve space for local variables
 	byte 0x
 
-	// contracts/mahber.algo.ts:302
+	// contracts/mahber.algo.ts:310
 	// id = sha256(msg)
 	frame_dig -2 // msg: bytes
 	sha256
 	frame_bury 0 // id: byte[32]
 
-	// contracts/mahber.algo.ts:303
+	// contracts/mahber.algo.ts:311
 	// this.sessionsBoxes(id).create(len(msg) + 2 * len(initialChallenge))
 	frame_dig 0 // id: byte[32]
 	frame_dig -2 // msg: bytes
@@ -853,7 +857,7 @@ initWithdrawalSession:
 	box_create
 	pop
 
-	// contracts/mahber.algo.ts:309
+	// contracts/mahber.algo.ts:317
 	// return id;
 	frame_dig 0 // id: byte[32]
 
@@ -910,7 +914,7 @@ createUploadPrecomputedChallengesBox:
 	// Push empty bytes after the frame pointer to reserve space for local variables
 	byte 0x
 
-	// contracts/mahber.algo.ts:325
+	// contracts/mahber.algo.ts:333
 	// boxId = sha256(concat(concat(sha256(msg), "precomputedChallenges"), itob(boxIndex)))
 	frame_dig -2 // msg: bytes
 	sha256
@@ -922,14 +926,14 @@ createUploadPrecomputedChallengesBox:
 	sha256
 	frame_bury 0 // boxId: byte[32]
 
-	// contracts/mahber.algo.ts:326
+	// contracts/mahber.algo.ts:334
 	// this.precomputedChallengesBoxes(boxId).create(boxSize)
 	frame_dig 0 // boxId: byte[32]
 	frame_dig -4 // boxSize: uint64
 	box_create
 	pop
 
-	// contracts/mahber.algo.ts:327
+	// contracts/mahber.algo.ts:335
 	// return boxId;
 	frame_dig 0 // boxId: byte[32]
 
@@ -975,7 +979,7 @@ uploadPrecomputedChallenges:
 	// Push empty bytes after the frame pointer to reserve space for local variables
 	byte 0x
 
-	// contracts/mahber.algo.ts:340
+	// contracts/mahber.algo.ts:348
 	// boxId = sha256(concat(concat(sha256(msg), "precomputedChallenges"), itob(boxIndex)))
 	frame_dig -1 // msg: bytes
 	sha256
@@ -987,14 +991,14 @@ uploadPrecomputedChallenges:
 	sha256
 	frame_bury 0 // boxId: byte[32]
 
-	// contracts/mahber.algo.ts:341
+	// contracts/mahber.algo.ts:349
 	// this.precomputedChallengesBoxes(boxId).replace(0, precomputedChallenges)
 	frame_dig 0 // boxId: byte[32]
 	int 0
 	frame_dig -3 // precomputedChallenges: bytes
 	box_replace
 
-	// contracts/mahber.algo.ts:342
+	// contracts/mahber.algo.ts:350
 	// return boxId;
 	frame_dig 0 // boxId: byte[32]
 
@@ -1051,7 +1055,7 @@ createIntermediateChallengesBox:
 	// Push empty bytes after the frame pointer to reserve space for local variables
 	byte 0x
 
-	// contracts/mahber.algo.ts:357
+	// contracts/mahber.algo.ts:365
 	// boxId = sha256(concat(concat(sha256(msg), "intermediateChallenges"), itob(boxIndex)))
 	frame_dig -2 // msg: bytes
 	sha256
@@ -1063,14 +1067,14 @@ createIntermediateChallengesBox:
 	sha256
 	frame_bury 0 // boxId: byte[32]
 
-	// contracts/mahber.algo.ts:358
+	// contracts/mahber.algo.ts:366
 	// this.precomputedChallengesBoxes(boxId).create(boxSize)
 	frame_dig 0 // boxId: byte[32]
 	frame_dig -4 // boxSize: uint64
 	box_create
 	pop
 
-	// contracts/mahber.algo.ts:359
+	// contracts/mahber.algo.ts:367
 	// return boxId;
 	frame_dig 0 // boxId: byte[32]
 
@@ -1137,14 +1141,14 @@ computeIndividualChallenge:
 	byte 0x
 	dupn 8
 
-	// contracts/mahber.algo.ts:390
+	// contracts/mahber.algo.ts:398
 	// pkBoxId = pkIndex / MAX_PK_BOX_PK_NUMBER
 	frame_dig -3 // pkIndex: uint64
 	int 496
 	/
 	frame_bury 0 // pkBoxId: uint64
 
-	// contracts/mahber.algo.ts:391
+	// contracts/mahber.algo.ts:399
 	// pkOffset = (pkIndex % MAX_PK_BOX_PK_NUMBER) * CURVE_POINT_SIZE
 	frame_dig -3 // pkIndex: uint64
 	int 496
@@ -1153,7 +1157,7 @@ computeIndividualChallenge:
 	*
 	frame_bury 1 // pkOffset: uint64
 
-	// contracts/mahber.algo.ts:392
+	// contracts/mahber.algo.ts:400
 	// pk = this.quickAccessPKBoxes(pkBoxId).extract(pkOffset, pkOffset + CURVE_POINT_SIZE)
 	frame_dig 0 // pkBoxId: uint64
 	itob
@@ -1164,7 +1168,7 @@ computeIndividualChallenge:
 	box_extract
 	frame_bury 2 // pk: byte[]
 
-	// contracts/mahber.algo.ts:394
+	// contracts/mahber.algo.ts:402
 	// cPrevBoxId = sha256(concat(concat(sha256(msg), "precomputedChallenges"), itob(cPrevBoxIndex)))
 	frame_dig -1 // msg: bytes
 	sha256
@@ -1176,7 +1180,7 @@ computeIndividualChallenge:
 	sha256
 	frame_bury 3 // cPrevBoxId: byte[32]
 
-	// contracts/mahber.algo.ts:395
+	// contracts/mahber.algo.ts:403
 	// cPrev = this.precomputedChallengesBoxes(cPrevBoxId).extract(cPrevOffset, cPrevOffset + CHALLENGE_SIZE)
 	frame_dig 3 // cPrevBoxId: byte[32]
 	frame_dig -6 // cPrevOffset: uint64
@@ -1186,7 +1190,7 @@ computeIndividualChallenge:
 	box_extract
 	frame_bury 4 // cPrev: byte[]
 
-	// contracts/mahber.algo.ts:397
+	// contracts/mahber.algo.ts:405
 	// computedChallenge = this.challenge(msg, nonce, cPrev, pk, keyImage)
 	frame_dig -4 // keyImage: bytes
 	frame_dig 2 // pk: byte[]
@@ -1196,12 +1200,12 @@ computeIndividualChallenge:
 	callsub challenge
 	frame_bury 5 // computedChallenge: byte[]
 
-	// contracts/mahber.algo.ts:399
+	// contracts/mahber.algo.ts:407
 	// intermediateChallengesBoxIndex = cPrevBoxIndex
 	frame_dig -5 // cPrevBoxIndex: uint64
 	frame_bury 6 // intermediateChallengesBoxIndex: uint64
 
-	// contracts/mahber.algo.ts:400
+	// contracts/mahber.algo.ts:408
 	// intermediateChallengesBoxOffset = cPrevOffset + CHALLENGE_SIZE
 	frame_dig -6 // cPrevOffset: uint64
 	int 32
@@ -1209,7 +1213,7 @@ computeIndividualChallenge:
 	frame_bury 7 // intermediateChallengesBoxOffset: uint64
 
 	// if1_condition
-	// contracts/mahber.algo.ts:401
+	// contracts/mahber.algo.ts:409
 	// intermediateChallengesBoxOffset === MAX_BOX_BYTES
 	frame_dig 7 // intermediateChallengesBoxOffset: uint64
 	int 32768
@@ -1217,20 +1221,20 @@ computeIndividualChallenge:
 	bz if1_end
 
 	// if1_consequent
-	// contracts/mahber.algo.ts:403
+	// contracts/mahber.algo.ts:411
 	// intermediateChallengesBoxIndex = intermediateChallengesBoxIndex + 1
 	frame_dig 6 // intermediateChallengesBoxIndex: uint64
 	int 1
 	+
 	frame_bury 6 // intermediateChallengesBoxIndex: uint64
 
-	// contracts/mahber.algo.ts:404
+	// contracts/mahber.algo.ts:412
 	// intermediateChallengesBoxOffset = 0
 	int 0
 	frame_bury 7 // intermediateChallengesBoxOffset: uint64
 
 if1_end:
-	// contracts/mahber.algo.ts:412
+	// contracts/mahber.algo.ts:420
 	// intermediateChallengesBoxId = sha256(
 	//       concat(concat(sha256(msg), "precomputedChallenges"), itob(intermediateChallengesBoxIndex))
 	//     )
@@ -1244,7 +1248,7 @@ if1_end:
 	sha256
 	frame_bury 8 // intermediateChallengesBoxId: byte[32]
 
-	// contracts/mahber.algo.ts:415
+	// contracts/mahber.algo.ts:423
 	// this.intermediateChallengesBoxes(intermediateChallengesBoxId).replace(
 	//       intermediateChallengesBoxOffset,
 	//       computedChallenge
@@ -1254,7 +1258,7 @@ if1_end:
 	frame_dig 5 // computedChallenge: byte[]
 	box_replace
 
-	// contracts/mahber.algo.ts:419
+	// contracts/mahber.algo.ts:427
 	// return [intermediateChallengesBoxId, intermediateChallengesBoxOffset];
 	frame_dig 8 // intermediateChallengesBoxId: byte[32]
 	frame_dig 7 // intermediateChallengesBoxOffset: uint64
@@ -1282,7 +1286,7 @@ call_NoOp:
 	method "publicPointAdd(byte[],byte[])byte[]"
 	method "publicHashPointToPoint(byte[])byte[]"
 	method "publicChallenge(byte[],byte[],byte[],byte[],byte[])byte[]"
-	method "publicChallengeLsig(byte[],byte[],byte[],byte[],byte[],pay)void"
+	method "publicChallengeLsig(byte[],byte[],byte[],byte[],byte[],pay,byte[])void"
 	method "deposit(pay,byte[])uint64[]"
 	method "initWithdrawalSession(pay,byte[],byte[])byte[32]"
 	method "createUploadPrecomputedChallengesBox(pay,byte[],uint64,uint64)byte[32]"
