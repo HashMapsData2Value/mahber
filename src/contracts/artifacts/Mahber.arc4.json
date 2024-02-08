@@ -5,22 +5,19 @@
     {
       "name": "createApplication",
       "args": [],
-      "desc": "",
       "returns": {
-        "type": "void",
-        "desc": ""
+        "type": "void"
       }
     },
     {
       "name": "dummyOpUp",
+      "desc": "Dummy Op UpDummy operation to get more opcode budget@i- The number to return, necssary to deduplicate the name",
       "args": [
         {
           "name": "i",
-          "type": "uint64",
-          "desc": ""
+          "type": "uint64"
         }
       ],
-      "desc": "Dummy Op UpDummy operation to get more opcode budget@i- The number to return, necssary to deduplicate the name",
       "returns": {
         "type": "uint64",
         "desc": "the number (but we do nothing with it)"
@@ -28,14 +25,13 @@
     },
     {
       "name": "publicScalarMultBase",
+      "desc": "publicScalarMultBasePublic wrapper around the scalarMultBase method, allowing it to be tested directly.@scalar- The scalar to multiply the basepoint by.",
       "args": [
         {
           "name": "scalar",
-          "type": "byte[]",
-          "desc": ""
+          "type": "byte[]"
         }
       ],
-      "desc": "publicScalarMultBasePublic wrapper around the scalarMultBase method, allowing it to be tested directly.@scalar- The scalar to multiply the basepoint by.",
       "returns": {
         "type": "byte[]",
         "desc": "the content of the scalarMultBase call"
@@ -43,19 +39,17 @@
     },
     {
       "name": "publicScalarMult",
+      "desc": "publicScalarMultPublic wrapper around the scalarMult method, allowing it to be tested directly.@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar",
       "args": [
         {
           "name": "scalar",
-          "type": "byte[]",
-          "desc": ""
+          "type": "byte[]"
         },
         {
           "name": "point",
-          "type": "byte[]",
-          "desc": ""
+          "type": "byte[]"
         }
       ],
-      "desc": "publicScalarMultPublic wrapper around the scalarMult method, allowing it to be tested directly.@scalar- The scalar to multiply the point with@point- The point that is multiplied with the scalar",
       "returns": {
         "type": "byte[]",
         "desc": "the content of the scalarMult call"
@@ -63,14 +57,13 @@
     },
     {
       "name": "publicValidPoint",
+      "desc": "publicValidPointPublic wrapper around the validPoint method, allowing it to be tested directly.@point- The point to check",
       "args": [
         {
           "name": "point",
-          "type": "byte[]",
-          "desc": ""
+          "type": "byte[]"
         }
       ],
-      "desc": "publicValidPointPublic wrapper around the validPoint method, allowing it to be tested directly.@point- The point to check",
       "returns": {
         "type": "bool",
         "desc": "the content of the validPoint call"
@@ -78,6 +71,7 @@
     },
     {
       "name": "publicPointAdd",
+      "desc": "publicPointAddPublic wrapper around the pointAdd method, allowing it to be tested directly.",
       "args": [
         {
           "name": "pointA",
@@ -90,7 +84,6 @@
           "desc": "The second point"
         }
       ],
-      "desc": "publicPointAddPublic wrapper around the pointAdd method, allowing it to be tested directly.",
       "returns": {
         "type": "byte[]",
         "desc": "the content of the pointAdd call"
@@ -98,6 +91,7 @@
     },
     {
       "name": "publicHashPointToPoint",
+      "desc": "publicHashPointToPointPublic wrapper around the hashPointToPoint method, allowing it to be tested directly.",
       "args": [
         {
           "name": "point",
@@ -105,7 +99,6 @@
           "desc": "The point to hash"
         }
       ],
-      "desc": "publicHashPointToPointPublic wrapper around the hashPointToPoint method, allowing it to be tested directly.",
       "returns": {
         "type": "byte[]",
         "desc": "the content of the hashPointToPoint call"
@@ -113,6 +106,7 @@
     },
     {
       "name": "publicChallenge",
+      "desc": "publicChallengePublic wrapper around the challenge method, allowing it to be tested directly.",
       "args": [
         {
           "name": "msg",
@@ -140,7 +134,6 @@
           "desc": "The key image of the signer, required for linkabiltiy to prevent double spending"
         }
       ],
-      "desc": "publicChallengePublic wrapper around the challenge method, allowing it to be tested directly.",
       "returns": {
         "type": "byte[]",
         "desc": "- the content of the privateChallenge call"
@@ -148,11 +141,11 @@
     },
     {
       "name": "deposit",
+      "desc": "depositDeposit funds + public key into the contract",
       "args": [
         {
           "name": "depositTxn",
-          "type": "pay",
-          "desc": ""
+          "type": "pay"
         },
         {
           "name": "pk",
@@ -160,10 +153,147 @@
           "desc": "The public key to depositTODO: Add custom EdDSA to check that the depositor knows the secret key. Useful to prevent rogue key attack, adding the negative of another pk."
         }
       ],
-      "desc": "depositDeposit funds + public key into the contract",
       "returns": {
         "type": "uint64[]",
         "desc": "- the number id of the public key, if successful. fails if unsuccessful."
+      }
+    },
+    {
+      "name": "initWithdrawalSession",
+      "desc": "initWithdrawalCreates a box representing a \"withdrawal session\".Of key importance is the signed message string, which must contain the following:Ring Size - Chosen number of PKs, i.e. size of anonymity setKey Image - The keyimage, the one thing that is unique for a withdrawalApp Id - The id of the smart contract appNominal amount - The denomination of the contract, what was deposited originallyASA ID - Clarifies the ASA ID. (Plain Algo has ID 0, \"the default\" asset of Algorand)Withdrawal Address - Address of the final recipient of the fundsRelayer Address - Address of the relayer, facilitating the withdrawal (could be same as withdrawal address)Relayer Fee - The fee the relayer charges for facilitating the withdrawal (could be 0)The hash of the message becomes the id of the withdrawal session's box.",
+      "args": [
+        {
+          "name": "mbbrDepositTxn",
+          "type": "pay",
+          "desc": "The transaction that deposited the MBBR"
+        },
+        {
+          "name": "msg",
+          "type": "byte[]",
+          "desc": "Signed message"
+        },
+        {
+          "name": "initialChallenge",
+          "type": "byte[]",
+          "desc": "The initial challenge, which needs to be re-created to verify the ring signature"
+        }
+      ],
+      "returns": {
+        "type": "byte[32]",
+        "desc": "- the id of the withdrawal session box"
+      }
+    },
+    {
+      "name": "createUploadPrecomputedChallengesBox",
+      "desc": "TODO: destroyWithdrawalSession, IF SESSION LOCKED",
+      "args": [
+        {
+          "name": "mbbrDepositTxn",
+          "type": "pay"
+        },
+        {
+          "name": "msg",
+          "type": "byte[]"
+        },
+        {
+          "name": "boxIndex",
+          "type": "uint64"
+        },
+        {
+          "name": "boxSize",
+          "type": "uint64"
+        }
+      ],
+      "returns": {
+        "type": "byte[32]"
+      }
+    },
+    {
+      "name": "uploadPrecomputedChallenges",
+      "desc": "uploadPrecomputedChallengesCreates a box and uploads the precomputed challenges into it.",
+      "args": [
+        {
+          "name": "msg",
+          "type": "byte[]",
+          "desc": "Msg, functioning as the id for the withdrawal session"
+        },
+        {
+          "name": "boxIndex",
+          "type": "uint64"
+        },
+        {
+          "name": "precomputedChallenges",
+          "type": "byte[]"
+        }
+      ],
+      "returns": {
+        "type": "byte[32]"
+      }
+    },
+    {
+      "name": "createIntermediateChallengesBox",
+      "desc": "createIntermediateChallengesBoxCreates a box that will be used to contain intermediateChallengesBox.Should eventually be a mirror image of the corresponding uploadPrecomputedChallengesBox.",
+      "args": [
+        {
+          "name": "mbbrDepositTxn",
+          "type": "pay"
+        },
+        {
+          "name": "msg",
+          "type": "byte[]",
+          "desc": "Msg, functioning as the id for the withdrawal session"
+        },
+        {
+          "name": "boxIndex",
+          "type": "uint64",
+          "desc": "The index of the precomputed challenge box, incrementing with each chunk of date."
+        },
+        {
+          "name": "boxSize",
+          "type": "uint64",
+          "desc": "The size of the precomputed challenge box"
+        }
+      ],
+      "returns": {
+        "type": "byte[32]",
+        "desc": "- the id of the precomputed challenge box"
+      }
+    },
+    {
+      "name": "computeIndividualChallenge",
+      "desc": "computeIndividualChallengeComputes an individual challenge.Note that the previous challenge is loaded specifically from the precomputed challenges box.While the calculated challenge is loaded into the intermediate challenges box.At the end we will compare if the two boxes are the same, and of course that the last challenge is the same as the initial challenge.By loading specifically from the precomputed challenges box we can verify in parallell.The odds of being able to arrive at the same initial challenge in the last challenge is astronomically low UNLESS it is a valid ring signature.Public keys are of course loaded from the contract storage.",
+      "args": [
+        {
+          "name": "msg",
+          "type": "byte[]",
+          "desc": "The message to be signed"
+        },
+        {
+          "name": "nonce",
+          "type": "byte[]",
+          "desc": "The nonce, part of the ring signature itself, aka one of the fake secret keys"
+        },
+        {
+          "name": "pkIndex",
+          "type": "uint64",
+          "desc": "The index number of the public key in the smart contract storage"
+        },
+        {
+          "name": "keyImage",
+          "type": "byte[]",
+          "desc": "The key image of the signer, required for linkabiltiy to prevent double spending"
+        },
+        {
+          "name": "cPrevBoxIndex",
+          "type": "uint64"
+        },
+        {
+          "name": "cPrevOffset",
+          "type": "uint64"
+        }
+      ],
+      "returns": {
+        "type": "(byte[32],uint64)"
       }
     }
   ]

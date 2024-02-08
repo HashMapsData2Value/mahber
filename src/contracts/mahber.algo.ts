@@ -32,18 +32,18 @@ class Mahber extends Contract {
 
   // Session BOXES
   // Each withdrawal attempt has a session box, which contains certain information.
-  sessionsBoxes = BoxMap<bytes, bytes>();
+  sessionsBoxes = BoxMap<bytes, bytes>({ allowPotentialCollisions: true });
 
   // Precomputed Challenges Boxes
-  precomputedChallengesBoxes = BoxMap<bytes, bytes>();
+  precomputedChallengesBoxes = BoxMap<bytes, bytes>({ allowPotentialCollisions: true });
 
   // Intermediate Challenges Boxes
-  intermediateChallengesBoxes = BoxMap<bytes, bytes>();
+  intermediateChallengesBoxes = BoxMap<bytes, bytes>({ allowPotentialCollisions: true });
 
   createApplication(): void {
     // Initialize global state
     this.denomination.value = 1000 * 1000000;
-    this.asaId = 0; // Algo, the "default" ASA
+    this.asaId.value = 0; // Algo, the "default" ASA
     this.pkIndex.value = 0;
   }
 
@@ -62,8 +62,7 @@ class Mahber extends Contract {
    * @returns a point on the curve
    */
   private scalarMultBase(scalar: bytes): bytes {
-    // @ts-ignore
-    const result = ec_scalar_mul(
+    const result = ecScalarMul(
       "BN254g1",
       hex(
         "00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002"
@@ -89,8 +88,7 @@ class Mahber extends Contract {
    * @returns a point on the curve
    */
   private scalarMult(scalar: bytes, point: bytes): bytes {
-    // @ts-ignore
-    const result = ec_scalar_mul("BN254g1", point, scalar);
+    const result = ecScalarMul("BN254g1", point, scalar);
     return result;
   }
 
@@ -110,8 +108,7 @@ class Mahber extends Contract {
    * @returns true if the point is valid, false otherwise
    */
   private validPoint(point: bytes): boolean {
-    // @ts-ignore
-    return ec_subgroup_check("BN254g1", point);
+    return ecSubgroupCheck("BN254g1", point);
   }
 
   /** publicValidPoint
@@ -130,8 +127,7 @@ class Mahber extends Contract {
    * @returns The result of the operation
    */
   private pointAdd(pointA: bytes, pointB: bytes): bytes {
-    // @ts-ignore
-    const result = ec_add("BN254g1", pointA, pointB);
+    const result = ecAdd("BN254g1", pointA, pointB);
     return result;
   }
 
@@ -159,8 +155,7 @@ class Mahber extends Contract {
     const hash = sha256(point);
     const fpElement =
       btobigint(hash) % btobigint(hex("30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47")); // 21888242871839275222246405745257275088696311157297823662689037894645226208583;
-    // @ts-ignore
-    const result = ec_map_to("BN254g1", fpElement);
+    const result = ecMapTo("BN254g1", rawBytes(fpElement));
     return result;
   }
 
@@ -204,8 +199,7 @@ class Mahber extends Contract {
     const h =
       btobigint(sha256(concat(concat(msg, left), right))) %
       btobigint(hex("0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001")); // 21888242871839275222246405745257275088548364400416034343698204186575808495617
-    // @ts-ignore
-    return h as bytes;
+    return rawBytes(h);
   }
 
   /** publicChallenge
@@ -287,7 +281,7 @@ class Mahber extends Contract {
    * @param initialChallenge - The initial challenge, which needs to be re-created to verify the ring signature
    * @returns - the id of the withdrawal session box
    */
-  initWithdrawalSession(mbbrDepositTxn: PayTxn, msg: bytes, initialChallenge: bytes): bytes {
+  initWithdrawalSession(mbbrDepositTxn: PayTxn, msg: bytes, initialChallenge: bytes): bytes32 {
     // TODO: verify relayer address is session creator, to prevent relayers screwing each other over
     // TODO: verify mbbr is enough to cover the box creation fee
     // TODO: verify message characer length is correct
@@ -310,7 +304,7 @@ class Mahber extends Contract {
    * @param boxSize - The size of the precomputed challenge box
    * @returns - the id of the precomputed challenge box
    */
-  createUploadPrecomputedChallengesBox(mbbrDepositTxn: PayTxn, msg: bytes, boxIndex: uint64, boxSize: uint64): bytes {
+  createUploadPrecomputedChallengesBox(mbbrDepositTxn: PayTxn, msg: bytes, boxIndex: uint64, boxSize: uint64): bytes32 {
     // TODO: verify relayer address is session creator, to prevent relayers screwing with each other
     // TODO: verify relayer has enough MBBR to cover the box creation fee
     // TODO: CHECK IF SESSION IS LOCKED, IN WHICH CASE NO CHANGE CAN BE MADE FOR THIS ID!
@@ -326,7 +320,7 @@ class Mahber extends Contract {
    * @param precomputedChallenges - The precomputed challenges
    * @returns - the id of the precomputed challenge box
    */
-  uploadPrecomputedChallenges(msg: bytes, boxIndex: uint64, precomputedChallenges: bytes): bytes {
+  uploadPrecomputedChallenges(msg: bytes, boxIndex: uint64, precomputedChallenges: bytes): bytes32 {
     // TODO: verify relayer address is session creator, to prevent others overwriting the precomputed challenges
     // TODO: CHECK IF SESSION IS LOCKED, IN WHICH CASE NO CHANGE CAN BE MADE FOR THIS ID!
     const boxId = sha256(concat(concat(sha256(msg), "precomputedChallenges"), itob(boxIndex)));
@@ -342,7 +336,7 @@ class Mahber extends Contract {
    * @param boxSize - The size of the precomputed challenge box
    * @returns - the id of the precomputed challenge box
    */
-  createIntermediateChallengesBox(mbbrDepositTxn: PayTxn, msg: bytes, boxIndex: uint64, boxSize: uint64): bytes {
+  createIntermediateChallengesBox(mbbrDepositTxn: PayTxn, msg: bytes, boxIndex: uint64, boxSize: uint64): bytes32 {
     // TODO: verify relayer address is session creator, to prevent relayers screwing with each other
     // TODO: verify relayer has enough MBBR to cover the box creation fee
     // TODO: CHECK IF SESSION IS LOCKED, IN WHICH CASE NO CHANGE CAN BE MADE FOR THIS ID!
@@ -375,7 +369,7 @@ class Mahber extends Contract {
     keyImage: bytes,
     cPrevBoxIndex: uint64,
     cPrevOffset: uint64
-  ): [bytes, uint64] {
+  ): [bytes32, uint64] {
     // TODO: extract PK from storage using index
     // TODO: extract cPrev from precomputed storage using index
 
@@ -423,9 +417,9 @@ class Mahber extends Contract {
    * Since
    * @param msg - the msg, which acts as id for the withdrawal session
    */
-  verifyChallengesEqualIncrement(msg: bytes, boxIndex: uint64, half: uint64): bytes {
-    // check if "lock" has been set! If not nothing can be done
-  }
+  // verifyChallengesEqualIncrement(msg: bytes, boxIndex: uint64, half: uint64): bytes {
+  //   // check if "lock" has been set! If not nothing can be done
+  // }
 
   // TODO:
   /** finalPayOutCheck
