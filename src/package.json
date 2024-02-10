@@ -4,21 +4,21 @@
   "license": "MIT",
   "scripts": {
     "generate-client": "algokitgen generate -a contracts/artifacts/Mahber.arc32.json -o contracts/clients/MahberClient.ts",
-    "compile-contract": "tealscript contracts/mahber.algo.ts contracts/artifacts",
-    "generate-components": "algokit-generate-component contracts/artifacts/Mahber.arc32.json contracts/artifacts/components",
-    "build": "npm run compile-contract && npm run generate-client",
+    "compile-contracts": "tealscript contracts/*.algo.ts contracts/artifacts",
+    "generate-clients": "algokit generate client contracts/artifacts/ --language typescript  --output contracts/clients/{contract_name}Client.ts",
+    "build": "npm run compile-contracts && npm run generate-clients",
     "test": "npm run build && jest",
     "lint": "eslint . --ext .ts",
     "fix": "eslint . --ext .ts --fix"
   },
   "dependencies": {
-    "@algorandfoundation/algokit-utils": "^2.2.0",
+    "@algorandfoundation/algokit-utils": "^5.3.2",
     "@noble/curves": "^1.2.0",
     "algosdk": "^2.4.0"
   },
   "devDependencies": {
     "@algorandfoundation/algokit-client-generator": "^2.2.1",
-    "@algorandfoundation/tealscript": "^0.79.0",
+    "@algorandfoundation/tealscript": "^0.79.2",
     "@jest/globals": "^29.5.0",
     "@joe-p/algokit-generate-component": "^0.2.0",
     "@typescript-eslint/eslint-plugin": "^5.13.0",

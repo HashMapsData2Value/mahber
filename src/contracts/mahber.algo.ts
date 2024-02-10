@@ -1,4 +1,5 @@
 import { Contract } from "@algorandfoundation/tealscript";
+import { MahberChallengeLsig } from "./challenge_lsig.algo";
 
 const MAX_BOX_BYTES = 32768; // 32 KB
 const CURVE_POINT_SIZE = 64; // 64 bytes for BN254 curve points (point.X || point.Y)
@@ -213,6 +214,27 @@ class Mahber extends Contract {
    */
   publicChallenge(msg: bytes, nonce: bytes, cPrev: bytes, pk: bytes, keyImage: bytes): bytes {
     return this.challenge(msg, nonce, cPrev, pk, keyImage);
+  }
+
+  /** publicChallenge
+   * Public wrapper around the challenge method, allowing it to be tested directly.
+   * @param msg - The message to be signed
+   * @param nonce - The nonce, part of the ring signature itself, aka one of the fake secret keys
+   * @param cPrev - The previous challenge, or the base challenge if this is the first link (in which case it is part of the ring sig)
+   * @param pk - The specific public key in the ƒring (indexed from the array of public keys)
+   * @param keyImage - The key image of the signer, required for linkabiltiy to prevent double spending
+   * @returns - the content of the privateChallenge call
+   */
+  publicChallengeLsig(
+    msg: bytes,
+    nonce: bytes,
+    cPrev: bytes,
+    pk: bytes,
+    keyImage: bytes,
+    lsigTxn: PayTxn,
+    output: bytes
+  ): void {
+    verifyTxn(lsigTxn, { sender: Address.fromBytes(MahberChallengeLsig.address()) });
   }
 
   /** deposit

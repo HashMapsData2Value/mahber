@@ -140,6 +140,49 @@
       }
     },
     {
+      "name": "publicChallengeLsig",
+      "desc": "publicChallengePublic wrapper around the challenge method, allowing it to be tested directly.",
+      "args": [
+        {
+          "name": "msg",
+          "type": "byte[]",
+          "desc": "The message to be signed"
+        },
+        {
+          "name": "nonce",
+          "type": "byte[]",
+          "desc": "The nonce, part of the ring signature itself, aka one of the fake secret keys"
+        },
+        {
+          "name": "cPrev",
+          "type": "byte[]",
+          "desc": "The previous challenge, or the base challenge if this is the first link (in which case it is part of the ring sig)"
+        },
+        {
+          "name": "pk",
+          "type": "byte[]",
+          "desc": "The specific public key in the ƒring (indexed from the array of public keys)"
+        },
+        {
+          "name": "keyImage",
+          "type": "byte[]",
+          "desc": "The key image of the signer, required for linkabiltiy to prevent double spending"
+        },
+        {
+          "name": "lsigTxn",
+          "type": "pay"
+        },
+        {
+          "name": "output",
+          "type": "byte[]"
+        }
+      ],
+      "returns": {
+        "type": "void",
+        "desc": "- the content of the privateChallenge call"
+      }
+    },
+    {
       "name": "deposit",
       "desc": "depositDeposit funds + public key into the contract",
       "args": [

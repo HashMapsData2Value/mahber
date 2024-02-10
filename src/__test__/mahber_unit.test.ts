@@ -3,6 +3,9 @@
 /* eslint-disable no-plusplus */
 import { describe, test, expect, beforeAll, beforeEach } from "@jest/globals";
 import { algorandFixture } from "@algorandfoundation/algokit-utils/testing";
+import { readFileSync } from "fs";
+import algosdk from "algosdk";
+import { microAlgos } from "@algorandfoundation/algokit-utils";
 import { MahberClient } from "../contracts/clients/MahberClient";
 
 const fixture = algorandFixture();
@@ -178,5 +181,72 @@ describe("Mahber - Unit Tests", () => {
       31, 23, 238, 26, 160, 14, 69, 231, 97, 21, 127, 13, 99, 116, 63, 10, 113, 187, 137, 219, 27, 244, 80, 61, 19, 14,
       234, 70, 151, 175, 55, 199,
     ]);
+  });
+
+  test("lsig challenge", async () => {
+    const { algod } = fixture.context;
+    const nonce = new Uint8Array([
+      46, 156, 236, 248, 53, 50, 159, 170, 109, 169, 33, 158, 103, 180, 57, 80, 45, 125, 194, 252, 175, 92, 76, 230, 42,
+      18, 31, 135, 164, 88, 110, 100,
+    ]);
+    const cPrev = new Uint8Array([
+      10, 242, 224, 61, 122, 18, 136, 168, 107, 81, 128, 119, 234, 141, 99, 16, 48, 109, 145, 6, 165, 41, 159, 175, 35,
+      161, 119, 221, 171, 37, 20, 143,
+    ]);
+    const pk = new Uint8Array([
+      46, 202, 152, 28, 229, 99, 170, 207, 25, 15, 76, 176, 41, 90, 186, 29, 18, 175, 126, 183, 69, 186, 134, 67, 137,
+      130, 204, 150, 101, 180, 58, 11, 20, 231, 21, 98, 227, 162, 44, 149, 112, 24, 20, 219, 254, 187, 147, 46, 82, 60,
+      232, 80, 19, 248, 27, 9, 175, 1, 235, 49, 63, 192, 225, 82,
+    ]);
+    const keyImage = new Uint8Array([
+      44, 6, 251, 206, 14, 47, 48, 192, 109, 48, 17, 22, 179, 194, 233, 24, 115, 237, 71, 95, 249, 32, 235, 161, 152,
+      236, 60, 30, 196, 74, 2, 161, 38, 223, 24, 19, 52, 138, 189, 23, 133, 217, 202, 20, 31, 102, 61, 97, 160, 130, 31,
+      238, 181, 244, 155, 126, 196, 87, 125, 121, 0, 75, 219, 53,
+    ]);
+
+    const msg = new Uint8Array([104, 101, 108, 108, 111]); // Hello
+
+    const output = new Uint8Array([
+      31, 23, 238, 26, 160, 14, 69, 231, 97, 21, 127, 13, 99, 116, 63, 10, 113, 187, 137, 219, 27, 244, 80, 61, 19, 14,
+      234, 70, 151, 175, 55, 199,
+    ]);
+
+    const lsigTeal = readFileSync("./contracts/artifacts/MahberChallengeLsig.lsig.teal").toString("utf-8");
+
+    const compileResult = await algod.compile(lsigTeal).do();
+
+    const abiBytes = algosdk.ABIType.from("byte[]");
+
+    const lsig = new algosdk.LogicSigAccount(
+      Buffer.from(compileResult.result, "base64"),
+      [msg, nonce, cPrev, pk, keyImage].map((v) => abiBytes.encode(v))
+    );
+
+    const sp = await algod.getTransactionParams().do();
+
+    const lsigPayTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+      suggestedParams: { ...sp, flatFee: true, fee: 0 },
+      from: lsig.address(),
+      to: lsig.address(),
+      amount: 0,
+    });
+
+    await appClient.publicChallengeLsig(
+      {
+        msg,
+        nonce,
+        cPrev,
+        pk,
+        keyImage,
+        output,
+        lsigTxn: {
+          transaction: lsigPayTxn,
+          signer: lsig,
+        },
+      },
+      { sendParams: { fee: microAlgos(2000) } }
+    );
+
+    console.log(lsig.lsig.address());
   });
 });
